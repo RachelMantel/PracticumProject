@@ -1,0 +1,6 @@
+@TuneYourMood_HostAddress = http://localhost:5277
+
+GET {{TuneYourMood_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
