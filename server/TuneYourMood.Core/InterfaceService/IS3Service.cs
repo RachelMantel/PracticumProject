@@ -11,7 +11,6 @@ namespace TuneYourMood.Core.InterfaceService
     {
         Task<string> GeneratePresignedUrlAsync(string fileName, string contentType);
         Task<string> GetDownloadUrlAsync(string fileName);
-        Task<bool> UploadFileAsync(IFormFile file, string fileName);
         public string BucketName();
     }
 }

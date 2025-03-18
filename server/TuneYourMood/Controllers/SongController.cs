@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using Amazon.S3;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneYourMood.Api.PostModels;
@@ -72,29 +74,6 @@ namespace TuneYourMood.Api.Controllers
             var url = await _s3Service.GeneratePresignedUrlAsync(fileName, contentType);
             return Ok(new { url });
         }
-
-        //[HttpPost("upload")]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return BadRequest("No file uploaded.");
-
-        //    // Generate a unique file name (to prevent overwriting files with the same name)
-        //    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-
-        //    // נניח שאתה משתמש בשירות S3 שהגדרת קודם לכן
-        //    var uploadResult = await _s3Service.UploadFileAsync(file, fileName);
-        //    if (uploadResult)
-        //    {
-        //        // משתמשים ב-BucketName מתוך השירות
-        //        return Ok(new { FileUrl = $"https://{_s3Service.BucketName()}.s3.amazonaws.com/{fileName}" });
-        //    }
-        //    else
-        //    {
-        //        return StatusCode(500, "File upload failed.");
-        //    }
-        //}
 
 
         // ⬇️ קבלת URL להורדת קובץ מה-S3

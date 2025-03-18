@@ -1,21 +1,26 @@
-// Layout.tsx
 import { Outlet } from "react-router-dom";
-import AuthButtons from "./AuthButtons"; // אפשר להכניס את הכפתורים ב-Layout
+import AuthButtons from "./AuthButtons";
+import { AppBar, Toolbar, Typography, Container, Box } from "@mui/material";
 
 const Layout = () => {
   return (
-    <div>
-      <header>
-        <h1>My App</h1>
-        <AuthButtons />
-      </header>
-      <main>
-        <Outlet /> {/* כאן ייטענו כל הקומפוננטות לפי הניתוב */}
-      </main>
-      <footer>
-        <p>&copy; 2025 My App</p>
-      </footer>
-    </div>
+    <Box sx={{ bgcolor: "white", minHeight: "100vh" }}>
+      {/* Header */}
+      <AppBar position="static" sx={{ bgcolor: "black" }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Typography variant="h5" sx={{ color: "#E91E63", fontWeight: "bold" }}>
+            Tune your mood!
+          </Typography>
+          <AuthButtons />
+        </Toolbar>
+      </AppBar>
+
+      {/* Main Content */}
+      <Container sx={{ py: 4 }}>
+        <Outlet />
+      </Container>
+
+    </Box>
   );
 };
 
