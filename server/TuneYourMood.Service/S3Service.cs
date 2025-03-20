@@ -56,19 +56,20 @@ namespace TuneYourMood.Service
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
-                Key = fileName,  
+                Key = fileName,
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMinutes(30) // תוקף של 30 דקות
+                Expires = DateTime.UtcNow.AddDays(7) // תוקף של 7 ימים
             };
 
-   
             string url = _s3Client.GetPreSignedURL(request);
 
             return url;
         }
 
 
+
     }
 }
+
 
 

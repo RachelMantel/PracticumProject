@@ -13,14 +13,17 @@ namespace TuneYourMood.Data.Repositories
 
         public IUserRepository _userRepository { get; set; }
         public ISongRepository _songRepository { get; set; }
+        public IFolderRepository _folderRepository { get; set; }
 
         public RepositoryManager(DataContext context,
             IUserRepository userRepository,
-            ISongRepository songRepository)
+            ISongRepository songRepository,
+            IFolderRepository folderRepository)
         {
             _context = context;
             _userRepository = userRepository;
             _songRepository = songRepository;
+            _folderRepository = folderRepository;
         }
 
         public void save()

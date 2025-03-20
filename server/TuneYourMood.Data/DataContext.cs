@@ -13,7 +13,7 @@ namespace TuneYourMood.Data
     {
         public DbSet<UserEntity> usersList { get; set; }
         public DbSet<SongEntity> songsList { get; set; }
-
+        public DbSet<FolderEntity> foldersList { get; set; }
         public DbSet<RoleEntity> rolesList { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)

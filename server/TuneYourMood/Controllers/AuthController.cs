@@ -32,7 +32,7 @@ namespace TuneYourMood.Api.Controllers
                 return BadRequest("User data is required.");
 
             var userDto = _mapper.Map<UserDto>(user);
-        user.DateRegistration = DateTime.Today;
+            user.DateRegistration = DateTime.Today;
             var result = await _authService.Register(userDto);
 
             if (result.IsSuccess)

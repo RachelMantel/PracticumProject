@@ -36,9 +36,12 @@ builder.Services.AddDbContext<DataContext>(option =>
 
 // ?? הוספת תלויות (Dependency Injection)
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISongService, SongService>();
+builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IService<SongDto>, SongService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISongRepository, SongRepository>();
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();

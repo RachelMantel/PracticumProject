@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TuneYourMood.Data;
 
@@ -11,9 +12,11 @@ using TuneYourMood.Data;
 namespace TuneYourMood.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250318145032_folder")]
+    partial class folder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,9 +116,6 @@ namespace TuneYourMood.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("FolderEntityId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("SongName")

@@ -12,7 +12,7 @@ namespace TuneYourMood.Api
         {
             CreateMap<UserPostModel, UserDto>();
             CreateMap<SongPostModel, SongDto>();
-
+            CreateMap<FolderPostModel, FolderDto>();
         }
     }
 }

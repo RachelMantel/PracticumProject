@@ -1,19 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { UserType } from "../../models/userType";
 
+// API URL
 const API_URL = "https://localhost:7238/api/Auth";
 
-// 🎯 מבנה הנתונים של המשתמש
-export type UserType = {
-  userId?: string;
-  name: string;
-  email: string;
-  password?: string; // לא נשמור סיסמה ב-Redux למען האבטחה
-  dateRegistration: Date;
+// Validate email format
+const validateEmail = (email: string) => {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
 };
 
-// 🎯 מבנה הנתונים של ה-AuthState
 export type AuthState = {
   token: string | null;
   user: UserType | null;
@@ -28,37 +26,41 @@ const initialState: AuthState = {
   error: null,
 };
 
-// 🔹 רישום משתמש
 export const registerUser = createAsyncThunk(
   "auth/register",
   async ({ name, email, password }: { name: string; email: string; password: string }, thunkAPI) => {
     try {
+      // Validate the email format
+      if (!validateEmail(email)) {
+        throw new Error("Invalid email format");
+      }
+
       const response = await axios.post(`${API_URL}/register`, { name, email, password });
       const { token, user } = response.data;
-      
+
+      // Save to local storage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      
+
       Swal.fire("Success!", "Your account has been created!", "success");
       return { token, user };
     } catch (e: any) {
-      Swal.fire("Error!", "Registration failed. Please try again.", "error");
-      return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+      Swal.fire("Error!", e.message || "Registration failed. Please try again.", "error");
+      return thunkAPI.rejectWithValue(e.message || e.response?.data?.message || e.message);
     }
   }
 );
 
-// 🔹 כניסת משתמש
 export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ userNameOrEmail, password }: { userNameOrEmail: string; password: string }, thunkAPI) => {
     try {
       const response = await axios.post(`${API_URL}/login`, { userNameOrEmail, password });
       const { token, user } = response.data;
-      
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      
+
       Swal.fire("Success!", "You have successfully logged in!", "success");
       return { token, user };
     } catch (e: any) {
@@ -68,14 +70,13 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 🔹 יציאת משתמש
 export const logout = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
 });
 
-// 🎯 Slice של ה-Auth
+// 🎯 Auth Slice
 const AuthSlice = createSlice({
   name: "auth",
   initialState,
@@ -116,3 +117,4 @@ const AuthSlice = createSlice({
 });
 
 export default AuthSlice;
+

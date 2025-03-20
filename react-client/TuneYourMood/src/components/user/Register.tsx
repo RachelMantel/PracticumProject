@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, StoreType } from "./redux/store";
-import { registerUser } from "./redux/AuthSlice";
+import { AppDispatch, StoreType } from "../redux/store";
+import { registerUser } from "../redux/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, Box, Typography, Paper, IconButton, CircularProgress } from "@mui/material";
 import { PersonAdd, Close } from "@mui/icons-material";

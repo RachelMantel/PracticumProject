@@ -1,9 +1,9 @@
 import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, StoreType } from "./redux/store";
-import { logout } from "./redux/AuthSlice";
+import { AppDispatch, StoreType } from "../redux/store";
+import { logout } from "../redux/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { Button, Stack, Avatar, Menu, MenuItem, IconButton, Typography, Divider } from "@mui/material";
-import { Login, Logout, PersonAdd, AccountCircle } from "@mui/icons-material";
+import { Login, Logout, PersonAdd, AccountCircle, Edit } from "@mui/icons-material";
 import { useState } from "react";
 
 const AuthButtons = () => {
@@ -27,6 +27,11 @@ const AuthButtons = () => {
   };
 
   const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProfile = () => {
+    navigate("/edit-user"); // מעבר לדף הפרופיל
     setAnchorEl(null);
   };
 
@@ -56,6 +61,9 @@ const AuthButtons = () => {
               <Typography variant="body1" fontWeight="bold">{userName}</Typography>
             </MenuItem>
             <Divider />
+            <MenuItem onClick={handleProfile} sx={{ fontWeight: "bold" }}>
+              <Edit sx={{ mr: 1 }} /> Edit
+            </MenuItem>
             <MenuItem onClick={handleLogout} sx={{ color: "#E91E63", fontWeight: "bold" }}>
               <Logout sx={{ mr: 1 }} /> Logout
             </MenuItem>
@@ -76,5 +84,3 @@ const AuthButtons = () => {
 };
 
 export default AuthButtons;
-
-

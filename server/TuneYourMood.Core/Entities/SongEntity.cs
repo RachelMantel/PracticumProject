@@ -18,16 +18,13 @@ namespace TuneYourMood.Core.Entities
 
         public string Artist { get; set; }
 
-        public string? Playlist_name { get; set; }
-
         public string FilePath { get; set; }
         public string mood_category { get; set; }
-
-
+        public int FolderId { get; set; } = -1;
         public UserEntity User { get; set; }
         public SongEntity()
         {
-
+            
         }
     }
 }

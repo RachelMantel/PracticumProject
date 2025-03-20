@@ -10,6 +10,7 @@ namespace TuneYourMood.Core.InterfaceRepository
     {
         IUserRepository _userRepository { get; set; }
         ISongRepository _songRepository { get; set; }
+        IFolderRepository _folderRepository { get; set; }
         void save();
 
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TuneYourMood.Core.DTOs;
 using TuneYourMood.Core.Entities;
 using TuneYourMood.Core.InterfaceRepository;
 
@@ -26,7 +27,7 @@ namespace TuneYourMood.Data.Repositories
 
         public List<SongEntity> GetSongsByUserId(int userId)
         {
-            return  _dbset.Where(song => song.UserId == userId) .ToList();
+            return _dbset.Where(song => song.UserId == userId).ToList();
         }
 
         public async Task<SongEntity> UploadSongAsync(SongEntity song)
@@ -40,6 +41,20 @@ namespace TuneYourMood.Data.Repositories
         {
             var song = await _context.songsList.FindAsync(songId);
             return song?.FilePath;
+        }
+        // פונקציה לשליפת כל השירים לפי Mood
+        public async Task<List<SongEntity>> GetSongsByMoodAsync(string mood)
+        {
+            return await _context.songsList
+                .Where(song => song.mood_category != null && song.mood_category.ToLower() == mood.ToLower())
+                .ToListAsync();
+        }
+
+        //שליפת שירים לפי תקיה
+        public List<SongEntity> GetSongsByFolderId(int folderId)
+        {
+            var songs = _dbset.Where(song => song.FolderId == folderId).ToList();
+            return songs ?? new List<SongEntity>(); // אם כלום לא חזר, מחזיר רשימה ריקה
         }
     }
 }

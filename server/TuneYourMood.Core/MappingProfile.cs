@@ -17,6 +17,8 @@ namespace TuneYourMood.Core
 
             CreateMap<SongEntity, SongDto>().ReverseMap();
 
+            CreateMap<FolderEntity, FolderDto>().ReverseMap();
+
         }
     }
 }

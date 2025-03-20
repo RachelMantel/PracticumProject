@@ -18,9 +18,9 @@ namespace TuneYourMood.Core.DTOs
 
         public string Artist { get; set; }
 
-        public string? Playlist_name { get; set; }
-
         public string FilePath { get; set; }
+
+        public int FolderId { get; set; }
         public string mood_category { get; set; }
     }
 }

@@ -6,15 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 using TuneYourMood.Api.PostModels;
 using TuneYourMood.Core.DTOs;
 using TuneYourMood.Core.InterfaceService;
+using TuneYourMood.Service;
 
 namespace TuneYourMood.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize] // דורש אימות כברירת מחדל לכל הפעולות
-    public class SongController(IService<SongDto> songService, IMapper mapper, IS3Service s3Service) : ControllerBase
+    public class SongController(ISongService songService, IMapper mapper, IS3Service s3Service) : ControllerBase
     {
-        private readonly IService<SongDto> _songService = songService;
+        private readonly ISongService _songService = songService;
         private readonly IMapper _mapper = mapper;
         private readonly IS3Service _s3Service = s3Service;
 
@@ -41,6 +42,7 @@ namespace TuneYourMood.Api.Controllers
         public async Task<ActionResult<SongDto>> Post([FromBody] SongPostModel song)
         {
             var songDto = _mapper.Map<SongDto>(song);
+            songDto.DateAdding = DateTime.Today;
             songDto = await _songService.addAsync(songDto);
             return Ok(songDto);
         }
@@ -82,6 +84,45 @@ namespace TuneYourMood.Api.Controllers
         {
             var url = await _s3Service.GetDownloadUrlAsync(fileName);
             return Ok(new { downloadUrl = url });
+        }
+
+
+        [HttpGet("random-song-by-mood")]
+        public async Task<ActionResult<SongDto>> GetRandomSongByMood([FromQuery] string mood)
+        {
+            if (string.IsNullOrEmpty(mood))
+                return BadRequest("Missing mood");
+
+            var song = await _songService.GetRandomSongByMoodAsync(mood);
+
+            if (song == null)
+                return NotFound("No songs found for the given mood");
+
+            return Ok(song);
+        }
+
+        [HttpGet("user/{userId}")]
+        public  IActionResult GetSongsByUserId(int userId)
+        {
+            var songs =  _songService.GetSongsByUserId(userId);
+
+            if (songs == null || songs.Count == 0)
+            {
+                return NoContent(); 
+            }
+
+            return Ok(songs);
+        }
+
+        [HttpGet("{id}/songs")]
+        public ActionResult<List<SongDto>> GetSongsByFolderId(int id)
+        {
+            var songs = _songService.GetSongsByFolderId(id);
+            if (songs == null || songs.Count == 0)
+                return NotFound("No songs found in this folder.");
+
+            var songDtos = _mapper.Map<List<SongDto>>(songs);
+            return Ok(songDtos);
         }
     }
 }

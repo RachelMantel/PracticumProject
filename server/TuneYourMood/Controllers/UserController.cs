@@ -36,7 +36,6 @@ namespace TuneYourMood.Api.Controllers
 
         // GET api/User/{id}
         [HttpGet("{id}")]
-        //[Authorize(Roles = "Admin")] // רק אדמין יכול לשלוף משתמש לפי ID
         public async Task<ActionResult<UserDto>> Get(int id)
         {
             var user = await _userService.getByIdAsync(id);

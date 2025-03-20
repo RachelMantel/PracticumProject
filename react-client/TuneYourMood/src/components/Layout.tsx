@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import AuthButtons from "./AuthButtons";
 import { AppBar, Toolbar, Typography, Container, Box } from "@mui/material";
+import Header from "./Header";
 
 const Layout = () => {
   return (
@@ -11,7 +11,8 @@ const Layout = () => {
           <Typography variant="h5" sx={{ color: "#E91E63", fontWeight: "bold" }}>
             Tune your mood!
           </Typography>
-          <AuthButtons />
+          {/* <AuthButtons /> */}
+          <Header/>
         </Toolbar>
       </AppBar>
 
