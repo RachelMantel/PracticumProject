@@ -14,8 +14,13 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
 using DotNetEnv;
+using Microsoft.AspNetCore.Hosting;
 
+Env.Load();
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
+string connectionString = Env.GetString("DB_CONNECTION_STRING");
+
 
 // ?? הוספת CORS לכל הקליינטים
 builder.Services.AddCors(options =>
@@ -28,11 +33,22 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ?? חיבור למסד הנתונים
-builder.Services.AddDbContext<DataContext>(option =>
-{
-    option.UseSqlServer("Data Source=DESKTOP-SSNMLFD;Initial Catalog=TuneYourMood;Integrated Security=True;TrustServerCertificate=True;");
-});
+// //?? חיבור למסד הנתונים
+//builder.Services.AddDbContext<DataContext>(option =>
+//{
+//    option.UseSqlServer("Data Source=DESKTOP-SSNMLFD;Initial Catalog=TuneYourMood;Integrated Security=True;TrustServerCertificate=True;");
+//});
+
+//builder.Services.AddDbContext<DataContext>(options =>
+//    options.UseMySql(connectionString, new MySqlServerVersion(new Version(9, 0, 0))));
+
+
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options => options.CommandTimeout(60)));
+
+//builder.Services.AddDbContext<DataContext>(options =>
+//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 // ?? הוספת תלויות (Dependency Injection)
 builder.Services.AddScoped<IUserService, UserService>();
@@ -123,7 +139,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Env.Load();
+
 // מוסיף את המשתנים ל-AppSettings בצורה דינאמית
 builder.Configuration["AWS:BucketName"] = Env.GetString("AWS_BUCKET_NAME");
 builder.Configuration["AWS:Region"] = Env.GetString("AWS_REGION");
@@ -138,6 +154,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
 app.UseCors("AllowAll"); // ?? הפעלת CORS לכל הלקוחות

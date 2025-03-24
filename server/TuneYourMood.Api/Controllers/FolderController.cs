@@ -7,6 +7,7 @@ using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TuneYourMood.Service;
+using TuneYourMood.Core.Entities;
 
 namespace TuneYourMood.Api.Controllers
 {
@@ -44,18 +45,51 @@ namespace TuneYourMood.Api.Controllers
             return Ok(_folderService.GetFoldersByUserId(userId));
         }
 
-        // GET api/Folder/{id}/songs - מחזיר את רשימת השירים בתיקייה מסוימת
-        //[HttpGet("{id}/songs")]
-        //public ActionResult<List<SongDto>> GetSongsByFolderId(int id)
-        //{
-        //    var songs = _folderService.GetSongsByFolderId(id);
-        //    if (songs == null || songs.Count == 0)
-        //        return NotFound("No songs found in this folder.");
+        [HttpGet("songs/{id}")]
+        public ActionResult<List<SongDto>> GetSongsByFolder(int id)
+        {
+            return Ok(_folderService.GetSongsByFolder(id));
+        }
 
-        //    var songDtos = _mapper.Map<List<SongDto>>(songs);
-        //    return Ok(songDtos);
-        //}
+        //הוספת שיר לתקיה
+        [HttpPost("songs/{folderId}")]
+        public ActionResult AddSongToFolder(int folderId, [FromBody] SongDto song)
+        {
+            if (song == null)
+            {
+                return BadRequest(new { message = "Song data is required." });
+            }
 
+            try
+            {
+                _folderService.AddSongToFolder(folderId, song);
+                return Ok(new { message = "Song added to folder successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        //מחיקת שיר מתקיה
+        [HttpDelete("songs/{folderId}")]
+        public ActionResult DeleteSongFromFolder(int folderId, [FromBody] SongDto song)
+        {
+            if (song == null)
+            {
+                return BadRequest(new { message = "Song data is required." });
+            }
+
+            try
+            {
+                _folderService.DeleteSongFromFolder(folderId, song);
+                return Ok(new { message = "Song deleted from folder successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
 
         // POST api/Folder - יצירת תיקייה חדשה
         [HttpPost]

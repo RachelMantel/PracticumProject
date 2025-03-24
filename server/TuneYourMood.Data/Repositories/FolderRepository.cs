@@ -36,17 +36,47 @@ namespace TuneYourMood.Data.Repositories
                 .ToListAsync();
         }
 
-        //public List<SongEntity> GetSongsByFolderId(int folderId)
-        //{
-        //    if (_dbsetSongs == null)
-        //    {
-        //        return new List<SongEntity>(); // אם ה-dbsetSongs לא מאותחל
-        //    }
+        public List<SongEntity> GetSongsByFolder(int folderId)
+        {
+            var folder = _context.foldersList
+                .Include(f => f.Songs)  // טוען את השירים יחד עם התיקייה
+                .FirstOrDefault(f => f.Id == folderId);
 
-        //    var songs = _dbsetSongs.Where(song => song.FolderId == folderId).ToList();
-        //    return songs ?? new List<SongEntity>(); // אם כלום לא חזר, מחזיר רשימה ריקה
-        //}
+            if (folder == null)
+            {
+                return new List<SongEntity>();
+            }
 
+            return folder.Songs.ToList();
+        }
+
+        public void AddSongToFolder(int folderId, SongEntity song)
+        {
+            var folder = _context.foldersList
+                .FirstOrDefault(f => f.Id == folderId); 
+
+            if (folder == null)
+            {
+                throw new Exception("Folder not found");
+            }
+
+            folder.Songs.Add(song);
+            _context.SaveChanges();
+        }
+
+        public void DeleteSongFromFolder(int folderId, SongEntity song)
+        {
+            var folder = _context.foldersList
+                .FirstOrDefault(f => f.Id == folderId);
+
+            if (folder == null)
+            {
+                throw new Exception("Folder not found");
+            }
+
+            folder.Songs.Remove(song);
+            _context.SaveChanges();
+        }
 
     }
 }

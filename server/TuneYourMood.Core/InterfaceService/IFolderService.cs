@@ -12,5 +12,9 @@ namespace TuneYourMood.Core.InterfaceService
     {
         public List<FolderEntity> GetFoldersByUserId(int userId);
         //public List<SongEntity> GetSongsByFolderId(int userId);
+        public List<SongEntity> GetSongsByFolder(int folderId);
+        public void AddSongToFolder(int folderId, SongDto song);
+        public void DeleteSongFromFolder(int folderId, SongDto song);
+
     }
 }

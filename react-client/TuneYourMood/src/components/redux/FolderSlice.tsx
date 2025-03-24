@@ -2,9 +2,11 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FolderType } from '../../models/folderType';
+import { SongType } from '../../models/songType';
 
 const API_URL = 'https://localhost:7238/api/Folder';
 
+export const selectSongsByFolder = (folderId: number) => (state: any) => state.folders.songsByFolder[folderId] || [];
 // Function to get authorization headers
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
@@ -13,15 +15,15 @@ const getAuthHeader = () => {
 
 export type FolderState = {
     folders: FolderType[] | null;
- 
+    songsByFolder: { [folderId: number]: SongType[] }; // עדכון: שירים ממוינים לפי תיקיות
     loading: boolean;
     error: string | null;
 };
 
 // Initial state
 const initialState: FolderState = {
-    folders: null,
-
+    folders: [], // רשימת התיקיות
+    songsByFolder: {}, // מפת תיקיות -> שירים
     loading: false,
     error: null,
 };
@@ -93,9 +95,57 @@ export const deleteFolder = createAsyncThunk(
     }
 );
 
+// Fetch songs by folder ID
+export const fetchSongsByFolder = createAsyncThunk(
+    'Folders/fetchSongsByFolder',
+    async (folderId: number, thunkAPI) => {
+        try {
+            const response = await axios.get(`${API_URL}/songs/${folderId}`, {
+                headers: getAuthHeader(),
+            });
+            return { folderId, songs: response.data }; // מחזירים גם את ה-folderId לצד השירים
+        } catch (e: any) {
+            Swal.fire('Error!', 'Failed to fetch songs for folder.', 'error');
+            return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+        }
+    }
+);
+
+// Add song to a specific folder
+export const addSongToFolder = createAsyncThunk(
+    'Folders/addSongToFolder',
+    async ({ folderId, song }: { folderId: number, song: SongType }, thunkAPI) => {
+        try {
+            const response = await axios.post(`${API_URL}/songs/${folderId}`, song, {
+                headers: getAuthHeader(),
+            });
+            Swal.fire('Success!', 'Song has been added to the folder!', 'success');
+            return response.data;
+        } catch (e: any) {
+            Swal.fire('Error!', 'Failed to add song to folder.', 'error');
+            return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+        }
+    }
+);
+
+// Delete song from a specific folder
+export const deleteSongFromFolder = createAsyncThunk(
+    'Folders/deleteSongFromFolder',
+    async ({ folderId, songId }: { folderId: number, songId: number }, thunkAPI) => {
+        try {
+             await axios.delete(`${API_URL}/songs/${folderId}/${songId}`, {
+                headers: getAuthHeader(),
+            });
+            Swal.fire('Success!', 'Song has been removed from the folder!', 'success');
+            return { folderId, songId }; // נחזיר את המידע שצריך לעדכן את ה-state
+        } catch (e: any) {
+            Swal.fire('Error!', 'Failed to remove song from folder.', 'error');
+            return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+        }
+    }
+);
 
 
-// 🎯 Create the Folder Slice
 const FolderSlice = createSlice({
     name: 'Folders',
     initialState,
@@ -115,58 +165,61 @@ const FolderSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            // Add folder
-            .addCase(addFolder.pending, (state) => {
+
+            // Fetch songs by folder
+            .addCase(fetchSongsByFolder.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(addFolder.fulfilled, (state, action) => {
+            .addCase(fetchSongsByFolder.fulfilled, (state, action) => {
                 state.loading = false;
-                if (state.folders) {
-                    state.folders.push(action.payload);
-                }
+                const { folderId, songs } = action.payload;
+                state.songsByFolder[folderId] = songs;
             })
-            .addCase(addFolder.rejected, (state, action) => {
+            .addCase(fetchSongsByFolder.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
+
             // Update folder
-            .addCase(updateFolder.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
             .addCase(updateFolder.fulfilled, (state, action) => {
-                state.loading = false;
                 if (state.folders) {
-                    const index = state.folders.findIndex(folder => folder.id === action.payload.id);
-                    if (index !== -1) {
-                        state.folders[index] = action.payload;
-                    }
+                    state.folders = state.folders.map(folder =>
+                        folder.id === action.payload.id ? action.payload : folder
+                    );
                 }
             })
-            .addCase(updateFolder.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
+
             // Delete folder
-            .addCase(deleteFolder.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
             .addCase(deleteFolder.fulfilled, (state, action) => {
-                state.loading = false;
                 if (state.folders) {
                     state.folders = state.folders.filter(folder => folder.id !== action.payload);
                 }
             })
-            .addCase(deleteFolder.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
+
+            // Add song to folder
+            .addCase(addSongToFolder.fulfilled, (state, action) => {
+                const { folderId, song } = action.payload;
+                if (!state.songsByFolder[folderId]) {
+                    state.songsByFolder[folderId] = [];
+                }
+                state.songsByFolder[folderId].push(song);
             })
-
-
-
+            .addCase(deleteSongFromFolder.pending, (state) => {
+                state.loading = true;
+            })
+            // סיום פעולה בהצלחה
+            .addCase(deleteSongFromFolder.fulfilled, (state, action) => {
+                state.loading = false;
+                // עדכון המידע על ידי הסרת השיר מתוך תיקיה
+                const { folderId, songId } = action.payload;
+                const folder = state.folders?.find((folder) => folder.id === folderId);
+                if (folder) {
+                    folder.songs = folder.songs.filter((song) => song.id !== songId);
+                }
+            })
     },
 });
+
 
 export default FolderSlice;

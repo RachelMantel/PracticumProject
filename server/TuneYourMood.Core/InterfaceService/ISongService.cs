@@ -12,7 +12,6 @@ namespace TuneYourMood.Core.InterfaceService
     {
         public Task<SongDto> GetRandomSongByMoodAsync(string mood);
         public List<SongDto> GetSongsByUserId(int userId);
-        public List<SongEntity> GetSongsByFolderId(int userId);
 
     }
 }

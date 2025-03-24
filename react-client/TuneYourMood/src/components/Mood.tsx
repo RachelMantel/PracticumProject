@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField, Button, Box, Typography, CircularProgress, Card, CardContent, Stack } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import axios from "axios";
+import MusicPlayer from "./songs/MusicPlayer";
 
 const Mood = () => {
   const [moodInput, setMoodInput] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [song, setSong] = useState<any>(null);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMoodInput(e.target.value);
@@ -22,41 +24,46 @@ const Mood = () => {
     if (!moodInput.trim()) return;
 
     setLoading(true);
+    setAiResponse(""); 
+    setSong(null); 
+
     try {
-      // שליחה ל-AI
-      // const aiResponse = await axios.post("http://127.0.0.1:5000/predict", 
-      //   { text: moodInput }, 
-      //   { headers: { 'Content-Type': 'application/json' } }
-      // );      
-      // setAiResponse(aiResponse.data.moodCategory); // מקבלים את הקטגוריה מהמכונה
-    
-      // console.log(aiResponse.data.moodCategory);
-
-      // const songResponse = await axios.get(
-      //   `https://localhost:7238/api/Song/random-song-by-mood`, 
-      //   {
-      //     params: { mood: aiResponse.data.moodCategory }, // שליחה בתוך ה-query string
-      //     headers: getAuthHeaders(),
-      //   }
-      // );
-
-      const songResponse = await axios.get(
-        `https://localhost:7238/api/Song/random-song-by-mood`, 
-        {
-          params: { mood: "relaxed" }, // שליחה בתוך ה-query string
-          headers: getAuthHeaders(),
-        }
-      );
-
-      console.log(songResponse)
-      setSong(songResponse.data); 
-
+      const aiResponse = await axios.post("http://127.0.0.1:5000/predict", 
+        { text: moodInput }, 
+        { headers: { 'Content-Type': 'application/json' } }
+      );      
+      setAiResponse(aiResponse.data.moodCategory);
     } catch (error) {
       console.error("Error sending mood to AI:", error);
-      setAiResponse("Error analyzing mood");
+      setAiResponse("Could not determine mood.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  useEffect(() => {
+    const fetchSong = async () => {
+      if (!aiResponse) return;
+
+      try {
+        const songResponse = await axios.get(
+          `https://localhost:7238/api/Song/random-song-by-mood`, 
+          {
+            params: { mood: aiResponse },
+            headers: getAuthHeaders(),
+          }
+        );
+        setSong(songResponse.data);
+      } catch (error) {
+        console.error("Error fetching song:", error);
+        setSong(null);
+      }
+    };
+
+    if (aiResponse) {
+      fetchSong(); // שליחה אוטומטית לשרת ברגע שה-AI מחזיר תגובה
+    }
+  }, [aiResponse]);
 
   return (
     <Box 
@@ -65,23 +72,20 @@ const Mood = () => {
       alignItems="center" 
       gap={2} 
       p={3} 
-      sx={{height: "100vh", color: "white" }}
+      sx={{ height: "100vh", color: "white", textAlign: "center" }}
     >
       <Typography variant="h6" fontWeight="bold" color="#E91E63">
         What’s your mood today?
       </Typography>
+      
       <TextField
         label="Enter your mood"
         variant="outlined"
         fullWidth
         value={moodInput}
         onChange={handleChange}
-        sx={{
-          "& .MuiInputBase-root": { backgroundColor: "#fff", color: "#212121" },
-          "& .MuiOutlinedInput-root": { borderColor: "#E91E63" },
-          "& .Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#E91E63" },
-        }}
       />
+
       <Button 
         variant="contained" 
         color="primary" 
@@ -91,15 +95,15 @@ const Mood = () => {
       >
         Send to AI
       </Button>
+
       {loading && <CircularProgress sx={{ color: "#E91E63" }} />}
 
       {aiResponse && (
-        <Typography variant="h6" sx={{ color: "#E91E63" }}>
+        <Typography variant="h5" sx={{ color: "#E91E63", fontWeight: "bold", mt: 2 }}>
           {aiResponse}
         </Typography>
       )}
 
-      {/* הצגת השיר בצורה כמו ברשימת השירים */}
       {song && (
         <Stack spacing={2} mt={3}>
           <Card sx={{ display: "flex", alignItems: "center", p: 2, bgcolor: "#212121", color: "white" }}>
@@ -114,16 +118,19 @@ const Mood = () => {
               variant="contained"
               color="primary"
               startIcon={<PlayArrowIcon />}
-              onClick={() => window.open(song.filePath, "_blank")}
+              onClick={() => setIsPlayerOpen(true)}
             >
               Play
             </Button>
           </Card>
         </Stack>
       )}
+
+      {isPlayerOpen && song && (
+        <MusicPlayer song={song} onClose={() => setIsPlayerOpen(false)} />
+      )}
     </Box>
   );
 };
 
 export default Mood;
-

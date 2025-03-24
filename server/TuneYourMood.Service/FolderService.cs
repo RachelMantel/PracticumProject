@@ -63,16 +63,24 @@ namespace TuneYourMood.Service
             return _repositoryManager._folderRepository.GetFoldersByUserId(userId);
         }
 
-        //public List<SongEntity> GetSongsByFolderId(int folderId)
-        //{
-        //    var folder = _repositoryManager._folderRepository.GetSongsByFolderId(folderId);
+        public List<SongEntity> GetSongsByFolder(int folderId)
+        {
+            return _repositoryManager._folderRepository.GetSongsByFolder(folderId);
 
-        //    if (folder == null)
-        //        return new List<SongEntity>(); // מחזיר רשימה ריקה אם התיקייה לא נמצאה
+        }
 
-        //    return folder; // מחזיר את רשימת השירים או רשימה ריקה אם אין שירים
-        //}
+        public void AddSongToFolder(int folderId, SongDto song)
+        {
+            var songEntity = _mapper.Map<SongEntity>(song);
+            _repositoryManager._folderRepository.AddSongToFolder(folderId, songEntity);
+            _repositoryManager.save();
+        }
 
-
+        public void DeleteSongFromFolder(int folderId, SongDto song)
+        {
+            var songEntity = _mapper.Map<SongEntity>(song);
+            _repositoryManager._folderRepository.DeleteSongFromFolder(folderId, songEntity);
+            _repositoryManager.save();
+        }
     }
 }

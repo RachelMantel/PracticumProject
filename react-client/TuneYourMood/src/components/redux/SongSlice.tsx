@@ -51,7 +51,7 @@ export const addSong = createAsyncThunk(
       const response = await axios.post(API_URL, newSong, {
         headers: getAuthHeader(),
       });
-      Swal.fire('Success!', 'Song has been added!', 'success');
+      Swal.fire('succes!', 'Failed to add song.', 'error');
       return response.data; // מחזירים את השיר החדש שנוסף
     } catch (e: any) {
       Swal.fire('Error!', 'Failed to add song.', 'error');
@@ -80,7 +80,7 @@ export const updateSong = createAsyncThunk(
 // פעולה למחיקת שיר
 export const deleteSong = createAsyncThunk(
   'Songs/deleteSong',
-  async (songId: string, thunkAPI) => {
+  async (songId: number, thunkAPI) => {
     try {
       await axios.delete(`${API_URL}/${songId}`, {
         headers: getAuthHeader(),
@@ -94,22 +94,22 @@ export const deleteSong = createAsyncThunk(
   }
 );
 
-// Fetch songs by folder ID
-export const fetchSongsByFolderId = createAsyncThunk(
-  'Folders/fetchSongsByFolderId',
-  async (folderId: number, thunkAPI) => {
-      try {
-           const response = await axios.get(`${API_URL}/${folderId}/songs`, {
-              headers: getAuthHeader(),
-          });
-          console.log(response.data);
-          return { folderId, songs: response.data };
-      } catch (e: any) {
-          Swal.fire('Error!', 'Failed to fetch songs.', 'error');
-          return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
-      }
-  }
-);
+// // Fetch songs by folder ID
+// export const fetchSongsByFolderId = createAsyncThunk(
+//   'Folders/fetchSongsByFolderId',
+//   async (folderId: number, thunkAPI) => {
+//       try {
+//            const response = await axios.get(`${API_URL}/${folderId}/songs`, {
+//               headers: getAuthHeader(),
+//           });
+//           console.log(response.data);
+//           return { folderId, songs: response.data };
+//       } catch (e: any) {
+//           Swal.fire('Error!', 'Failed to fetch songs.', 'error');
+//           return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+//       }
+//   }
+// );
 
 // 🎯 Slice של השירים
 const SongSlice = createSlice({
@@ -172,26 +172,13 @@ const SongSlice = createSlice({
       .addCase(deleteSong.fulfilled, (state, action) => {
         state.loading = false;
         if (state.songs) {
-          state.songs = state.songs.filter(song => song.id?.toString() !== action.payload); // מסנן את השיר שנמחק
+          state.songs = state.songs.filter(song => song.id !== action.payload); // מסנן את השיר שנמחק
         }
       })
       .addCase(deleteSong.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-                  // Fetch songs by folder ID
-                  .addCase(fetchSongsByFolderId.pending, (state) => {
-                    state.loading = true;
-                    state.error = null;
-                })
-                .addCase(fetchSongsByFolderId.fulfilled, (state, action) => {
-                    state.loading = false;
-                    state.songsByFolder[action.payload.folderId] = action.payload.songs;
-                })
-                .addCase(fetchSongsByFolderId.rejected, (state, action) => {
-                    state.loading = false;
-                    state.error = action.payload as string;
-                });
   },
 });
 

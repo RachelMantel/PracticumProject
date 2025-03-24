@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import SongUploader from "./SongUploader";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 interface UploadSongProps {
   open: boolean;
@@ -8,11 +8,10 @@ interface UploadSongProps {
 }
 
 const UploadSong: React.FC<UploadSongProps> = ({ open, onClose }) => {
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
   const handleUploadSuccess = () => {
     onClose();
-    navigate("-1");
   };
 
   return (

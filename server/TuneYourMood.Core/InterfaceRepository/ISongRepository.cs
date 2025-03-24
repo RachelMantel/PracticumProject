@@ -15,7 +15,6 @@ namespace TuneYourMood.Core.InterfaceRepository
 
         public List<SongEntity> GetSongsByUserId(int userId);
 
-        public List<SongEntity> GetSongsByFolderId(int folderId);
 
         Task<SongEntity> UploadSongAsync(SongEntity song);
         Task<string> GetSongUrlAsync(int songId);

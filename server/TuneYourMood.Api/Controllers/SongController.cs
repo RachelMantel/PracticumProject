@@ -49,7 +49,6 @@ namespace TuneYourMood.Api.Controllers
 
         // עדכון שיר לפי ID
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Put(int id, [FromBody] SongPostModel song)
         {
             var songDto = _mapper.Map<SongDto>(song);
@@ -112,17 +111,6 @@ namespace TuneYourMood.Api.Controllers
             }
 
             return Ok(songs);
-        }
-
-        [HttpGet("{id}/songs")]
-        public ActionResult<List<SongDto>> GetSongsByFolderId(int id)
-        {
-            var songs = _songService.GetSongsByFolderId(id);
-            if (songs == null || songs.Count == 0)
-                return NotFound("No songs found in this folder.");
-
-            var songDtos = _mapper.Map<List<SongDto>>(songs);
-            return Ok(songDtos);
         }
     }
 }

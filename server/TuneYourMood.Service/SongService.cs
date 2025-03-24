@@ -96,15 +96,7 @@ namespace TuneYourMood.Service
             return songDtos;
         }
 
-        public List<SongEntity> GetSongsByFolderId(int folderId)
-        {
-            var folder = _repositoryManager._songRepository.GetSongsByFolderId(folderId);
 
-            if (folder == null)
-                return new List<SongEntity>(); // מחזיר רשימה ריקה אם התיקייה לא נמצאה
-
-            return folder; // מחזיר את רשימת השירים או רשימה ריקה אם אין שירים
-        }
     }
 }
 

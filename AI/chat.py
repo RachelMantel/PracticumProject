@@ -17,6 +17,7 @@ openai.api_key = my_api_key
 
 # רשימה של קטגוריות מצב רוח אפשריות
 choices = ["happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
+default_mood = "natural"  # קטגוריית ברירת מחדל
 
 my_model = "gpt-4o-mini"
 
@@ -37,14 +38,14 @@ def generate_mood(user_prompt):
     )
     
     # קבלת התוצאה מהמענה
-    result = completion.choices[0].message['content'].strip()
+    result = completion.choices[0].message['content'].strip().lower()
 
-    # הדפסת הפלט המלא כדי לראות מה המודל מחזיר
+    # הדפסת הפלט המלא כדי לבדוק מה המודל מחזיר
     print(f"Model response: {result}")
 
-    # אם התוצאה לא תואמת לאחת הקטגוריות, נחזיר שגיאה
-    if result.lower() not in [mood.lower() for mood in choices]:
-        return {"error": "Mood category not recognized."}
+    # אם התוצאה לא תואמת לאחת הקטגוריות, נחזיר "natural"
+    if result not in [mood.lower() for mood in choices]:
+        result = default_mood
     
     return {"moodCategory": result}
 
@@ -54,14 +55,13 @@ def predict():
     
     if user_prompt:
         response = generate_mood(user_prompt)
-        if 'error' in response:
-            return jsonify(response), 400
         return jsonify(response)
     else:
         return jsonify({'error': 'No text provided'}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
 
 
 

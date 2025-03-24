@@ -25,5 +25,14 @@ namespace TuneYourMood.Data
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.LogTo(mesege => Console.Write(mesege));
         }
+
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
+        //    // Ensure that Identity model creating logic is executed
+
+        //}
     }
+
 }

@@ -5,10 +5,10 @@ import { Button, LinearProgress, Typography, Box, Paper, TextField, MenuItem, Co
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { addSong } from "../redux/SongSlice";
 import { SongType } from "../../models/songType";
-import { UserType } from "../../models/userType";
 import { AppDispatch } from "../redux/store";
+import { UserType } from "../../models/userType";
 
-const moodChoices = ["happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"];
+const moodChoices = ["natural","happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"];
 const API_BASE_URL = "https://localhost:7238/api/Song/";
 
 interface SongUploaderProps {  
@@ -24,12 +24,12 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  //
   const [progress, setProgress] = useState(0);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [songDetails, setSongDetails] = useState<SongType>({
-    SongName: "",
-    Artist: "",
-    FilePath: "",
+    songName: "",
+    artist: "",
+    filePath: "",
     mood_category: "happy",
-    UserId: user?.id ?? 1,
-    FolderId:-1,
+    userId: user?.id ?? 1,
+    folderId:-1,
   });
 
   const getAuthHeaders = () => {
@@ -79,7 +79,7 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  //
 
       const newSong: SongType = {
         ...songDetails,
-        FilePath: uploadedFileUrl,
+        filePath: uploadedFileUrl,
       };
 
       dispatch(addSong(newSong));
@@ -103,9 +103,9 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  //
 
         <TextField
           fullWidth
-          label="Artist"
-          name="Artist"
-          value={songDetails.Artist}
+          label="artist"
+          name="artist"
+          value={songDetails.artist}
           onChange={handleChange}
           sx={{ mb: 2 }}
         />
@@ -113,7 +113,7 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  //
         <TextField
           fullWidth
           select
-          label="Mood Category"
+          label="mood Category"
           name="mood_category"
           value={songDetails.mood_category}
           onChange={handleChange}

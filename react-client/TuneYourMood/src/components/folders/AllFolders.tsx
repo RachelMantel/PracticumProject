@@ -1,170 +1,120 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../redux/store";
-import { addFolder, fetchUserFolders } from "../redux/FolderSlice";
+import { fetchUserFolders, addFolder, fetchSongsByFolder } from "../redux/FolderSlice";
 import { FolderType } from "../../models/folderType";
-import { Button, Card, CardContent, Typography, Stack, Dialog, DialogTitle, DialogContent, TextField, CircularProgress, Divider } from "@mui/material";
+import { Button, Stack, Typography, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ShowSongs from "../songs/ShowSongs";
-import { fetchSongsByFolderId } from "../redux/SongSlice";
-import AllSongs from "../songs/AllSongs";
 import UploadSong from "../songs/UploadSong";
+import FolderCard from "./FolderCard";
+import FolderDialog from "./FolderDialog";
+import AllSongs from "../songs/AllSongs";
 
 const AllFolders = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const folders = useSelector((state: any) => state.folders?.folders || []);
-    const songsByFolder = useSelector((state: any) => state.songs?.songsByFolder || {});
-    const loading = useSelector((state: any) => state.songs?.loading || false);    
-    const [open, setOpen] = useState(false);
-    const [folderName, setFolderName] = useState("");
-    const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
-    const [songs, setSongs] = useState([]); 
-    const [isUploadOpen, setUploadOpen] = useState(false);
-    
-    const [user] = useState(() => JSON.parse(localStorage.getItem("user") || "null"));
+  const dispatch = useDispatch<AppDispatch>();
+  const folders = useSelector((state: any) => state.folders?.folders || []);
+  const songsByFolder = useSelector((state: any) => state.folders.songsByFolder || {});
+  const [isUploadOpen, setUploadOpen] = useState(false);
+  const [openFolderDialog, setOpenFolderDialog] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => {
-        dispatch(fetchUserFolders());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchUserFolders());
+  }, [dispatch]);
 
-    useEffect(() => {
-        if (selectedFolder) {
-            dispatch(fetchSongsByFolderId(selectedFolder?.id??0));
-        }
-    }, [selectedFolder, dispatch]);
-
-    useEffect(() => {
-        if (selectedFolder && songsByFolder[selectedFolder?.id??0]) {
-            setSongs(songsByFolder[selectedFolder?.id??0]); 
-        }
-    }, [selectedFolder, songsByFolder]);
-
-    const handleAddFolder = () => {
-        if (!folderName.trim()) return;
-        const userId = user?.id;
-        if (!userId) {
-            alert("User ID is missing!");
-            return;
-        }
-
-        const newFolder: FolderType = {
-            parentId: -1,
-            folderName: folderName,
-            userId: userId,
-        };
-
-        dispatch(addFolder(newFolder));
-        setFolderName("");
-        setOpen(false);
+  const handleAddFolder = (folderName: string) => {
+    const userId = JSON.parse(localStorage.getItem("user") || "null")?.id;
+    const newFolder: FolderType = {
+      parentId: -1,
+      folderName: folderName,
+      userId: userId,
+      songs: []
     };
+    dispatch(addFolder(newFolder));
+    console.log(newFolder);
+    setOpenFolderDialog(false);
+    window.location.reload();
+  };
 
-    const handleShowSongs = (folder: FolderType) => {
-        setSelectedFolder(folder);
-        setSongs([]);
-        dispatch(fetchSongsByFolderId(folder?.id??0));
-    };
+  const onShowSongs = (folder: FolderType) => {
+    setSelectedFolder(folder);
+    dispatch(fetchSongsByFolder(folder?.id ?? 0));
+  };
 
-    return (
-        <>
-            {/* כפתור הוספת שיר וכפתור יצירת תקייה בראש העמוד */}
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                <Typography variant="h4" sx={{ color: "#E91E63", fontWeight: "bold" }}>
-                    My Songs
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                    <Button
-                        sx={{ backgroundColor: "#E91E63", color: "white" }}
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => setOpen(true)}
-                    >
-                        New Folder
-                    </Button>
-            {/* כפתור הוספת שיר */}
-            <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ mb: 2 }}>
-                <Button
-                    sx={{ backgroundColor: "#E91E63", color: "white" }}
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setUploadOpen(true)} // פתיחת הדיאלוג
-                >
-                    Add Song
-                </Button>
-            </Stack>
+  const onCloseSongs = () => {
+    setSelectedFolder(null);
+  };
 
-            {/* קומפוננטת העלאת שיר */}
-            <UploadSong open={isUploadOpen} onClose={() => setUploadOpen(false)} />
+  const filteredFolders = folders.filter((folder: FolderType) => 
+    folder.folderName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-                </Stack>
-            </Stack>
+  return (
+    <>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+        <Typography variant="h4" sx={{ color: "#E91E63", fontWeight: "bold" }}>
+          My Songs
+        </Typography>
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ backgroundColor: "#E91E63", color: "white" }}
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setUploadOpen(true)}
+          >
+            Add Song
+          </Button>
+          <Button
+            sx={{ backgroundColor: "#E91E63", color: "white" }}
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setOpenFolderDialog(true)}
+          >
+            Add Playlist
+          </Button>
+        </Stack>
+      </Stack>
+      
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search songs and playlists..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{ mb: 2 }}
+      />
 
-            {loading && <Typography variant="h6">Loading folders...</Typography>}
+      <UploadSong open={isUploadOpen} onClose={() => setUploadOpen(false)} />
+      <FolderDialog
+        open={openFolderDialog}
+        onClose={() => setOpenFolderDialog(false)}
+        onCreateFolder={handleAddFolder}
+      />
 
-            {folders.length > 0 ? (
-                <Stack spacing={2}>
-                    {folders
-                        .filter((folder: FolderType) => folder.parentId === -1)
-                        .map((folder: FolderType) => (
-                            <Card key={folder.id} sx={{ m: 2, p: 2, bgcolor: "#212121", color: "white" }}>
-                                <CardContent>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                        <Typography variant="h6">{folder.folderName}</Typography>
-                                        <Button
-                                            sx={{ backgroundColor: "#E91E63", color: "white" }}
-                                            variant="contained"
-                                            startIcon={<PlayArrowIcon />}
-                                            onClick={() => handleShowSongs(folder)}
-                                        >
-                                            Show Songs
-                                        </Button>
-                                    </Stack>
-
-                                    {/* טוען בזמן שהשירים נטענים */}
-                                    {selectedFolder?.id === folder.id && loading && (
-                                        <CircularProgress sx={{ display: "block", mx: "auto", my: 2 }} />
-                                    )}
-
-                                    {/* מפריד בין שם התקייה לרשימת השירים */}
-                                    {selectedFolder?.id === folder.id && !loading && songs.length > 0 && (
-                                        <>
-                                            <Divider sx={{ my: 2, bgcolor: "white" }} />
-                                            <ShowSongs songs={songs} />
-                                        </>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        ))}
-                </Stack>
-            ) : (
-                <Typography>No folders available</Typography>
-            )}
-
-            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Add a New Folder</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Folder Name"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        value={folderName}
-                        onChange={(e) => setFolderName(e.target.value)}
-                    />
-                    <Button onClick={handleAddFolder} variant="contained" sx={{ mt: 2, backgroundColor: "#E91E63", color: "white" }}>
-                        Create
-                    </Button>
-                </DialogContent>
-            </Dialog>
-
-            <Stack sx={{ mt: 3 }}>
-                <AllSongs />
-            </Stack>
-        </>
-    );
+      {filteredFolders.length > 0 ? (
+        <Stack spacing={2}>
+          {filteredFolders.map((folder: FolderType) => {
+            const folderSongs = songsByFolder[folder?.id ?? 0] || [];
+            const isLoading = selectedFolder?.id === folder.id && !folderSongs.length;
+            return (
+              <FolderCard
+                key={folder.id}
+                folder={folder}
+                songs={folderSongs}
+                loading={isLoading}
+                onShowSongs={onShowSongs}
+                onCloseSongs={onCloseSongs}
+              />
+            );
+          })}
+          <AllSongs />
+        </Stack>
+      ) : (
+        <Typography>No playlist available</Typography>
+      )}
+    </>
+  );
 };
 
 export default AllFolders;
-

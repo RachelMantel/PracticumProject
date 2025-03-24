@@ -50,11 +50,5 @@ namespace TuneYourMood.Data.Repositories
                 .ToListAsync();
         }
 
-        //שליפת שירים לפי תקיה
-        public List<SongEntity> GetSongsByFolderId(int folderId)
-        {
-            var songs = _dbset.Where(song => song.FolderId == folderId).ToList();
-            return songs ?? new List<SongEntity>(); // אם כלום לא חזר, מחזיר רשימה ריקה
-        }
     }
 }

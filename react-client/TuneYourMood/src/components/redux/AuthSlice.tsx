@@ -60,11 +60,8 @@ export const loginUser = createAsyncThunk(
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      Swal.fire("Success!", "You have successfully logged in!", "success");
       return { token, user };
     } catch (e: any) {
-      Swal.fire("Error!", "Login failed. Please check your credentials.", "error");
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -73,7 +70,6 @@ export const loginUser = createAsyncThunk(
 export const logout = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  Swal.fire("Logged Out!", "You have been logged out successfully.", "success");
 });
 
 // 🎯 Auth Slice

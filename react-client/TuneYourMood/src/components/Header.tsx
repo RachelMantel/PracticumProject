@@ -30,7 +30,7 @@ const Header = () => {
   });
 
   return (
-    <Stack direction="row" spacing={3} justifyContent="space-between" alignItems="center" sx={{ padding: "1rem 2rem", color: "white" }}>
+    <Stack direction="row" spacing={3} justifyContent="space-between" alignItems="center" height="100px" sx={{ padding: "1rem 2rem 1rem 1 rem", color: "white" }}>
       {/* אם המשתמש רשום, הצג את הכפתורים */}
       {token && (
         <Stack direction="row" spacing={4}>
@@ -41,7 +41,6 @@ const Header = () => {
         </Stack>
       )}
 
-      {/* כפתורי הזדהות תמיד מוצגים */}
       <AuthButtons />
     </Stack>
   );
