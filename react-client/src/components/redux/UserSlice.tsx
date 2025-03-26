@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import Swal from "sweetalert2";
 import { UserType } from "../../models/userType";
 
 const API_URL = "https://localhost:7238/api/User";
@@ -30,10 +29,10 @@ export const updateUser = createAsyncThunk(
         },
       });
 
-      Swal.fire("Success!", "Your profile has been updated!", "success");
+      // Swal.fire("Success!", "Your profile has been updated!", "success");
       return response.data; // החזרת הנתונים המעודכנים
     } catch (e: any) {
-      Swal.fire("Error!", "Update failed. Please try again.", "error");
+      // Swal.fire("Error!", "Update failed. Please try again.", "error");
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import { FolderType } from '../../models/folderType';
 import { SongType } from '../../models/songType';
 
@@ -38,7 +38,7 @@ export const fetchUserFolders = createAsyncThunk(
             });
             return response.data;
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to fetch folders.', 'error');
+            // Swal.fire('Error!', 'Failed to fetch folders.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -52,10 +52,10 @@ export const addFolder = createAsyncThunk(
             const response = await axios.post(API_URL, newFolder, {
                 headers: getAuthHeader(),
             });
-            Swal.fire('Success!', 'Folder has been created!', 'success');
+            // Swal.fire('Success!', 'Folder has been created!', 'success');
             return response.data;
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to create folder.', 'error');
+            // Swal.fire('Error!', 'Failed to create folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -69,10 +69,10 @@ export const updateFolder = createAsyncThunk(
             const response = await axios.put(`${API_URL}/${folder.id}`, folder, {
                 headers: getAuthHeader(),
             });
-            Swal.fire('Success!', 'Folder has been updated!', 'success');
+            // Swal.fire('Success!', 'Folder has been updated!', 'success');
             return response.data;
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to update folder.', 'error');
+            // Swal.fire('Error!', 'Failed to update folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -86,10 +86,10 @@ export const deleteFolder = createAsyncThunk(
             await axios.delete(`${API_URL}/${folderId}`, {
                 headers: getAuthHeader(),
             });
-            Swal.fire('Success!', 'Folder has been deleted!', 'success');
+            // Swal.fire('Success!', 'Folder has been deleted!', 'success');
             return folderId;
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to delete folder.', 'error');
+            // Swal.fire('Error!', 'Failed to delete folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -105,7 +105,7 @@ export const fetchSongsByFolder = createAsyncThunk(
             });
             return { folderId, songs: response.data }; // מחזירים גם את ה-folderId לצד השירים
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to fetch songs for folder.', 'error');
+            // Swal.fire('Error!', 'Failed to fetch songs for folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -119,10 +119,10 @@ export const addSongToFolder = createAsyncThunk(
             const response = await axios.post(`${API_URL}/songs/${folderId}`, song, {
                 headers: getAuthHeader(),
             });
-            Swal.fire('Success!', 'Song has been added to the folder!', 'success');
+            // Swal.fire('Success!', 'Song has been added to the folder!', 'success');
             return response.data;
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to add song to folder.', 'error');
+            // Swal.fire('Error!', 'Failed to add song to folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
@@ -136,10 +136,10 @@ export const deleteSongFromFolder = createAsyncThunk(
              await axios.delete(`${API_URL}/songs/${folderId}/${songId}`, {
                 headers: getAuthHeader(),
             });
-            Swal.fire('Success!', 'Song has been removed from the folder!', 'success');
+            // Swal.fire('Success!', 'Song has been removed from the folder!', 'success');
             return { folderId, songId }; // נחזיר את המידע שצריך לעדכן את ה-state
         } catch (e: any) {
-            Swal.fire('Error!', 'Failed to remove song from folder.', 'error');
+            // Swal.fire('Error!', 'Failed to remove song from folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }

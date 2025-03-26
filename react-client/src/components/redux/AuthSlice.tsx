@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import Swal from "sweetalert2";
 import { UserType } from "../../models/userType";
 
 // API URL
@@ -42,10 +41,10 @@ export const registerUser = createAsyncThunk(
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      Swal.fire("Success!", "Your account has been created!", "success");
+      // Swal.fire("Success!", "Your account has been created!", "success");
       return { token, user };
     } catch (e: any) {
-      Swal.fire("Error!", e.message || "Registration failed. Please try again.", "error");
+      // Swal.fire("Error!", e.message || "Registration failed. Please try again.", "error");
       return thunkAPI.rejectWithValue(e.message || e.response?.data?.message || e.message);
     }
   }
@@ -62,7 +61,7 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem("user", JSON.stringify(user));
       return { token, user };
     } catch (e: any) {
-      return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+      return thunkAPI.rejectWithValue("one or more details are wrong");
     }
   }
 );

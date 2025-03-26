@@ -12,7 +12,7 @@ using TuneYourMood.Data;
 namespace TuneYourMood.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250325152236_init")]
+    [Migration("20250326175928_init")]
     partial class init
     {
         /// <inheritdoc />

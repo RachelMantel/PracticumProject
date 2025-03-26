@@ -16,9 +16,10 @@ const ShowSongs = ({ songs }: { songs: Array<SongType> }) => {
   const error = useSelector((state: any) => state.songs?.error || null);
 
   const [playingSong, setPlayingSong] = useState<SongType | null>(null);
-  const [editingSong, setEditingSong] = useState<SongType | null>(null); // ✅ ניהול שיר לעריכה
+  const [editingSong, setEditingSong] = useState<SongType | null>(null); 
 
   const handleMoveSong = (song: SongType, folderId: number) => {
+
     if (folderId) {
       const updatedSong = { ...song, folderId };
       dispatch(addSongToFolder({ folderId, song: updatedSong }));

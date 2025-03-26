@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Hosting;
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
-//string connectionString = Env.GetString("DATABASE_CONNECTION_STRING");
+string connectionString = Env.GetString("DATABASE_CONNECTION_STRING");
 
 
 // ?? הוספת CORS לכל הקליינטים
@@ -39,15 +39,18 @@ builder.Services.AddDbContext<DataContext>(option =>
     option.UseSqlServer("Data Source=DESKTOP-SSNMLFD;Initial Catalog=TuneYourMood;Integrated Security=True;TrustServerCertificate=True;");
 });
 
-//builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseMySql(connectionString, new MySqlServerVersion(new Version(9, 0, 0))));
+//builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+//builder.Services.AddDbContext<DataContext>(options => options.UseMySql(connectionString);
 
 
 //builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options => options.CommandTimeout(60)));
+//    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
+
 
 //builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+//    options => options.CommandTimeout(60)));
+
 
 
 // ?? הוספת תלויות (Dependency Injection)

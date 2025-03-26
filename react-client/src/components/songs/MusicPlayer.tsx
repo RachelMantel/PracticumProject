@@ -91,8 +91,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
                     >
                         🎶
                     </Box>
-
-                    {/* נגן המוזיקה */}
                     <audio controls autoPlay style={{ width: "100%", marginTop: 20, borderRadius: 10 }}>
                         <source src={song.filePath} type="audio/mpeg" />
                         Your browser does not support the audio element.

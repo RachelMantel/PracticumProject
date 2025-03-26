@@ -67,6 +67,7 @@ const Mood = () => {
 
   return (
     <Box
+      maxHeight="550px"
       display="flex"
       flexDirection="column"
       alignItems="center"

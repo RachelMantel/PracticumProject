@@ -89,8 +89,8 @@ const FolderCard = ({ folder }: FolderCardProps) => {
                 )}
             </CardContent>
 
-            <EditFolderDialog open={editFolderOpen} folder={folder} onClose={() => { setEditFolderOpen(false); window.location.reload(); }} />
-            <DeleteFolderDialog open={deleteFolderOpen} folder={folder} onClose={() => { setDeleteFolderOpen(false); window.location.reload(); }} />
+            <EditFolderDialog open={editFolderOpen} folder={folder} onClose={() => { setEditFolderOpen(false);  }} />
+            <DeleteFolderDialog open={deleteFolderOpen} folder={folder} onClose={() => { setDeleteFolderOpen(false);  }} />
         </Card>
     );
 };

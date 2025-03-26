@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,8 +18,10 @@ namespace TuneYourMood.Data
         public DbSet<FolderEntity> foldersList { get; set; }
         public DbSet<RoleEntity> rolesList { get; set; }
 
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+            
 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -27,12 +30,16 @@ namespace TuneYourMood.Data
             optionsBuilder.LogTo(mesege => Console.Write(mesege));
         }
 
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
-        //    base.OnModelCreating(modelBuilder);
-        //    // Ensure that Identity model creating logic is executed
+        //    string connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 
+        //    if (string.IsNullOrEmpty(connectionString))
+        //    {
+        //        throw new InvalidOperationException("Database connection string is missing.");
+        //    }
+
+        //    optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         //}
     }
 

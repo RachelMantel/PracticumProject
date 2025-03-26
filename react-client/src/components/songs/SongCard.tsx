@@ -49,15 +49,12 @@ const SongCard = ({ song, folders, onPlay, onMoveSong, onDelete, onEdit, onDownl
                 </Typography>
             </CardContent>
 
-            {/* כפתור PLAY */}
             <IconButton 
                 sx={{ color: "white", bgcolor: "#E91E63",margin:"10px", transition: "0.3s", "&:hover": { bgcolor: "#d81b60" } }} 
-                onClick={() => onPlay(song)}
-            >
+                onClick={() => onPlay(song)}>
                 <PlayArrowIcon sx={{ fontSize: "1.8rem" }} />
             </IconButton>
 
-            {/* כפתור תפריט שלוש נקודות */}
             <IconButton 
                 sx={{ color: "black", transition: "0.3s", "&:hover": { bgcolor: "#f5f5f5" } }} 
                 onClick={handleMenuOpen}
@@ -65,7 +62,6 @@ const SongCard = ({ song, folders, onPlay, onMoveSong, onDelete, onEdit, onDownl
                 <MoreVertIcon />
             </IconButton>
 
-            {/* תפריט ראשי */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                 <MenuItem onClick={() => { handleMenuClose(); onDownload(); }}>
                     <DownloadIcon sx={{ mr: 1 }} /> Download
@@ -77,9 +73,8 @@ const SongCard = ({ song, folders, onPlay, onMoveSong, onDelete, onEdit, onDownl
                     <DeleteIcon sx={{ mr: 1 }} /> Delete
                 </MenuItem>
 
-                {/* תפריט העברה לתיקייה */}
                 <MenuItem onClick={handleMoveOpen}>
-                    <AddCircleIcon sx={{ mr: 1 }} /> Move to playlist
+                    <AddCircleIcon sx={{ mr: 1 }} /> Add to playlist
                 </MenuItem>
                 
                 {subMenuOpen && (

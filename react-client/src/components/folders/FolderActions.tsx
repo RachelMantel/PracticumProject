@@ -3,7 +3,6 @@ import AddIcon from "@mui/icons-material/Add";
 
 interface FolderActionsProps {
   onNewFolderClick: () => void;
-  // onAddSongClick: () => void;
 }
 
 const FolderActions = ({ onNewFolderClick }: FolderActionsProps) => (

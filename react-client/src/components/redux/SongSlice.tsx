@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
 
 const API_URL = 'https://localhost:7238/api/Song';  // API endpoint עבור שירים
@@ -37,7 +37,7 @@ export const fetchUserSongs = createAsyncThunk(
     
       return response.data;
     } catch (e: any) {
-      Swal.fire('Error!', 'Failed to fetch songs.', 'error');
+      // Swal.fire('Error!', 'Failed to fetch songs.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -51,10 +51,10 @@ export const addSong = createAsyncThunk(
       const response = await axios.post(API_URL, newSong, {
         headers: getAuthHeader(),
       });
-      Swal.fire('succes!', 'Failed to add song.', 'error');
+      // Swal.fire('succes!', 'Failed to add song.', 'error');
       return response.data; // מחזירים את השיר החדש שנוסף
     } catch (e: any) {
-      Swal.fire('Error!', 'Failed to add song.', 'error');
+      // Swal.fire('Error!', 'Failed to add song.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -68,10 +68,10 @@ export const updateSong = createAsyncThunk(
       const response = await axios.put(`${API_URL}/${song.id}`, song, {
         headers: getAuthHeader(),
       });
-      Swal.fire('Success!', 'Song has been updated!', 'success');
+      // Swal.fire('Success!', 'Song has been updated!', 'success');
       return response.data; // מחזירים את השיר המעודכן
     } catch (e: any) {
-      Swal.fire('Error!', 'Failed to update song.', 'error');
+      // Swal.fire('Error!', 'Failed to update song.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -85,31 +85,14 @@ export const deleteSong = createAsyncThunk(
       await axios.delete(`${API_URL}/${songId}`, {
         headers: getAuthHeader(),
       });
-      Swal.fire('Success!', 'Song has been deleted!', 'success');
+      // Swal.fire('Success!', 'Song has been deleted!', 'success');
       return songId; // מחזירים את ה-ID של השיר שנמחק
     } catch (e: any) {
-      Swal.fire('Error!', 'Failed to delete song.', 'error');
+      // Swal.fire('Error!', 'Failed to delete song.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
 );
-
-// // Fetch songs by folder ID
-// export const fetchSongsByFolderId = createAsyncThunk(
-//   'Folders/fetchSongsByFolderId',
-//   async (folderId: number, thunkAPI) => {
-//       try {
-//            const response = await axios.get(`${API_URL}/${folderId}/songs`, {
-//               headers: getAuthHeader(),
-//           });
-//           console.log(response.data);
-//           return { folderId, songs: response.data };
-//       } catch (e: any) {
-//           Swal.fire('Error!', 'Failed to fetch songs.', 'error');
-//           return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
-//       }
-//   }
-// );
 
 // 🎯 Slice של השירים
 const SongSlice = createSlice({

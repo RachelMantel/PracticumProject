@@ -1,9 +1,12 @@
-import { Box, Typography, Grid, Button, Paper } from "@mui/material";
-import { motion } from "framer-motion";  // אם לא התקנת את framer-motion, תוודא שיש לך את זה עם npm install framer-motion
+import { Box, Typography, Grid, Button, Paper, Container } from "@mui/material";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const About = () => {
+  const navigate = useNavigate();
+
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh", padding: "4rem 2rem" }}>
+    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "auto", padding: "4rem 2rem", pb: "30px" }}>
       
       {/* כותרת עמוד */}
       <motion.div 
@@ -51,22 +54,60 @@ const About = () => {
         </Grid>
       </Grid>
 
-      {/* כפתור "הצטרף אלינו" */}
+      {/* קישורים לשירותים שלנו */}
       <Box sx={{ textAlign: "center", marginTop: "4rem" }}>
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: "#E91E63", 
-            "&:hover": { bgcolor: "#d81b60" }, 
-            padding: "1rem 2rem", 
-            fontSize: "1rem"
-          }}
-        >
-          Join Us
-        </Button>
+        <Typography variant="h5" sx={{ color: "#E91E63", marginBottom: "1rem" }}>
+          Explore Our Features
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "#E91E63", "&:hover": { bgcolor: "#d81b60" }, padding: "1rem 2rem", fontSize: "1rem" }}
+              onClick={() => navigate("/my-songs")}
+            >
+              Browse Songs
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "#E91E63", "&:hover": { bgcolor: "#d81b60" }, padding: "1rem 2rem", fontSize: "1rem" }}
+              onClick={() => navigate("/my-playlists")}
+            >
+              Discover Playlists
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "#E91E63", "&:hover": { bgcolor: "#d81b60" }, padding: "1rem 2rem", fontSize: "1rem" }}
+              onClick={() => navigate("/mood")}
+            >
+              Find Music by Mood
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
+            {/* שאלות נפוצות */}
+            <Container maxWidth="md" sx={{ mt: 10 }}>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Frequently Asked Questions
+        </Typography>
+        {[
+          { question: "How does AI recommend songs?", answer: "Our AI analyzes  suggests songs that match your mood and preferences." },
+          { question: "Can I create my own playlists?", answer: "Absolutely! You can create and customize playlists with your favorite songs." },
+          { question: "Is the service free?", answer: "We offer both free and premium plans with additional features." }
+        ].map((faq, index) => (
+          <Box key={index} sx={{ mt: 3, p: 3, bgcolor: "#ffffff", borderRadius: 3, textAlign: "left", boxShadow: 2 }}>
+            <Typography variant="h6" fontWeight={700}>{faq.question}</Typography>
+            <Typography variant="body1" mt={1}>{faq.answer}</Typography>
+          </Box>
+        ))}
+      </Container>
     </Box>
   );
 };
 
 export default About;
+

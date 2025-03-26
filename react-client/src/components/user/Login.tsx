@@ -10,7 +10,7 @@ const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: StoreType) => state.auth);
-  
+
   const [formData, setFormData] = useState({ userNameOrEmail: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,8 +20,11 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await dispatch(loginUser(formData));
-    
-    if (loginUser.fulfilled.match(result)) {
+
+    // אם התשובה מהשרת היא שגיאת 401, נווט לדף הרישום
+    if (loginUser.rejected.match(result) && result.error.message === "Unauthorized") {
+      navigate("/register");
+    } else if (loginUser.fulfilled.match(result)) {
       navigate("/home");
     }
   };
@@ -29,7 +32,6 @@ const Login = () => {
   return (
     <Box display="flex" justifyContent="center" alignItems="center">
       <Paper elevation={6} sx={{ p: 4, width: "350px", textAlign: "center", borderRadius: "8px", position: "relative" }}>
-        
         <IconButton
           onClick={() => navigate("/home")}
           sx={{
@@ -93,10 +95,25 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
+
+        {/* כפתור רישום */}
+        {
+          <Box mt={2}>
+            <Typography variant="body2" color="textSecondary">
+              Don't have an account?{" "}
+              <Button
+                variant="text"
+                onClick={() => navigate("/register")}
+                sx={{ color: "#E91E63", textTransform: "none" }}
+              >
+                Sign Up
+              </Button>
+            </Typography>
+          </Box>
+        }
       </Paper>
     </Box>
   );
 };
 
 export default Login;
-

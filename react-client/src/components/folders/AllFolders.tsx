@@ -27,7 +27,6 @@ const AllFolders = () => {
       songs: []
     };
     dispatch(addFolder(newFolder));
-    console.log(newFolder);
     setOpenFolderDialog(false);
     window.location.reload();
   };
