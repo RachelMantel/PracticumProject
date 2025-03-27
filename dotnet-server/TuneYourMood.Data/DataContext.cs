@@ -30,17 +30,6 @@ namespace TuneYourMood.Data
             optionsBuilder.LogTo(mesege => Console.Write(mesege));
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    string connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //    {
-        //        throw new InvalidOperationException("Database connection string is missing.");
-        //    }
-
-        //    optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        //}
     }
 
 }

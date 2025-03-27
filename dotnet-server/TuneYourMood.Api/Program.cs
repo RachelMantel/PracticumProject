@@ -14,7 +14,6 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi.Models;
 using DotNetEnv;
-using Microsoft.AspNetCore.Hosting;
 
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -34,22 +33,16 @@ builder.Services.AddCors(options =>
 });
 
 //?? חיבור למסד הנתונים
-builder.Services.AddDbContext<DataContext>(option =>
-{
-    option.UseSqlServer("Data Source=DESKTOP-SSNMLFD;Initial Catalog=TuneYourMood;Integrated Security=True;TrustServerCertificate=True;");
-});
-
-//builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-//builder.Services.AddDbContext<DataContext>(options => options.UseMySql(connectionString);
+//builder.Services.AddDbContext<DataContext>(option =>
+//{
+//    option.UseSqlServer("Data Source=DESKTOP-SSNMLFD;Initial Catalog=TuneYourMood;Integrated Security=True;TrustServerCertificate=True;");
+//});
 
 
-//builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
 
-
-//builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
-//    options => options.CommandTimeout(60)));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+    options => options.CommandTimeout(60)));
 
 
 
