@@ -2,7 +2,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { UserType } from "../../models/userType";
 
-const API_URL = "https://localhost:7238/api/User";
+// const API_URL = "https://localhost:7238/api/User";
+const API_URL ="https://tuneyourmood-server.onrender.com/api/User";
+
 
 export type UsersState = {
   users: UserType[] | null;

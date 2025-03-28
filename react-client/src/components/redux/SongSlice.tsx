@@ -3,7 +3,8 @@ import axios from 'axios';
 // import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
 
-const API_URL = 'https://localhost:7238/api/Song';  // API endpoint עבור שירים
+// const API_URL = 'https://localhost:7238/api/Song';  // API endpoint עבור שירים
+const API_URL ="https://tuneyourmood-server.onrender.com/api/Song";
 
 // שליפת ה-TOKEN מ-localStorage
 const getAuthHeader = () => {
