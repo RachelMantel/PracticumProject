@@ -8,8 +8,6 @@ import path from "path";
 //   plugins: [react()],
 // })
 
-
-
 export default defineConfig({
   plugins: [react()],
   resolve: {
