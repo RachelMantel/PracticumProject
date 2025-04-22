@@ -23,7 +23,7 @@ namespace TuneYourMood.Core.Entities
 
         public List<SongEntity> SongList { get; set; }
 
-        public List<RoleEntity>? Roles { get; set; }
+        public List<RoleEntity>? Roles { get; set; } = new List<RoleEntity>();
 
         public UserEntity()
         {

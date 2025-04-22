@@ -19,8 +19,6 @@ namespace TuneYourMood.Core.Entities
         [MaxLength(50)]
         public string RoleName { get; set; }
 
-        public string Description { get; set; }
-
         [Required]
         public DateTime CreatedAt { get; set; }
 

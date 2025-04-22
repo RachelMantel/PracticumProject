@@ -2,6 +2,6 @@ export class Admin{
     constructor(
         public email: string,
         public password: string,
-        public adminSecretCode?: string){
+        public AdminSecretCode?: string){
      }
 }

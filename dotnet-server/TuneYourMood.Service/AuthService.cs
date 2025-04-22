@@ -31,11 +31,11 @@ namespace TuneYourMood.Service
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            // הוספת כל תפקיד מה-DB כ-Claim
             foreach (var role in user.Roles?.Select(r => r.RoleName) ?? Enumerable.Empty<string>())
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
@@ -53,7 +53,7 @@ namespace TuneYourMood.Service
             roles = null;
             user = _repositoryManager._userRepository.GetUserWithRoles(usernameOrEmail);
 
-            if (user != null &&user.Password==password)
+            if (user != null && user.Password == password)
             {
                 roles = user.Roles.Select(r => r.RoleName).ToArray();
                 return true;
@@ -62,58 +62,32 @@ namespace TuneYourMood.Service
             return false;
         }
 
-
         public Result<LoginResponseDto> Login(string usernameOrEmail, string password)
         {
             if (ValidateUser(usernameOrEmail, password, out var roles, out var user))
             {
                 var token = GenerateJwtToken(user);
+
                 var userDto = new UserDto
                 {
                     Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
-                   Password = user.Password
+                    Password = user.Password,
+                    Roles = roles.ToList()
                 };
+
                 var response = new LoginResponseDto
                 {
                     User = userDto,
                     Token = token
                 };
+
                 return Result<LoginResponseDto>.Success(response);
             }
 
             return Result<LoginResponseDto>.Failure("Invalid username or password.");
         }
-
-        //public async Task<Result<bool>> Register(UserDto userDto)
-        //{
-        //    var user = new UserEntity
-        //    {
-        //        Name = userDto.Name,
-        //        Email = userDto.Email,
-        //        Password = userDto.Password,
-        //        DateRegistration = DateTime.UtcNow,
-        //    };
-
-        //    var users = await _repositoryManager._userRepository.GetAsync();
-        //    if (users.Any(u =>
-        //            u.Name == user.Email ||
-        //            u.Email == user.Email ||
-        //            u.Email == user.Name))
-        //    {
-        //        return Result<bool>.Failure("Username or email already exists.");
-        //    }
-
-        //    var result = await _repositoryManager._userRepository.AddAsync(user);
-        //    if (result == null)
-        //    {
-        //        return Result<bool>.Failure("Failed to register user.");
-        //    }
-
-        //     _repositoryManager.save();
-        //    return Result<bool>.Success(true);
-        //}
 
         public async Task<Result<LoginResponseDto>> Register(UserDto userDto)
         {
@@ -123,6 +97,7 @@ namespace TuneYourMood.Service
                 Email = userDto.Email,
                 Password = userDto.Password,
                 DateRegistration = DateTime.UtcNow,
+                Roles = userDto.Roles.Select(role => new RoleEntity { RoleName = role }).ToList()
             };
 
             var users = await _repositoryManager._userRepository.GetAsync();
@@ -142,7 +117,6 @@ namespace TuneYourMood.Service
 
             _repositoryManager.save();
 
-            // יצירת טוקן למשתמש שנרשם
             var token = GenerateJwtToken(user);
 
             var userDtoResponse = new UserDto
@@ -150,7 +124,8 @@ namespace TuneYourMood.Service
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Password = user.Password
+                Password = user.Password,
+                Roles = user.Roles.Select(r => r.RoleName).ToList()
             };
 
             var response = new LoginResponseDto
@@ -161,6 +136,5 @@ namespace TuneYourMood.Service
 
             return Result<LoginResponseDto>.Success(response);
         }
-
     }
 }
