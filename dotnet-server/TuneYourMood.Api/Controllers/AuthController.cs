@@ -32,7 +32,19 @@ namespace TuneYourMood.Api.Controllers
                 return BadRequest("User data is required.");
 
             var userDto = _mapper.Map<UserDto>(user);
-            user.DateRegistration = DateTime.Today;
+            userDto.DateRegistration = DateTime.Today;
+
+            // בדיקת קוד סודי
+            const string secret = "Aa5040"; // הקוד שאת מחליטה
+            if (user?.AdminSecretCode == secret)
+            {
+                userDto.Roles = new List<string> { "Admin" };
+            }
+            else
+            {
+                userDto.Roles = new List<string> { "User" };
+            }
+
             var result = await _authService.Register(userDto);
 
             if (result.IsSuccess)
@@ -42,7 +54,6 @@ namespace TuneYourMood.Api.Controllers
 
             return BadRequest(result.ErrorMessage);
         }
-
 
     }
 

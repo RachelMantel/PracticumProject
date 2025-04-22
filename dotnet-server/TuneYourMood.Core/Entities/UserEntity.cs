@@ -19,7 +19,7 @@ namespace TuneYourMood.Core.Entities
 
         public string Password { get; set; }
 
-        public DateTime DateRegistration { get; set; }
+        public DateTime? DateRegistration { get; set; }
 
         public List<SongEntity> SongList { get; set; }
 

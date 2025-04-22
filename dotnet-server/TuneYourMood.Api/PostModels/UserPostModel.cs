@@ -9,5 +9,7 @@
         public string Password { get; set; }
 
         public DateTime? DateRegistration { get; set; }
+
+        public string? AdminSecretCode { get; set; }
     }
 }

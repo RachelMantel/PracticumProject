@@ -1,0 +1,14 @@
+<h2>log in</h2>
+<form (ngSubmit)="login()" #f="ngForm">
+
+  <label>email:</label>
+  <input [(ngModel)]="user.email" name="email" type="email" required>
+
+  <label>password:</label>
+  <input [(ngModel)]="user.password" name="password" type="password" required>
+
+  <label>secret code (Admin):</label>
+  <input [(ngModel)]="user.adminSecretCode" name="adminSecretCode">
+
+  <button type="submit">send</button>
+</form>

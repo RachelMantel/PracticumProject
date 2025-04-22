@@ -155,7 +155,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll"); // ?? הפעלת CORS לכל הלקוחות
 
-app.MapGet("/", () => "Api is running");
+//app.MapGet("/", () => "Api is running");
 app.UseAuthentication();  // ?? אימות משתמשים (JWT)
 app.UseAuthorization();   // ?? הרשאות משתמשים
 

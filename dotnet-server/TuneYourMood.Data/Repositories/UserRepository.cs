@@ -34,7 +34,7 @@ namespace TuneYourMood.Data.Repositories
         {
             return  _context.usersList
                 .Include(u => u.Roles)
-                .FirstOrDefault(u => u.Name == usernameOrEmail || u.Email == usernameOrEmail);
+                .FirstOrDefault(u =>  u.Email == usernameOrEmail);
         }
 
         public async Task<IEnumerable<RoleEntity>> GetUserRoles(int userId)

@@ -19,7 +19,7 @@ const AuthButtons = () => {
   const handleLogout = () => {
     dispatch(logout());
     setAnchorEl(null);
-    navigate("/"); // חזרה לדף הבית לאחר יציאה
+    navigate("/"); 
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

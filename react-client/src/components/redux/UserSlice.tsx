@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { UserType } from "../../models/userType";
 
-// const API_URL = "https://localhost:7238/api/User";
-const API_URL ="https://tuneyourmood-server.onrender.com/api/User";
+const API_URL = "https://localhost:7238/api/User";
+// const API_URL ="https://tuneyourmood-server.onrender.com/api/User";
 
 
 export type UsersState = {
@@ -20,10 +20,9 @@ const initialState: UsersState = {
   error: null,
 };
 
-// פעולה לעדכון פרטי המשתמש
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async (userData: { userId: number; name: string; email: string }, thunkAPI) => {
+  async (userData: { userId: number; name: string; email: string; password?: string }, thunkAPI) => {
     try {
       const response = await axios.put(`${API_URL}/${userData.userId}`, userData, {
         headers: {
@@ -31,14 +30,23 @@ export const updateUser = createAsyncThunk(
         },
       });
 
-      // Swal.fire("Success!", "Your profile has been updated!", "success");
-      return response.data; // החזרת הנתונים המעודכנים
+      const updatedUser = response.data; // הנתונים המעודכנים מהשרת
+
+      console.log("Updated user data:", JSON.stringify(updatedUser, null, 2));
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      thunkAPI.dispatch({ type: "auth/setUser", payload: updatedUser });
+
+      return updatedUser;
+
+      
     } catch (e: any) {
-      // Swal.fire("Error!", "Update failed. Please try again.", "error");
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
 );
+
+
 
 // פעולה למשיכת פרטי המשתמש
 export const getUser = createAsyncThunk(

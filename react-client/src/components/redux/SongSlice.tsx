@@ -3,8 +3,8 @@ import axios from 'axios';
 // import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
 
-// const API_URL = 'https://localhost:7238/api/Song';  // API endpoint עבור שירים
-const API_URL ="https://tuneyourmood-server.onrender.com/api/Song";
+const API_URL = 'https://localhost:7238/api/Song';  // API endpoint עבור שירים
+// const API_URL ="https://tuneyourmood-server.onrender.com/api/Song";
 
 // שליפת ה-TOKEN מ-localStorage
 const getAuthHeader = () => {
@@ -34,8 +34,7 @@ export const fetchUserSongs = createAsyncThunk(
     try {
       const response = await axios.get(`${API_URL}/user/${userId}`, {
         headers: getAuthHeader(),
-      });
-    
+      });      
       return response.data;
     } catch (e: any) {
       // Swal.fire('Error!', 'Failed to fetch songs.', 'error');
@@ -52,7 +51,7 @@ export const addSong = createAsyncThunk(
       const response = await axios.post(API_URL, newSong, {
         headers: getAuthHeader(),
       });
-      // Swal.fire('succes!', 'Failed to add song.', 'error');
+      // Swal.fire('succes!', 'Failed to add song.', 'error');      
       return response.data; // מחזירים את השיר החדש שנוסף
     } catch (e: any) {
       // Swal.fire('Error!', 'Failed to add song.', 'error');

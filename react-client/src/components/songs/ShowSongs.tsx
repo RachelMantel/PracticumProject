@@ -22,9 +22,11 @@ const ShowSongs = ({ songs }: { songs: Array<SongType> }) => {
 
     if (folderId) {
       const updatedSong = { ...song, folderId };
+      console.log(updateSong);
+      
       dispatch(addSongToFolder({ folderId, song: updatedSong }));
     }
-    window.location.reload();
+    // window.location.reload();
   };
 
 
@@ -80,7 +82,7 @@ const ShowSongs = ({ songs }: { songs: Array<SongType> }) => {
               onMoveSong={handleMoveSong}
               onDelete={() => handleDeleteSong(song?.id ?? 0)}
               onEdit={() => handleEditSong(song)}
-              onDownload={() => handleDownloadSong(song)}              // ✅ חיבור לעריכה
+              onDownload={() => handleDownloadSong(song)} 
             />
           ))}
         </Stack>

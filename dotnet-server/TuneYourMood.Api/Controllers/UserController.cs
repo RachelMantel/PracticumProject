@@ -77,7 +77,7 @@ namespace TuneYourMood.Api.Controllers
 
         // DELETE api/User/{id}
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")] // רק אדמין יכול למחוק משתמש
+        [Authorize(Roles = "Admin")] // רק אדמין יכול למחוק משתמש
         public async Task<ActionResult> Delete(int id)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));

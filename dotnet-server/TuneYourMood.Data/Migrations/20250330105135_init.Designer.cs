@@ -12,8 +12,8 @@ using TuneYourMood.Data;
 namespace TuneYourMood.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250326235913_mysql")]
-    partial class mysql
+    [Migration("20250330105135_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

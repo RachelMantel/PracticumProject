@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, TextField, Stack, Typography, CircularProgress } from "@mui/material";
-import Swal from "sweetalert2";
 import { AppDispatch, StoreType } from "../redux/store";
 import { getUser, updateUser } from "../redux/UserSlice";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +21,6 @@ const EditUser = () => {
   }, [user]);
 
   useEffect(() => {
-    // אם המשתמש לא נמצא ב-redux, נטען אותו מ-API
     if (!user) {
         const user1 = JSON.parse(localStorage.getItem("user") || "null");
       if (user1.id) {
@@ -31,19 +29,18 @@ const EditUser = () => {
     }
   }, [user, dispatch]);
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (name && email) {
       const userId = user?.id;
       if (userId) {
-        // אם יש סיסמה, נוסיף אותה לעדכון
         const updatedData: { name: string, email: string, password?: string } = { name, email };
         if (password) updatedData.password = password;
-        dispatch(updateUser({ userId, ...updatedData }));
+        await dispatch(updateUser({ userId, ...updatedData }));
       }
     } else {
-      Swal.fire("Error!", "All fields are required.", "error");
     }
     navigate("/home"); 
+    window.location.reload();
   };
 
   return (

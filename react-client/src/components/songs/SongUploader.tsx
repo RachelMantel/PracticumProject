@@ -18,7 +18,6 @@ interface SongUploaderProps {
 const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  // שינוי: שימוש בפרופ
   const userString = localStorage.getItem("user");
   const user: UserType | null = userString ? JSON.parse(userString) : null;
-
   const dispatch = useDispatch<AppDispatch>();
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
@@ -86,7 +85,7 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {  //
 
       if (onUploadSuccess) {  // שינוי: קריאה לפונקציה שסוגרת את המודל לאחר ההעלאה
         onUploadSuccess();
-        window.location.reload();
+        // window.location.reload();
       }
 
     } catch (error) {

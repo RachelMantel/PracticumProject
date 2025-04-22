@@ -17,7 +17,7 @@ const DeleteFolderDialog = ({ open, folder, onClose }: DeleteFolderDialogProps) 
 
       await dispatch(deleteFolder(folder?.id??0) as any);
       onClose(); // סגור את הדיאלוג לאחר המחיקה
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error deleting folder: ", error);
       // תוכל להוסיף הודעה למשתמש במקרה של שגיאה

@@ -18,7 +18,7 @@ const AllFolders = () => {
     dispatch(fetchUserFolders());
   }, [dispatch]);
 
-  const handleAddFolder = (folderName: string) => {
+  const handleAddFolder = async (folderName: string) => {
     const userId = JSON.parse(localStorage.getItem("user") || "null")?.id;
     const newFolder: FolderType = {
       parentId: -1,
@@ -26,9 +26,10 @@ const AllFolders = () => {
       userId: userId,
       songs: []
     };
-    dispatch(addFolder(newFolder));
+    
+    await dispatch(addFolder(newFolder)); 
+    dispatch(fetchUserFolders());
     setOpenFolderDialog(false);
-    window.location.reload();
   };
 
   const filteredFolders = folders.filter((folder: FolderType) => 

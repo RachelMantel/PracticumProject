@@ -3,8 +3,8 @@ import axios from "axios";
 import { UserType } from "../../models/userType";
 
 // API URL
-const API_URL ="https://tuneyourmood-server.onrender.com/api/Auth"
-// const API_URL = "https://localhost:7238/api/Auth";
+// const API_URL ="https://tuneyourmood-server.onrender.com/api/Auth"
+const API_URL = "https://localhost:7238/api/Auth";
 
 // Validate email format
 const validateEmail = (email: string) => {
@@ -38,14 +38,10 @@ export const registerUser = createAsyncThunk(
       const response = await axios.post(`${API_URL}/register`, { name, email, password });
       const { token, user } = response.data;
 
-      // Save to local storage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      // Swal.fire("Success!", "Your account has been created!", "success");
       return { token, user };
     } catch (e: any) {
-      // Swal.fire("Error!", e.message || "Registration failed. Please try again.", "error");
       return thunkAPI.rejectWithValue(e.message || e.response?.data?.message || e.message);
     }
   }
