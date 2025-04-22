@@ -10,7 +10,7 @@ function App() {
     <Provider store={Store}>
       <RouterProvider router={Router} /> {/* מייבא ומבצע את הניתוב */}
       <Footer/>
-    </Provider>
+    </Provider>)
 }
 
 
