@@ -1,1 +1,40 @@
-<p>users works!</p>
+<!-- @for(user of users$.value;track user.name){
+<mat-card  class="user-card">
+    <mat-card-title>{{ user.name }}</mat-card-title>
+    <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
+    <mat-card-actions>
+      <button mat-icon-button color="primary" (click)="showUserDetails(user.id)">
+        <mat-icon>info</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+}
+
+@if(this.show){
+   <app-display-user></app-display-user>
+} -->
+
+
+    @for(user of users$.value;track user.name){
+    <mat-card>
+      <div>{{ user.name }} - {{ user.email }}</div>
+      <button mat-icon-button (click)="edit(user)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-card>
+   }
+  
+   @if(editFlag){
+  <app-display-user
+    [user]="userToEdit"
+    (saveUser)="saveUser($event)"
+    (cancelUser)="cancelEdit()"
+  ></app-display-user>
+   }
+  

@@ -4,9 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
-  private tokenKey = 'authToken';
+  private readonly tokenKey = 'authToken';
 
-  saveToken(token: string) {
+  saveToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);
   }
 
@@ -15,27 +15,32 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return this.getToken() !== null;
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem(this.tokenKey);
   }
 
   getUserRole(): string | null {
     const token = this.getToken();
     if (!token) return null;
-
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role || null;
-    } catch (e) {
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
+      
+    if (Array.isArray(payload.role)) {
+      return payload.role.includes("Admin") ? "Admin" : "User";
+    } 
+    return null;
+    } catch (error) {
+      console.error('Invalid token format', error);
       return null;
     }
   }
 
   isAdmin(): boolean {
-    console.log(this.getUserRole()+"================");
     return this.getUserRole() === 'Admin';
   }
 }

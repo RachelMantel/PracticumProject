@@ -1,5 +1,8 @@
 <h2>log in</h2>
 <form (ngSubmit)="login()" #f="ngForm">
+  
+  <label>name:</label>
+  <input [(ngModel)]="user.name" name="name"  required>
 
   <label>email:</label>
   <input [(ngModel)]="user.email" name="email" type="email" required>

@@ -24,22 +24,25 @@ namespace TuneYourMood.Data.Repositories
 
         public async Task<IEnumerable<UserEntity>> GetFullAsync()
         {
-            return await _dbset
-                .Include(u => u.SongList) 
-                .ToListAsync();
+            var users = await _dbset
+            .Include(u => u.SongList)
+            .Include(u => u.Roles) // נביא גם את התפקידים
+            .ToListAsync(); // טוען את הכל לזיכרון
+
+            return users.Where(u => !u.Roles.Any(r => r.RoleName.ToUpper() == "ADMIN"));
         }
 
 
         public UserEntity GetUserWithRoles(string usernameOrEmail)
         {
-            return  _context.usersList
+            return _context.usersList
                 .Include(u => u.Roles)
-                .FirstOrDefault(u =>  u.Email == usernameOrEmail);
+                .FirstOrDefault(u => u.Email == usernameOrEmail);
         }
 
         public async Task<IEnumerable<RoleEntity>> GetUserRoles(int userId)
         {
-            var user =await _context.usersList
+            var user = await _context.usersList
                 .Include(u => u.Roles)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 

@@ -34,7 +34,8 @@ namespace TuneYourMood.Service
             // הוספת כל תפקיד מה-DB כ-Claim
             foreach (var role in user.Roles?.Select(r => r.RoleName) ?? Enumerable.Empty<string>())
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                //claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim("role", role));
             }
 
             var token = new JwtSecurityToken(

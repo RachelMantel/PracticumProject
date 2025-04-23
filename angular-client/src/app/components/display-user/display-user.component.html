@@ -1,0 +1,19 @@
+<mat-card>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="user.name" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput [(ngModel)]="user.email" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Password</mat-label>
+    <input matInput [(ngModel)]="user.password" />
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="save()">Update</button>
+  <button mat-raised-button color="warn" (click)="cancel()">Cancel</button>
+</mat-card>

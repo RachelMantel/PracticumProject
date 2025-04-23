@@ -25,6 +25,7 @@ namespace TuneYourMood.Api.Controllers
             }
             return Unauthorized(result.ErrorMessage);
         }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserPostModel user)
         {
@@ -32,25 +33,21 @@ namespace TuneYourMood.Api.Controllers
                 return BadRequest("User data is required.");
 
             var userDto = _mapper.Map<UserDto>(user);
-            userDto.DateRegistration = DateTime.Today;
+            userDto.DateRegistration = DateTime.UtcNow;
 
             // בדיקת קוד סודי
-            const string secret = "Aa5040"; // הקוד שאת מחליטה
-            if (user?.AdminSecretCode == secret)
+            const string secret = "Aa5040";
+            if (!string.IsNullOrWhiteSpace(user.AdminSecretCode) && user.AdminSecretCode == secret)
             {
-                userDto.Roles = new List<string> { "Admin" };
+                userDto.Roles = new List<string> { "User", "Admin" };
             }
             else
             {
                 userDto.Roles = new List<string> { "User" };
             }
-
             var result = await _authService.Register(userDto);
-
             if (result.IsSuccess)
-            {
                 return Ok(result.Data);
-            }
 
             return BadRequest(result.ErrorMessage);
         }
