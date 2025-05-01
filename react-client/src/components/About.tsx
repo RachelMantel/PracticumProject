@@ -1,11 +1,25 @@
-import type React from "react"
 import { useState } from "react"
-import {Box,Typography,Grid,Button,Paper,Container,Avatar,Divider,Accordion,AccordionSummary,
-AccordionDetails,Card,CardContent,} from "@mui/material"
+import {
+  Box,
+  Typography,
+  Grid,
+  Button,
+  Paper,
+  Container,
+  Avatar,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Card,
+  CardContent,
+} from "@mui/material"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import {
-ExpandMore, MusicNote,QueueMusic,
+  ExpandMore,
+  MusicNote,
+  QueueMusic,
   Mood,
   Headphones,
   People,
@@ -19,7 +33,8 @@ const About = () => {
   const navigate = useNavigate()
   const [expandedFaq, setExpandedFaq] = useState<string | false>(false)
 
-  const handleFaqChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+  // Fixed the event handler by removing the explicit event type
+  const handleFaqChange = (panel: string) => (_: any, isExpanded: boolean) => {
     setExpandedFaq(isExpanded ? panel : false)
   }
 

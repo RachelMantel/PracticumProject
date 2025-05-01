@@ -59,14 +59,13 @@ const SongCard = ({
   onEdit,
   onDownload,
   isInFolderView = false,
-  folderId,
 }: SongCardProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [subMenuOpen, setSubMenuOpen] = useState<null | HTMLElement>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedSong, setEditedSong] = useState<SongType>({ ...song })
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const [, setIsHovered] = useState(false)
 
   // Mood choices
   const moodChoices = ["happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
