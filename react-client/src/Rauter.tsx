@@ -4,10 +4,10 @@ import Register from "./components/user/Register";
 import Login from "./components/user/Login";
 import Home from "./components/Home";
 import About from "./components/About";
-import Mood from "./components/Mood";
 import EditUser from "./components/user/EditUser";
 import AllFolders from "./components/folders/AllFolders";
 import AllSongs from "./components/songs/AllSongs";
+import Mood from "./components/mood/Mood";
 
 
 export const Router = createBrowserRouter(

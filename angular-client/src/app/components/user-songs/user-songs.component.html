@@ -1,0 +1,92 @@
+<div class="songs-container">
+    <div class="back-button-container">
+      <button mat-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon> Back to User Details
+      </button>
+    </div>
+    
+    @if(loading) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+    
+    @if(!loading && user) {
+      <div class="user-header">
+        <div class="user-avatar">
+          <div class="avatar-circle">
+            {{ user.name.charAt(0) | uppercase }}
+          </div>
+        </div>
+        <h2 class="user-name">{{ user.name }}'s Songs</h2>
+      </div>
+      
+      @if(loadingSongs) {
+        <div class="loading-songs">
+          <mat-spinner diameter="30"></mat-spinner>
+          <span>Loading songs...</span>
+        </div>
+      }
+  
+      @if(!loadingSongs && songs.length === 0) {
+        <div class="no-songs">
+          <mat-card>
+            <mat-card-content>
+              <div class="empty-state">
+                <mat-icon>music_off</mat-icon>
+                <p>No songs found for this user</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      }
+      
+      @if(!loadingSongs && songs.length > 0) {
+        <div class="songs-list">
+          @for(song of songs$ | async; track song.id) {
+            <mat-card class="song-card">
+              <mat-card-content>
+                <div class="song-content">
+                  <div class="song-icon">
+                    <mat-icon>music_note</mat-icon>
+                  </div>
+                  <div class="song-details">
+                    <h3 class="song-title">{{ song.songName }}</h3>
+                    <p class="song-artist">{{ song.artist }}</p>
+                    <div class="song-meta">
+                      <mat-chip-set>
+                        <mat-chip color="primary">{{ song.mood }}</mat-chip>
+                      </mat-chip-set>
+                      <span class="song-date">Added: {{ song.dateAdding | date }}</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+              <mat-divider></mat-divider>
+              <mat-card-actions>
+                <button mat-button color="primary" (click)="getDownloadUrl(song.filePath)" matTooltip="Download Song">
+                  <mat-icon>download</mat-icon> Download
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      }
+    }
+    
+    @if(!loading && !user) {
+      <div class="error-container">
+        <mat-card class="error-card">
+          <mat-card-content>
+            <div class="error-message">
+              <mat-icon>error</mat-icon>
+              <p>User not found</p>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="goToUsers()">Return to Users</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    }
+  </div>

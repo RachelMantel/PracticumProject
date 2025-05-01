@@ -60,10 +60,10 @@ namespace TuneYourMood.Api.Controllers
         public async Task<ActionResult> UpdateUser(int id, [FromBody] UserPostModel user)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var userRole = User.FindFirstValue(ClaimTypes.Role); // התפקיד של המשתמש
+            var userRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value);
 
             // לבדוק שהמשתמש מעדכן רק את עצמו, או שהוא אדמין
-            if (userId != id && userRole != "Admin")
+            if (userId != id && !userRoles.Contains("Admin"))
             {
                 return Forbid(); // 403 - אין הרשאה
             }
@@ -81,10 +81,9 @@ namespace TuneYourMood.Api.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var userRole = User.FindFirstValue(ClaimTypes.Role); // התפקיד של המשתמש
-
+            var userRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value);
             // לוודא שהמשתמש מוחק רק את עצמו, אלא אם כן הוא אדמין
-            if (userId != id && userRole != "Admin")
+            if (userId != id && !userRoles.Contains("Admin"))
             {
                 return Forbid(); // 403 - אין הרשאה
             }

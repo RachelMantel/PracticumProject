@@ -3,7 +3,7 @@ import { AppDispatch, StoreType } from "../redux/store";
 import { logout } from "../redux/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { Button, Stack, Avatar, Menu, MenuItem, IconButton, Typography, Divider } from "@mui/material";
-import { Login, Logout, PersonAdd, AccountCircle, Edit } from "@mui/icons-material";
+import { Login, Logout, AccountCircle, Edit } from "@mui/icons-material";
 import { useState } from "react";
 
 const AuthButtons = () => {
@@ -36,7 +36,7 @@ const AuthButtons = () => {
   };
 
   const buttonStyle = {
-    color: "white",
+    color: "#000000",
     fontWeight: "bold",
     px: 3,
     borderRadius: "5px",
@@ -74,9 +74,9 @@ const AuthButtons = () => {
           <Button sx={buttonStyle} startIcon={<Login />} onClick={() => navigate("/login")}>
             Login
           </Button>
-          <Button sx={buttonStyle} startIcon={<PersonAdd />} onClick={() => navigate("/register")}>
+          {/* <Button sx={buttonStyle} startIcon={<PersonAdd />} onClick={() => navigate("/register")}>
             Register
-          </Button>
+          </Button> */}
         </>
       )}
     </Stack>

@@ -1,40 +1,37 @@
-<!-- @for(user of users$.value;track user.name){
-<mat-card  class="user-card">
-    <mat-card-title>{{ user.name }}</mat-card-title>
-    <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
-    <mat-card-actions>
-      <button mat-icon-button color="primary" (click)="showUserDetails(user.id)">
-        <mat-icon>info</mat-icon>
-      </button>
-      <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
-        <mat-icon>delete</mat-icon>
-      </button>
-    </mat-card-actions>
-  </mat-card>
-}
-
-@if(this.show){
-   <app-display-user></app-display-user>
-} -->
-
-
+<div class="users-container">
+  <div class="header">
+    <h1 class="page-title">Users Management</h1>
+  </div>
+  
+  <div class="users-grid">
     @for(user of users$.value;track user.name){
-    <mat-card>
-      <div>{{ user.name }} - {{ user.email }}</div>
-      <button mat-icon-button (click)="edit(user)">
-        <mat-icon>edit</mat-icon>
-      </button>
-      <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
-        <mat-icon>delete</mat-icon>
-      </button>
+    <mat-card class="user-card"  (click)="viewUserDetails(user.id)">
+      <div class="user-content">
+        <div class="user-avatar">
+          <div class="avatar-circle">
+            {{ user.name.charAt(0) | uppercase }}
+          </div>
+        </div>
+        <div class="user-info">
+          <h3 class="user-name">{{ user.name }}</h3>
+          <p class="user-email">{{ user.email }}</p>
+        </div>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <div class="user-actions">
+        <button mat-icon-button color="primary" matTooltip="View Songs" (click)="viewUserSongs(user.id, $event)">
+          <mat-icon>music_note</mat-icon>
+        </button>
+        <button mat-icon-button color="accent" matTooltip="Edit User" (click)="editUser(user.id, $event)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" matTooltip="Delete User" (click)="deleteUser(user.id, $event)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </mat-card>
-   }
-  
-   @if(editFlag){
-  <app-display-user
-    [user]="userToEdit"
-    (saveUser)="saveUser($event)"
-    (cancelUser)="cancelEdit()"
-  ></app-display-user>
-   }
-  
+  }
+  </div>
+</div>

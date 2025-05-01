@@ -4,8 +4,8 @@ import axios from 'axios';
 import { FolderType } from '../../models/folderType';
 import { SongType } from '../../models/songType';
 
-const API_URL = 'https://localhost:7238/api/Folder';
-// const API_URL ="https://tuneyourmood-server.onrender.com/api/Folder"
+// const API_URL = 'https://localhost:7238/api/Folder';
+const API_URL ="https://tuneyourmood-server.onrender.com/api/Folder"
 
 
 export const selectSongsByFolder = (folderId: number) => (state: any) => state.folders.songsByFolder[folderId] || [];
@@ -121,10 +121,8 @@ export const addSongToFolder = createAsyncThunk(
             const response = await axios.post(`${API_URL}/songs/${folderId}`, song, {
                 headers: getAuthHeader(),
             });
-            // Swal.fire('Success!', 'Song has been added to the folder!', 'success');
             return response.data;
         } catch (e: any) {
-            // Swal.fire('Error!', 'Failed to add song to folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }

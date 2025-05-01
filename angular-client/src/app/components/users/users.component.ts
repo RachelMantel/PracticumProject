@@ -1,86 +1,50 @@
-// import { Component } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { RouterModule, Router } from '@angular/router';
-// import { MatCardModule } from '@angular/material/card';
-// import { MatIconModule } from '@angular/material/icon';
-// import { MatButtonModule } from '@angular/material/button';
-// import { UsersService } from '../../services/users/users.service';
-// import { User } from '../../models/user.model';
-// import { DisplayUserComponent } from '../display-user/display-user.component';
-
-// @Component({
-//   selector: 'app-users',
-//   standalone: true,
-//   imports: [CommonModule,MatCardModule, MatIconModule, MatButtonModule, RouterModule,DisplayUserComponent],
-//   templateUrl: './users.component.html',
-//   styleUrl: './users.component.css'
-// })
-// export class UsersComponent {
-//   users$ = this.usersService.users;
-//   // displayUser:User=new User('','','',new Date(),0);
-//   show=false;
-//   displayUserId=0;
-//   constructor(private usersService: UsersService, private router: Router) {}
-
-//   ngOnInit(): void {
-//     this.usersService.getUsers();
-//   }
-
-//   showUserDetails(id: number) {
-//       this.show=true;
-//       this.displayUserId=id;
-//       // this.usersService.getUserById(id).subscribe(user => {
-//       //   this.displayUser = user;
-//       // });
-//   }
-
-//   deleteUser(id: number) {
-//     this.usersService.deleteUser(id);
-//   }
-// }
-
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { UsersService } from '../../services/users/users.service';
-import { User } from '../../models/user.model';
-import { DisplayUserComponent } from '../display-user/display-user.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, type OnInit } from "@angular/core"
+import { CommonModule } from "@angular/common"
+import { MatCardModule } from "@angular/material/card"
+import { MatIconModule } from "@angular/material/icon"
+import { MatButtonModule } from "@angular/material/button"
+import { MatTooltipModule } from "@angular/material/tooltip"
+import { MatDividerModule } from "@angular/material/divider"
+import { UsersService } from "../../services/users/users.service"
+import { Router } from "@angular/router"
 
 @Component({
-  selector: 'app-users',
+  selector: "app-users",
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, DisplayUserComponent],
-  templateUrl: './users.component.html',
-  styleUrl: './users.component.css'
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule, MatTooltipModule, MatDividerModule],
+  templateUrl: "./users.component.html",
+  styleUrl: "./users.component.css",
 })
-export class UsersComponent {
-  users$ = this.usersService.users;
-  editFlag = false;
-  userToEdit: User;
+export class UsersComponent implements OnInit {
+  users$ = this.usersService.users
 
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.usersService.getUsers();
+    this.usersService.getUsers()
   }
 
-  edit(user: User) {
-    this.userToEdit = { ...user }; // כדי לא לשנות את המקור בטעות
-    this.editFlag = true;
+  viewUserDetails(userId: number): void {
+    this.router.navigate(["/users", userId])
   }
 
-  saveUser(updatedUser: User) {
-    this.usersService.updateUser(updatedUser.id, updatedUser);
-    this.editFlag = false;
+  editUser(userId: number, event: Event): void {
+    event.stopPropagation() // Prevent the card click event
+    this.router.navigate(["/users", userId, "edit"])
   }
 
-  cancelEdit() {
-    this.editFlag = false;
+  viewUserSongs(userId: number, event: Event): void {
+    event.stopPropagation() // Prevent the card click event
+    this.router.navigate(["/users", userId, "songs"])
   }
 
-  deleteUser(userId: number) {
-    console.log(userId);
-    this.usersService.deleteUser(userId);
+  deleteUser(userId: number, event: Event): void {
+    event.stopPropagation() // Prevent the card click event
+    if (confirm("Are you sure you want to delete this user?")) {
+      this.usersService.deleteUser(userId)
+    }
   }
 }

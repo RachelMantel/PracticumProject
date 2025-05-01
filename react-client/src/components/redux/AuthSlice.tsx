@@ -3,8 +3,8 @@ import axios from "axios";
 import { UserType } from "../../models/userType";
 
 // API URL
-// const API_URL ="https://tuneyourmood-server.onrender.com/api/Auth"
-const API_URL = "https://localhost:7238/api/Auth";
+const API_URL ="https://tuneyourmood-server.onrender.com/api/Auth"
+// const API_URL = "https://localhost:7238/api/Auth";
 
 // Validate email format
 const validateEmail = (email: string) => {

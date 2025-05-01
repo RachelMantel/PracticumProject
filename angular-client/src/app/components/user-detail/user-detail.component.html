@@ -1,0 +1,75 @@
+<div class="detail-container">
+    <div class="back-button-container">
+        <button mat-button color="primary" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon> Back to Users
+        </button>
+    </div>
+
+    @if(loading){
+    <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    }
+
+    @if(!loading&&user){
+    <mat-card  class="user-detail-card">
+        <div class="card-header">
+            <mat-card-header>
+                <mat-card-title>User Details</mat-card-title>
+            </mat-card-header>
+        </div>
+
+        <mat-card-content>
+            <div class="user-profile">
+                <div class="user-avatar-large">
+                    <div class="avatar-circle-large">
+                        {{ user.name.charAt(0) | uppercase }}
+                    </div>
+                </div>
+
+                <div class="user-info-container">
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">{{ user.name }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ user.email }}</span>
+                    </div>
+
+                    <!-- Add more user details as needed -->
+                </div>
+            </div>
+        </mat-card-content>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-actions>
+            <div class="detail-actions">
+                <button mat-raised-button color="primary" (click)="viewSongs()">
+                    <mat-icon>music_note</mat-icon> View Songs
+                </button>
+                <button mat-raised-button color="accent" (click)="editUser()">
+                    <mat-icon>edit</mat-icon> Edit User
+                </button>
+            </div>
+        </mat-card-actions>
+    </mat-card>}
+
+    @if(!loading&&!user){
+    <div class="error-container">
+        <mat-card class="error-card">
+            <mat-card-content>
+                <div class="error-message">
+                    <mat-icon>error</mat-icon>
+                    <p>User not found</p>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-button color="primary" (click)="goBack()">Return to Users</button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+}
+</div>
