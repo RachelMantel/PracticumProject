@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Stack, Typography, Box, Alert } from "@mui/material"
@@ -41,10 +39,12 @@ const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
   const handleDeleteSong = (songId: number) => {
     if (isInFolderView && folderId) {
       // Remove song from folder/playlist
+      console.log("1")
       dispatch(deleteSongFromFolder({ folderId, songId }))
       showSuccessMessage("Song removed from playlist")
     } else {
       // Delete song completely
+      console.log("1")
       dispatch(deleteSong(songId))
       showSuccessMessage("Song deleted successfully")
     }

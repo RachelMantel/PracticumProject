@@ -1,25 +1,7 @@
-"use client"
-
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import {
-  Card,
-  CardContent,
-  Box,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-  TextField,
-  Chip,
-  Tooltip,
-  Fade,
-  Select,
-  FormControl,
-  InputLabel,
-  type SelectChangeEvent,
-} from "@mui/material"
+import {Card,CardContent,Box,Typography,IconButton,Menu,MenuItem,TextField,Chip,Tooltip,
+Fade,Select,FormControl,InputLabel,type SelectChangeEvent,} from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 import PauseIcon from "@mui/icons-material/Pause"

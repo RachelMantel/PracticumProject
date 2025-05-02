@@ -1,19 +1,6 @@
 import { useState } from "react"
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  Paper,
-  Container,
-  Avatar,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Card,
-  CardContent,
-} from "@mui/material"
+import {Box,Typography,Grid,Button,Paper,Container,Avatar,Divider,Accordion,AccordionSummary,AccordionDetails,
+  Card,CardContent,} from "@mui/material"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import {

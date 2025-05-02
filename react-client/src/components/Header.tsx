@@ -28,8 +28,7 @@ const Header = () => {
   useEffect(() => {
     const savedState = localStorage.getItem("sidebarCollapsed")
     if (savedState) {
-      setSidebarCollapsed(savedState === "true")
-    }
+      setSidebarCollapsed(savedState === "true")}
   }, [])
 
   useEffect(() => {
@@ -41,8 +40,7 @@ const Header = () => {
       navigate("/login")
     } else {
       setActiveButton(path)
-      navigate(path)
-    }
+      navigate(path)}
   }
 
   const toggleSidebar = () => {
@@ -54,8 +52,7 @@ const Header = () => {
     { path: "/about", label: "About", icon: <InfoRoundedIcon />, requiresAuth: false },
     { path: "/my-playlists", label: "My Playlists", icon: <QueueMusicRoundedIcon />, requiresAuth: true },
     { path: "/my-songs", label: "My Songs", icon: <MusicNoteRoundedIcon />, requiresAuth: true },
-    { path: "/mood", label: "Mood", icon: <MoodRoundedIcon />, requiresAuth: true },
-  ]
+    { path: "/mood", label: "Mood", icon: <MoodRoundedIcon />, requiresAuth: true },]
 
   const sidebarWidth = sidebarCollapsed ? 80 : 280
   const drawer = (
@@ -64,7 +61,6 @@ const Header = () => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#FFFFFF",
         color: "#333",
         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
         width: sidebarWidth,
@@ -115,7 +111,6 @@ const Header = () => {
         )}
       </Box>
 
-      {/* Menu Items - Always visible */}
       <Stack
         sx={{
           flexGrow: 1,
@@ -123,16 +118,13 @@ const Header = () => {
           px: sidebarCollapsed ? 2 : 2,
           overflowY: "auto",
         }}
-        spacing={1}
-      >
+        spacing={1}>
         {menuItems.map((item) => {
           const needsAuth = item.requiresAuth && !token
 
           return (
             <Tooltip key={item.path} title={needsAuth ? "Login required" : ""} placement="right" arrow>
               <div>
-                {" "}
-                {/* Wrapper div needed for Tooltip to work with disabled Button */}
                 <Button
                   onClick={() => handleNavigation(item.path)}
                   startIcon={
@@ -149,9 +141,7 @@ const Header = () => {
                       >
                         {item.icon}
                       </Badge>
-                    ) : (
-                      item.icon
-                    ))
+                    ) : (item.icon))
                   }
                   sx={{
                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
@@ -163,8 +153,7 @@ const Header = () => {
                     fontWeight: activeButton === item.path ? 600 : 500,
                     "&:hover": {
                       backgroundColor: "rgba(233, 30, 99, 0.2)",
-                      transform: sidebarCollapsed ? "scale(1.1)" : "translateX(5px)",
-                    },
+                      transform: sidebarCollapsed ? "scale(1.1)" : "translateX(5px)",},
                     transition: "all 0.3s ease",
                     textAlign: "left",
                     textTransform: "none",
@@ -189,11 +178,8 @@ const Header = () => {
                         >
                           {item.icon}
                         </Badge>
-                      ) : (
-                        item.icon
-                      )}
-                    </Box>
-                  ) : (
+                      ) : (item.icon)}
+                    </Box>) : (
                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                       {item.label}
                     </motion.span>
@@ -204,10 +190,8 @@ const Header = () => {
           )
         })}
       </Stack>
-    </Box>
-  )
+    </Box>)
 
-  // Desktop drawer
   const desktopDrawer = (
     <Drawer
       variant="permanent"
@@ -232,7 +216,6 @@ const Header = () => {
 
   return (
     <>
-      {/* Fixed Header */}
       <Box
         sx={{
           position: "fixed",
@@ -255,25 +238,20 @@ const Header = () => {
           <AuthButtons />
         </Box>
       </Box>
-
-      {/* Sidebar */}
       {desktopDrawer}
 
-      {/* Main content offset */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           ml: `${sidebarWidth}px`,
           width: `calc(100% - ${sidebarWidth}px)`,
-          pt: "70px", // Offset for fixed header
+          pt: "70px", 
           transition: "margin-left 0.3s ease, width 0.3s ease",
         }}
       >
-        {/* Content goes here */}
       </Box>
     </>
-  )
-}
+  )}
 
 export default Header

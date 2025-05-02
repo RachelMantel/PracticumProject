@@ -5,10 +5,9 @@ import { Outlet } from "react-router-dom";
 const Layout = () => {
   return (
     <Box sx={{ display: "flex" }}>
-      {/* Sidebar */}
       <Box
         sx={{
-          width: "80px", 
+          width: "60px", 
           bgcolor: "white",
           height: "100vh", 
         }}
