@@ -76,10 +76,9 @@ namespace TuneYourMood.Service
             _repositoryManager.save();
         }
 
-        public void DeleteSongFromFolder(int folderId, SongDto song)
+        public void DeleteSongFromFolder(int folderId, int songId)
         {
-            var songEntity = _mapper.Map<SongEntity>(song);
-            _repositoryManager._folderRepository.DeleteSongFromFolder(folderId, songEntity);
+            _repositoryManager._folderRepository.DeleteSongFromFolder(folderId, songId);
             _repositoryManager.save();
         }
     }

@@ -64,10 +64,12 @@ namespace TuneYourMood.Data.Repositories
             _context.SaveChanges();
         }
 
-        public void DeleteSongFromFolder(int folderId, SongEntity song)
+        public void DeleteSongFromFolder(int folderId, int songId)
         {
             var folder = _context.foldersList
                 .FirstOrDefault(f => f.Id == folderId);
+
+            var song = folder.Songs.FirstOrDefault(s => s.Id == songId);
 
             if (folder == null)
             {

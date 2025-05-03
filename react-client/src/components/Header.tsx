@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Box, Drawer, Stack, Typography, IconButton, Button, Tooltip, Badge } from "@mui/material"
@@ -14,37 +15,28 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import LockIcon from "@mui/icons-material/Lock"
 import { motion } from "framer-motion"
 
-const Header = () => {
+interface HeaderProps {
+  sidebarCollapsed: boolean
+  toggleSidebar: () => void
+}
+
+const Header = ({ sidebarCollapsed, toggleSidebar }: HeaderProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const token = useSelector((state: StoreType) => state.auth.token)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeButton, setActiveButton] = useState<string>(location.pathname)
 
   useEffect(() => {
     setActiveButton(location.pathname)
   }, [location.pathname])
 
-  useEffect(() => {
-    const savedState = localStorage.getItem("sidebarCollapsed")
-    if (savedState) {
-      setSidebarCollapsed(savedState === "true")}
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("sidebarCollapsed", String(sidebarCollapsed))
-  }, [sidebarCollapsed])
-
   const handleNavigation = (path: string) => {
     if (!token && path !== "/" && path !== "/about") {
       navigate("/login")
     } else {
       setActiveButton(path)
-      navigate(path)}
-  }
-
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed)
+      navigate(path)
+    }
   }
 
   const menuItems = [
@@ -52,7 +44,8 @@ const Header = () => {
     { path: "/about", label: "About", icon: <InfoRoundedIcon />, requiresAuth: false },
     { path: "/my-playlists", label: "My Playlists", icon: <QueueMusicRoundedIcon />, requiresAuth: true },
     { path: "/my-songs", label: "My Songs", icon: <MusicNoteRoundedIcon />, requiresAuth: true },
-    { path: "/mood", label: "Mood", icon: <MoodRoundedIcon />, requiresAuth: true },]
+    { path: "/mood", label: "Mood", icon: <MoodRoundedIcon />, requiresAuth: true },
+  ]
 
   const sidebarWidth = sidebarCollapsed ? 80 : 280
   const drawer = (
@@ -118,7 +111,8 @@ const Header = () => {
           px: sidebarCollapsed ? 2 : 2,
           overflowY: "auto",
         }}
-        spacing={1}>
+        spacing={1}
+      >
         {menuItems.map((item) => {
           const needsAuth = item.requiresAuth && !token
 
@@ -141,7 +135,9 @@ const Header = () => {
                       >
                         {item.icon}
                       </Badge>
-                    ) : (item.icon))
+                    ) : (
+                      item.icon
+                    ))
                   }
                   sx={{
                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
@@ -153,7 +149,8 @@ const Header = () => {
                     fontWeight: activeButton === item.path ? 600 : 500,
                     "&:hover": {
                       backgroundColor: "rgba(233, 30, 99, 0.2)",
-                      transform: sidebarCollapsed ? "scale(1.1)" : "translateX(5px)",},
+                      transform: sidebarCollapsed ? "scale(1.1)" : "translateX(5px)",
+                    },
                     transition: "all 0.3s ease",
                     textAlign: "left",
                     textTransform: "none",
@@ -178,8 +175,11 @@ const Header = () => {
                         >
                           {item.icon}
                         </Badge>
-                      ) : (item.icon)}
-                    </Box>) : (
+                      ) : (
+                        item.icon
+                      )}
+                    </Box>
+                  ) : (
                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                       {item.label}
                     </motion.span>
@@ -190,7 +190,8 @@ const Header = () => {
           )
         })}
       </Stack>
-    </Box>)
+    </Box>
+  )
 
   const desktopDrawer = (
     <Drawer
@@ -230,9 +231,12 @@ const Header = () => {
           justifyContent: "space-between",
           padding: "0 20px",
           boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+          cursor: "pointer", // Add cursor pointer to indicate it's clickable
         }}
+        onClick={toggleSidebar} // Add click handler to toggle sidebar
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}></Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+        </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <AuthButtons />
@@ -246,12 +250,12 @@ const Header = () => {
           flexGrow: 1,
           ml: `${sidebarWidth}px`,
           width: `calc(100% - ${sidebarWidth}px)`,
-          pt: "70px", 
+          pt: "70px",
           transition: "margin-left 0.3s ease, width 0.3s ease",
         }}
-      >
-      </Box>
+      ></Box>
     </>
-  )}
+  )
+}
 
 export default Header

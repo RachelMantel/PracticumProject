@@ -16,7 +16,7 @@ namespace TuneYourMood.Core.InterfaceRepository
         public Task<List<SongEntity>> GetSongsByFolder(int folderId);
         
         public void AddSongToFolder(int folderId, SongEntity song);
-        public void DeleteSongFromFolder(int folderId, SongEntity song);
+        public void DeleteSongFromFolder(int folderId, int songId);
 
     }
 }

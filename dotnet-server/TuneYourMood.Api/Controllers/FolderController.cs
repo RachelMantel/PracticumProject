@@ -71,18 +71,13 @@ namespace TuneYourMood.Api.Controllers
             }
         }
 
-        //מחיקת שיר מתקיה
-        [HttpDelete("songs/{folderId}")]
-        public ActionResult DeleteSongFromFolder(int folderId, [FromBody] SongDto song)
+        //delete song from folder
+        [HttpDelete("songs/{folderId}/{songId}")]
+        public ActionResult DeleteSongFromFolder(int folderId, int songId)
         {
-            if (song == null)
-            {
-                return BadRequest(new { message = "Song data is required." });
-            }
-
             try
             {
-                _folderService.DeleteSongFromFolder(folderId, song);
+                _folderService.DeleteSongFromFolder(folderId, songId);
                 return Ok(new { message = "Song deleted from folder successfully." });
             }
             catch (Exception ex)
