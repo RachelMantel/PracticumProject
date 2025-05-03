@@ -69,13 +69,17 @@ namespace TuneYourMood.Data.Repositories
             var folder = _context.foldersList
                 .FirstOrDefault(f => f.Id == folderId);
 
-            var song = folder.Songs.FirstOrDefault(s => s.Id == songId);
 
             if (folder == null)
             {
                 throw new Exception("Folder not found");
             }
 
+            var song = folder.Songs.FirstOrDefault(s => s.Id == songId);
+            if (song == null)
+            {
+                throw new Exception("Song not found");
+            }
             folder.Songs.Remove(song);
             _context.SaveChanges();
         }

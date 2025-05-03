@@ -136,10 +136,8 @@ export const deleteSongFromFolder = createAsyncThunk(
              await axios.delete(`${API_URL}/songs/${folderId}/${songId}`, {
                 headers: getAuthHeader(),
             });
-            // Swal.fire('Success!', 'Song has been removed from the folder!', 'success');
             return { folderId, songId }; // נחזיר את המידע שצריך לעדכן את ה-state
         } catch (e: any) {
-            // Swal.fire('Error!', 'Failed to remove song from folder.', 'error');
             return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
         }
     }
