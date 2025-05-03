@@ -36,17 +36,13 @@ const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
     }
   }
 
-  const handleDeleteSong = (songId: number) => {
-    console.log(isInFolderView);
-    
+  const handleDeleteSong = (songId: number) => {    
     if (isInFolderView && folderId) {
       // Remove song from folder/playlist
-      console.log("1")
       dispatch(deleteSongFromFolder({ folderId, songId }))
       showSuccessMessage("Song removed from playlist")
     } else {
       // Delete song completely
-      console.log("2")
       dispatch(deleteSong(songId))
       showSuccessMessage("Song deleted successfully")
     }

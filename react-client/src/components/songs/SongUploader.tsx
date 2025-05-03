@@ -14,7 +14,8 @@ import type { UserType } from "../../models/userType"
 
 const moodChoices = ["natural", "happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
 // const API_BASE_URL = "https://localhost:7238/api/Song/"
-const API_BASE_URL ="https://tuneyourmood-server.onrender.com/api/Song";
+const API_BASE_URL ="https://tuneyourmood-server.onrender.com/api/Song/";
+
 
 interface SongUploaderProps {
   onUploadSuccess?: () => void
