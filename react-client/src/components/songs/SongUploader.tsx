@@ -1,22 +1,8 @@
-"use client"
-
 import type React from "react"
 import { useState, useRef } from "react"
 import axios from "axios"
 import { useDispatch } from "react-redux"
-import {
-  Button,
-  LinearProgress,
-  Typography,
-  Box,
-  Paper,
-  TextField,
-  MenuItem,
-  Container,
-  Fade,
-  Grow,
-  Slide,
-} from "@mui/material"
+import {Button,LinearProgress,Typography,Box,Paper,TextField,MenuItem,Container,Fade,Grow,Slide,} from "@mui/material"
 import { motion } from "framer-motion"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import MusicNoteIcon from "@mui/icons-material/MusicNote"
@@ -27,7 +13,8 @@ import type { AppDispatch } from "../redux/store"
 import type { UserType } from "../../models/userType"
 
 const moodChoices = ["natural", "happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
-const API_BASE_URL = "https://localhost:7238/api/Song/"
+// const API_BASE_URL = "https://localhost:7238/api/Song/"
+const API_BASE_URL ="https://tuneyourmood-server.onrender.com/api/Song";
 
 interface SongUploaderProps {
   onUploadSuccess?: () => void
@@ -157,9 +144,9 @@ const SongUploader: React.FC<SongUploaderProps> = ({ onUploadSuccess }) => {
         <Paper
           elevation={3}
           sx={{
-            padding: 4,
+            padding: 2,
             textAlign: "center",
-            marginTop: 5,
+            marginTop: 2,
             backgroundColor: "#ffffff",
             color: "#333",
             borderRadius: "16px",

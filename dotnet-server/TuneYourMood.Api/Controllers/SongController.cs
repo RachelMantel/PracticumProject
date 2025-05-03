@@ -21,6 +21,7 @@ namespace TuneYourMood.Api.Controllers
 
         // שליפת כל השירים
         [HttpGet]
+        [Authorize(Roles = "Admin")] // רק אדמין יכול לקבל את כל השירים
         public async Task<ActionResult<List<SongDto>>> Get()
         {
             return Ok(await _songService.getallAsync());

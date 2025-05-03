@@ -293,7 +293,7 @@ const FolderCard = ({ folder }: FolderCardProps) => {
                   <CircularProgress size={32} sx={{ color: "#E91E63" }} />
                 </Box>
               ) : songs.length > 0 ? (
-                <ShowSongs songs={songs} />
+                <ShowSongs songs={songs} folderId={folder.id} />
               ) : (
                 <Box sx={{ py: 4, textAlign: "center" }}>
                   <MusicNote sx={{ fontSize: 48, color: "rgba(0, 0, 0, 0.2)", mb: 1 }} />
