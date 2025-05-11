@@ -33,7 +33,9 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     setPortalElement(element)
 
     return () => {
-      document.body.removeChild(element)
+      if (element && document.body.contains(element)) {
+        document.body.removeChild(element)
+      }
     }
   }, [])
 
@@ -41,24 +43,71 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     const audio = audioRef.current
     if (!audio) return
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime)
-    const handleLoadedMetadata = () => setDuration(audio.duration)
+    // Set initial volume
+    audio.volume = volume
 
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime)
+    }
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration)
+      console.log("Audio duration loaded:", audio.duration)
+    }
+
+    const handleEnded = () => {
+      setIsPlaying(false)
+      setCurrentTime(audio.duration)
+    }
+
+    // Add event listeners
     audio.addEventListener("timeupdate", handleTimeUpdate)
     audio.addEventListener("loadedmetadata", handleLoadedMetadata)
+    audio.addEventListener("ended", handleEnded)
 
     // Auto-play when component mounts
-    audio.play().catch((error) => {
-      console.error("Auto-play failed:", error)
-      setIsPlaying(false)
-    })
+    const playPromise = audio.play()
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.error("Auto-play failed:", error)
+        setIsPlaying(false)
+      })
+    }
+
+    // If the audio already has metadata loaded, set the duration immediately
+    if (audio.readyState >= 1) {
+      setDuration(audio.duration)
+    }
 
     return () => {
       audio.pause()
       audio.removeEventListener("timeupdate", handleTimeUpdate)
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
+      audio.removeEventListener("ended", handleEnded)
     }
-  }, [])
+  }, [volume])
+
+  // Reset player when song changes
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    // Reset state
+    setCurrentTime(0)
+    setIsPlaying(true)
+
+    // Load new song
+    audio.load()
+
+    // Play new song
+    const playPromise = audio.play()
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.error("Auto-play failed:", error)
+        setIsPlaying(false)
+      })
+    }
+  }, [song.filePath])
 
   const handlePlayPause = () => {
     const audio = audioRef.current
@@ -67,7 +116,12 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     if (isPlaying) {
       audio.pause()
     } else {
-      audio.play()
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error("Play failed:", error)
+        })
+      }
     }
     setIsPlaying(!isPlaying)
   }
@@ -81,6 +135,8 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
   }
 
   const formatTime = (time: number) => {
+    if (!time || isNaN(time)) return "0:00"
+
     const minutes = Math.floor(time / 60)
     const seconds = Math.floor(time % 60)
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`
@@ -108,6 +164,7 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
           backdropFilter: "blur(5px)",
           zIndex: 1000,
         }}
+        onClick={onClose}
       />
 
       {/* Player */}
@@ -120,6 +177,7 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
           zIndex: 1100,
           width: { xs: "90%", sm: "500px" },
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <Paper
           elevation={8}
@@ -196,15 +254,19 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
 
             {/* Audio controls */}
             <Box sx={{ mb: 2 }}>
-              <audio ref={audioRef} src={song.filePath} />
+              <audio ref={audioRef} src={song.filePath} preload="metadata" />
 
               {/* Progress bar */}
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Typography variant="caption" sx={{ mr: 1, color: "text.secondary" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ mr: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
+                >
                   {formatTime(currentTime)}
                 </Typography>
                 <Slider
                   value={currentTime}
+                  min={0}
                   max={duration || 100}
                   onChange={handleSeek}
                   sx={{
@@ -215,7 +277,10 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
                     },
                   }}
                 />
-                <Typography variant="caption" sx={{ ml: 1, color: "text.secondary" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ ml: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
+                >
                   {formatTime(duration)}
                 </Typography>
               </Box>
@@ -237,7 +302,7 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
 
               {/* Volume control */}
               <Box sx={{ display: "flex", alignItems: "center", width: "80%", margin: "0 auto" }}>
-                <IconButton onClick={() => setVolume(0)} sx={{ color: "text.secondary" }}>
+                <IconButton onClick={() => setVolume(volume === 0 ? 0.5 : 0)} sx={{ color: "text.secondary" }}>
                   {volume === 0 ? <VolumeMuteIcon /> : volume < 0.5 ? <VolumeDownIcon /> : <VolumeUpIcon />}
                 </IconButton>
                 <Slider

@@ -18,6 +18,11 @@ namespace TuneYourMood.Api.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel model)
         {
+            const string secret = "Aa5040";
+            if (!string.IsNullOrWhiteSpace(model.AdminSecretCode)&& model.AdminSecretCode!= secret)
+            {
+                return BadRequest("secret code is required");
+            }
             var result = _authService.Login(model.UserNameOrEmail, model.Password);
             if (result.IsSuccess)
             {
@@ -58,5 +63,8 @@ namespace TuneYourMood.Api.Controllers
     {
         public string UserNameOrEmail { get; set; }
         public string Password { get; set; }
+
+        public string AdminSecretCode { get; set; }
+
     }
 }

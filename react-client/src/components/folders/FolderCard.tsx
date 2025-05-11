@@ -1,5 +1,7 @@
+"use client"
+
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import type { AppDispatch } from "../redux/store"
@@ -23,7 +25,6 @@ import {
   Delete as DeleteIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowUp as KeyboardArrowUpIcon,
-  PlayArrow as PlayArrowIcon,
   LibraryMusic,
   MusicNote,
   Album,
@@ -34,6 +35,7 @@ import DeleteFolderDialog from "./DeleteFolderDialog"
 
 type FolderCardProps = {
   folder: FolderType
+  onPlayFolder?: (folderId: number) => void
 }
 
 const FolderCard = ({ folder }: FolderCardProps) => {
@@ -45,21 +47,62 @@ const FolderCard = ({ folder }: FolderCardProps) => {
   const [deleteFolderOpen, setDeleteFolderOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [songCount, setSongCount] = useState(folder.songs?.length || 0)
+
+  // Fetch songs count when component mounts
+  useEffect(() => {
+    const fetchSongsCount = async () => {
+      // Only fetch if we don't already have the songs and the folder has an ID
+      if (songs.length === 0 && folder?.id) {
+        setLoading(true)
+        await dispatch(fetchSongsByFolder(folder.id))
+        setLoading(false)
+      }
+    }
+
+    fetchSongsCount()
+  }, [dispatch, folder.id, songs.length])
+
+  // Update song count whenever songs change
+  useEffect(() => {
+    if (songs) {
+      setSongCount(songs.length)
+    } else if (folder.songs?.length) {
+      setSongCount(folder.songs.length)
+    } else {
+      setSongCount(0)
+    }
+  }, [songs, folder.songs])
+
+  // נוסיף useEffect שיאזין לשינויים בתיקייה ויעדכן את התצוגה
+  useEffect(() => {
+    // אם התיקייה פתוחה, נוודא שהשירים מעודכנים
+    if (isOpen && folder?.id) {
+      dispatch(fetchSongsByFolder(folder.id))
+    }
+  }, [isOpen, folder?.id, dispatch])
 
   const handleToggleSongs = async () => {
     if (isOpen) {
       setIsOpen(false)
     } else {
-      if (songs.length === 0) {
+      if (songs.length === 0 && folder?.id) {
         setLoading(true)
-        await dispatch(fetchSongsByFolder(folder?.id ?? 0))
+        await dispatch(fetchSongsByFolder(folder.id))
         setLoading(false)
       }
       setIsOpen(true)
     }
   }
 
+  // const handlePlayFolder = () => {
+  //   if (onPlayFolder && folder?.id && songCount > 0) {
+  //     onPlayFolder(folder.id)
+  //   }
+  // }
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
 
@@ -80,7 +123,6 @@ const FolderCard = ({ folder }: FolderCardProps) => {
   }
 
   const bgColor = generatePastelColor(folder.folderName)
-  const songCount = songs.length
 
   return (
     <motion.div
@@ -189,9 +231,21 @@ const FolderCard = ({ folder }: FolderCardProps) => {
                   fontSize: 12,
                   fontWeight: 500,
                   color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
                 }}
               >
-                {songCount} {songCount === 1 ? "track" : "tracks"}
+                {loading ? (
+                  <>
+                    <CircularProgress size={12} sx={{ color: "white" }} />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <>
+                    {songCount} {songCount === 1 ? "track" : "tracks"}
+                  </>
+                )}
               </Box>
 
               <IconButton
@@ -208,6 +262,7 @@ const FolderCard = ({ folder }: FolderCardProps) => {
                   elevation: 3,
                   sx: { borderRadius: 2, minWidth: 120 },
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <MenuItem
                   onClick={() => {
@@ -248,20 +303,6 @@ const FolderCard = ({ folder }: FolderCardProps) => {
             </Box>
 
             <Box sx={{ display: "flex", gap: 1 }}>
-              {songCount > 0 && (
-                <Button
-                  size="small"
-                  startIcon={<PlayArrowIcon />}
-                  sx={{
-                    color: "#E91E63",
-                    "&:hover": { bgcolor: "rgba(233, 30, 99, 0.1)" },
-                    minWidth: 0,
-                    px: 1,
-                  }}
-                >
-                  Play
-                </Button>
-              )}
 
               <Button
                 size="small"

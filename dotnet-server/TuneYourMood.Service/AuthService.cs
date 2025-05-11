@@ -102,10 +102,7 @@ namespace TuneYourMood.Service
             };
 
             var users = await _repositoryManager._userRepository.GetAsync();
-            if (users.Any(u =>
-                    u.Name == user.Email ||
-                    u.Email == user.Email ||
-                    u.Email == user.Name))
+            if (users.Any(u => u.Email == user.Email))
             {
                 return Result<LoginResponseDto>.Failure("Username or email already exists.");
             }

@@ -7,6 +7,11 @@ export const routes: Routes = [
             import('./components/login/login.component').then(m => m.LoginComponent) 
     },
     {
+        path: 'register',
+        loadComponent: () =>
+            import('./components/register/register.component').then(m => m.RegisterComponent) 
+    },
+    {
         path: 'users',
         loadComponent: () =>
             import('./components/users/users.component').then(m => m.UsersComponent) 
@@ -25,6 +30,17 @@ export const routes: Routes = [
         path: 'users/:id/songs',
         loadComponent: () =>
             import('./components/user-songs/user-songs.component').then(m => m.UserSongsComponent) 
+      },
+      {
+        path: 'songs',
+        loadComponent: () =>
+            import('./components/songs/songs.component').then(m => m.SongsComponent) 
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+            import('./components/graph-dashboard/graph-dashboard.component').then(m => m.GraphDashboardComponent) 
       }
+
 
 ];

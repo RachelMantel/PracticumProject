@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 // import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
+import { FolderType } from '../../models/folderType';
+import { deleteSongFromFolder } from './FolderSlice';
 
 // const API_URL = 'https://localhost:7238/api/Song';
 const API_URL ="https://tuneyourmood-server.onrender.com/api/Song";
@@ -77,22 +79,61 @@ export const updateSong = createAsyncThunk(
   }
 );
 
-// פעולה למחיקת שיר
+// // פעולה למחיקת שיר
+// export const deleteSong = createAsyncThunk(
+//   'Songs/deleteSong',
+//   async (songId: number, thunkAPI) => {
+//     try {
+//       await axios.delete(`${API_URL}/${songId}`, {
+//         headers: getAuthHeader(),
+//       });
+//       // Swal.fire('Success!', 'Song has been deleted!', 'success');
+//       return songId; // מחזירים את ה-ID של השיר שנמחק
+//     } catch (e: any) {
+//       // Swal.fire('Error!', 'Failed to delete song.', 'error');
+//       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+//     }
+//   }
+// );
+
 export const deleteSong = createAsyncThunk(
-  'Songs/deleteSong',
-  async (songId: number, thunkAPI) => {
+  "Songs/deleteSong",
+  async (songId: number, { dispatch, getState, rejectWithValue }) => {
     try {
+      // קודם נמצא את כל התיקיות שמכילות את השיר
+      const state = getState() as { folders: { folders: any[] } }
+      const folders = state.folders?.folders || []
+
+      // מוצאים את כל התיקיות שמכילות את השיר
+      const foldersWithSong = folders.filter((folder) =>
+        folder.songs?.some((song: any) => song.id === songId || (typeof song === "number" && song === songId)),
+      )
+
+      // מחיקת השיר מכל תיקייה שהוא נמצא בה
+      for (const folder of foldersWithSong) {
+        if (folder.id) {
+          try {
+            await dispatch(deleteSongFromFolder({ songId, folderId: folder.id })).unwrap()
+          } catch (error) {
+            console.error(`Failed to remove song ${songId} from folder ${folder.id}:`, error)
+            // ממשיכים למרות השגיאה
+          }
+        }
+      }
+
+      // לבסוף מוחקים את השיר עצמו
       await axios.delete(`${API_URL}/${songId}`, {
         headers: getAuthHeader(),
-      });
+      })
+
       // Swal.fire('Success!', 'Song has been deleted!', 'success');
-      return songId; // מחזירים את ה-ID של השיר שנמחק
+      return songId // מחזירים את ה-ID של השיר שנמחק
     } catch (e: any) {
       // Swal.fire('Error!', 'Failed to delete song.', 'error');
-      return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
+      return rejectWithValue(e.response?.data?.message || e.message)
     }
-  }
-);
+  },
+)
 
 // 🎯 Slice של השירים
 const SongSlice = createSlice({

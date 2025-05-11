@@ -1,63 +1,42 @@
-.edit-container {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .edit-card {
-  width: 100%;
-  max-width: 500px;
+  max-width: 600px;
+  margin: 20px auto;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: none;
 }
 
 .card-header {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  color: white;
-  padding: 8px 16px;
+  background: linear-gradient(90deg, rgba(233, 30, 99, 0.1) 0%, rgba(255, 87, 34, 0.1) 100%);
+  padding: 16px;
+  position: relative;
 }
 
 mat-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 0;
+  padding: 0;
 }
 
 mat-card-title {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  color: #E91E63;
 }
 
 .close-button {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: background-color 0.3s ease;
-}
-
-.close-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-mat-card-content {
-  padding: 24px 16px 8px;
-  min-height: 200px;
+  position: absolute;
+  right: 8px;
+  top: 8px;
 }
 
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  padding: 40px;
 }
 
 .form-content {
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -67,35 +46,13 @@ mat-card-content {
   width: 100%;
 }
 
-mat-card-actions {
-  padding: 16px;
-  background-color: #f9fafc;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
 .action-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
+  padding: 8px 16px 16px;
 }
 
-.action-buttons button {
-  min-width: 100px;
-  border-radius: 6px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  padding: 4px 16px;
-  transition: transform 0.2s ease;
-}
-
-.action-buttons button:hover {
-  transform: translateY(-2px);
-}
-
-.action-buttons button:active {
-  transform: translateY(0);
-}
-
-.action-buttons [mat-raised-button] {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+button[color="primary"] {
+  background: linear-gradient(90deg, #E91E63 0%, #FF5722 100%);
 }

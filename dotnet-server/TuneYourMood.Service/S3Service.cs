@@ -42,7 +42,7 @@ namespace TuneYourMood.Service
                 BucketName = _bucketName,
                 Key = fileName,
                 Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMinutes(10),
+                Expires = DateTime.UtcNow.AddMonths(12),
                 ContentType = contentType
             };
             var url = _s3Client.GetPreSignedURL(request);
@@ -50,7 +50,7 @@ namespace TuneYourMood.Service
             return url;
         }
 
-
+        2
         public async Task<string> GetDownloadUrlAsync(string fileName)
         {
             var request = new GetPreSignedUrlRequest
@@ -58,7 +58,7 @@ namespace TuneYourMood.Service
                 BucketName = _bucketName,
                 Key = fileName,
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddDays(7) // תוקף של 7 ימים
+                Expires = DateTime.UtcNow.AddMonths(12) 
             };
 
             string url = _s3Client.GetPreSignedURL(request);

@@ -1,0 +1,104 @@
+<div class="uploader-container">
+    <mat-card class="uploader-card" [@slideIn]>
+      <!-- Background elements -->
+      <div class="bg-circle top-right"></div>
+      <div class="bg-circle bottom-left"></div>
+      
+      <div class="card-content">
+        <!-- Header -->
+        <div class="header" [@fadeIn]>
+          <mat-icon class="header-icon">library_music</mat-icon>
+          <h2 class="header-title">Upload Music</h2>
+        </div>
+        
+        <!-- Form -->
+        <div class="form-container" [@growIn]>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Artist</mat-label>
+            <input matInput [(ngModel)]="songDetails.artist">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mood Category</mat-label>
+            <mat-select [(ngModel)]="songDetails.mood_category">
+              @for (choice of moodChoices; track choice) {
+                <mat-option [value]="choice">{{choice}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <!-- File upload area with drag & drop -->
+          <div 
+            class="upload-area" 
+            [class.drag-active]="dragActive"
+            (dragenter)="handleDrag($event)"
+            (dragleave)="handleDrag($event)"
+            (dragover)="handleDrag($event)"
+            (drop)="handleDrop($event)"
+            (click)="fileInput.click()">
+            
+            <input 
+              #fileInput 
+              type="file" 
+              (change)="handleFileChange($event)" 
+              style="display: none"
+              accept="audio/*">
+            
+            <mat-icon class="upload-icon">cloud_upload</mat-icon>
+            
+            <h3 class="upload-title">
+              {{file ? 'Change File' : 'Drop your audio file here'}}
+            </h3>
+            
+            <p class="upload-subtitle">or click to browse</p>
+            
+            @if (file) {
+              <div class="selected-file">
+                <mat-icon>music_note</mat-icon>
+                <span class="file-name">{{file.name}}</span>
+              </div>
+            }
+          </div>
+          
+          <!-- Song name field - only show after file selection -->
+          @if (file) {
+            <mat-form-field appearance="outline" class="full-width" [@fadeIn]>
+              <mat-label>Song Name</mat-label>
+              <input matInput [(ngModel)]="songDetails.songName">
+            </mat-form-field>
+          }
+          
+          <!-- Upload button -->
+          <!-- <button 
+            mat-raised-button 
+            color="primary"
+            class="upload-button"
+            [disabled]="!file || uploading || uploadComplete"
+            (click)="handleUpload()">
+            <mat-icon>cloud_upload</mat-icon>
+            {{uploading ? 'Uploading...' : uploadComplete ? 'Upload Complete' : 'Upload Song'}}
+          </button> -->
+          
+          <!-- Progress bar -->
+          @if (uploading) {
+            <div class="progress-container" [@fadeIn]>
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="progress"
+                class="upload-progress">
+              </mat-progress-bar>
+              <p class="progress-text">{{progress}}% Uploaded</p>
+            </div>
+          }
+          
+          <!-- Success message -->
+          @if (uploadComplete) {
+            <div class="success-message" [@fadeIn]>
+              <p>Song uploaded successfully!</p>
+            </div>
+          }
+        </div>
+      </div>
+    </mat-card>
+  </div>
+  

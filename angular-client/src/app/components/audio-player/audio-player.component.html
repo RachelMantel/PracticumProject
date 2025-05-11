@@ -1,0 +1,48 @@
+<div class="audio-player" *ngIf="currentSong">
+    <div class="song-info">
+      <div class="song-thumbnail" [style.--song-color]="currentSong.mood_category || 'pink'">
+        <mat-icon>music_note</mat-icon>
+      </div>
+      <div class="song-details">
+        <div class="song-name">{{ currentSong.songName }}</div>
+        <div class="song-artist">{{ currentSong.artist }}</div>
+      </div>
+    </div>
+    
+    <div class="player-controls">
+      <button mat-icon-button matTooltip="Stop" (click)="stop()">
+        <mat-icon>stop</mat-icon>
+      </button>
+      
+      <button mat-icon-button matTooltip="{{isPlaying ? 'Pause' : 'Play'}}" (click)="togglePlay()">
+        <mat-icon>{{isPlaying ? 'pause' : 'play_arrow'}}</mat-icon>
+      </button>
+      
+      <div class="time-slider">
+        <span class="current-time">{{formatTime(currentTime)}}</span>
+        <!-- Updated mat-slider syntax for Angular Material 15+ -->
+        <mat-slider class="progress-slider">
+          <input matSliderThumb
+            [min]="0"
+            [max]="duration || 1"
+            [value]="currentTime"
+            (valueChange)="seek($event)">
+        </mat-slider>
+        <span class="duration">{{formatTime(duration)}}</span>
+      </div>
+      
+      <div class="volume-control">
+        <mat-icon>volume_up</mat-icon>
+        <!-- Updated mat-slider syntax for Angular Material 15+ -->
+        <mat-slider class="volume-slider">
+          <input matSliderThumb
+            [min]="0"
+            [max]="1"
+            [step]="0.01"
+            [value]="volume"
+            (valueChange)="setVolume($event)">
+        </mat-slider>
+      </div>
+    </div>
+  </div>
+  
