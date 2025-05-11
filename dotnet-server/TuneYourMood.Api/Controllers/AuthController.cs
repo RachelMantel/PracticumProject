@@ -19,17 +19,23 @@ namespace TuneYourMood.Api.Controllers
         public IActionResult Login([FromBody] LoginModel model)
         {
             const string secret = "Aa5040";
-            if (!string.IsNullOrWhiteSpace(model.AdminSecretCode)&& model.AdminSecretCode!= secret)
+
+            // אם הקוד נשלח, נבדוק שהוא תקין
+            if (!string.IsNullOrWhiteSpace(model.AdminSecretCode) && model.AdminSecretCode != secret)
             {
-                return BadRequest("secret code is required");
+                return BadRequest("Invalid secret code");
             }
+
             var result = _authService.Login(model.UserNameOrEmail, model.Password);
+
             if (result.IsSuccess)
             {
                 return Ok(result.Data);
             }
+
             return Unauthorized(result.ErrorMessage);
         }
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserPostModel user)
