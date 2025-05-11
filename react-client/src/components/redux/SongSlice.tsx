@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 // import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
-import { FolderType } from '../../models/folderType';
+// import { FolderType } from '../../models/folderType';
 import { deleteSongFromFolder } from './FolderSlice';
 
 // const API_URL = 'https://localhost:7238/api/Song';
