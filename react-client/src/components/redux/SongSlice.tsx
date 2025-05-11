@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-// import Swal from 'sweetalert2';
 import { SongType } from '../../models/songType';
 // import { FolderType } from '../../models/folderType';
 import { deleteSongFromFolder } from './FolderSlice';
@@ -39,7 +38,6 @@ export const fetchUserSongs = createAsyncThunk(
       });      
       return response.data;
     } catch (e: any) {
-      // Swal.fire('Error!', 'Failed to fetch songs.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -53,10 +51,8 @@ export const addSong = createAsyncThunk(
       const response = await axios.post(API_URL, newSong, {
         headers: getAuthHeader(),
       });
-      // Swal.fire('succes!', 'Failed to add song.', 'error');      
       return response.data; // מחזירים את השיר החדש שנוסף
     } catch (e: any) {
-      // Swal.fire('Error!', 'Failed to add song.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -70,10 +66,8 @@ export const updateSong = createAsyncThunk(
       const response = await axios.put(`${API_URL}/${song.id}`, song, {
         headers: getAuthHeader(),
       });
-      // Swal.fire('Success!', 'Song has been updated!', 'success');
       return response.data; // מחזירים את השיר המעודכן
     } catch (e: any) {
-      // Swal.fire('Error!', 'Failed to update song.', 'error');
       return thunkAPI.rejectWithValue(e.response?.data?.message || e.message);
     }
   }
@@ -125,11 +119,8 @@ export const deleteSong = createAsyncThunk(
       await axios.delete(`${API_URL}/${songId}`, {
         headers: getAuthHeader(),
       })
-
-      // Swal.fire('Success!', 'Song has been deleted!', 'success');
-      return songId // מחזירים את ה-ID של השיר שנמחק
+      return songId 
     } catch (e: any) {
-      // Swal.fire('Error!', 'Failed to delete song.', 'error');
       return rejectWithValue(e.response?.data?.message || e.message)
     }
   },

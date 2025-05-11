@@ -37,17 +37,32 @@ namespace TuneYourMood.Service
 
         public async Task<string> GeneratePresignedUrlAsync(string fileName, string contentType)
         {
-            var request = new GetPreSignedUrlRequest
+            try
             {
-                BucketName = _bucketName,
-                Key = fileName,
-                Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMonths(12),
-                ContentType = contentType
-            };
-            var url = _s3Client.GetPreSignedURL(request);
+                if (string.IsNullOrEmpty(_bucketName))
+                    throw new Exception("Bucket name is missing.");
+                if (string.IsNullOrEmpty(fileName))
+                    throw new Exception("File name is missing.");
+                if (_s3Client == null)
+                    throw new Exception("S3 client is not initialized.");
 
-            return url;
+                var request = new GetPreSignedUrlRequest
+                {
+                    BucketName = _bucketName,
+                    Key = fileName,
+                    Verb = HttpVerb.PUT,
+                    Expires = DateTime.UtcNow.AddMonths(12),
+                    ContentType = contentType
+                };
+
+                var url = _s3Client.GetPreSignedURL(request);
+                return url;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error generating pre-signed URL: {ex.Message}");
+                throw; // כדי שה-Controller יתפוס ויחזיר שגיאה עם הודעה
+            }
         }
 
 
