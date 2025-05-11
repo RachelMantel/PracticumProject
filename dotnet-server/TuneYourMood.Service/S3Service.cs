@@ -51,7 +51,7 @@ namespace TuneYourMood.Service
                     BucketName = _bucketName,
                     Key = fileName,
                     Verb = HttpVerb.PUT,
-                    Expires = DateTime.UtcNow.AddMonths(12),
+                    Expires = DateTime.UtcNow.AddDays(7),
                     ContentType = contentType
                 };
 
@@ -73,7 +73,7 @@ namespace TuneYourMood.Service
                 BucketName = _bucketName,
                 Key = fileName,
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMonths(12) 
+                Expires = DateTime.UtcNow.AddDays(7) 
             };
 
             string url = _s3Client.GetPreSignedURL(request);
