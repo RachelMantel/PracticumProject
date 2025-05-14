@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using TuneYourMood.Core.DTOs;
 using TuneYourMood.Core.Entities;
 using TuneYourMood.Core.InterfaceRepository;
+using TuneYourMood.Core.InterfaceService;
+using TuneYourMood.Service;
 
 namespace TuneYourMood.Data.Repositories
 {
@@ -14,11 +16,14 @@ namespace TuneYourMood.Data.Repositories
     {
         readonly DbSet<SongEntity> _dbset;
         private readonly DataContext _context;
-        public SongRepository(DataContext dataContext)
+        private readonly IS3Service _s3Service;
+
+        public SongRepository(DataContext dataContext, IS3Service s3Service)
             : base(dataContext)
         {
             _dbset = dataContext.Set<SongEntity>();
             _context = dataContext;
+            _s3Service = s3Service;
         }
         public async Task<IEnumerable<SongEntity>> GetFullAsync()
         {
@@ -40,9 +45,16 @@ namespace TuneYourMood.Data.Repositories
         public async Task<string> GetSongUrlAsync(int songId)
         {
             var song = await _context.songsList.FindAsync(songId);
-            return song?.FilePath;
+            if (song == null)
+                return null;
+
+            if (string.IsNullOrEmpty(song.SongName))
+                throw new Exception("Song does not have a valid file path.");
+
+            var url = await _s3Service.GetDownloadUrlAsync(song.FilePath);
+            return url;
         }
-        // פונקציה לשליפת כל השירים לפי Mood
+
         public async Task<List<SongEntity>> GetSongsByMoodAsync(string mood)
         {
             return await _context.songsList

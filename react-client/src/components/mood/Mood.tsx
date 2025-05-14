@@ -34,7 +34,7 @@ const Mood = () => {
 
     try {
       const aiResponse = await axios.post(
-        "http://127.0.0.1:5000/predict",
+        "https://tuneyourmood-ai-server.onrender.com/predict",
         { text: mood },
         { headers: { "Content-Type": "application/json" } },
       )
