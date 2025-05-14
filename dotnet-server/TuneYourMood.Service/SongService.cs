@@ -70,29 +70,29 @@ namespace TuneYourMood.Service
             if (songs == null || !songs.Any())
                 return null;
 
-            // בחירת שיר רנדומלי מתוך השירים שמצאנו
             var randomSong = songs[new Random().Next(songs.Count)];
 
-            // המרת SongEntity ל-SongDto באמצעות AutoMapper
             var songDto = _mapper.Map<SongDto>(randomSong);
-
+            songDto.FilePath = await _repositoryManager._songRepository.GetSongUrlAsync(songId: songDto.Id);
             return songDto;
         }
 
         public async Task<List<SongDto>> GetSongsByUserId(int userId)
         {
-            // שליפת השירים מה-Repository על פי ה-userId
             var songs =await _repositoryManager._songRepository.GetSongsByUserId(userId);
 
-            // אם לא נמצאו שירים, החזר רשימה ריקה
             if (songs == null || !songs.Any())
             {
                 return new List<SongDto>();
             }
 
-            // המרת רשימת SongEntity ל-SongDto באמצעות AutoMapper
             var songDtos = _mapper.Map<List<SongDto>>(songs);
 
+            foreach (var songDto in songDtos)
+            {
+                songDto.FilePath = await _repositoryManager._songRepository.GetSongUrlAsync(songId: songDto.Id);
+
+            }
             return songDtos;
         }
 

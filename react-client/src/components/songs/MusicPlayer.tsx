@@ -1,5 +1,3 @@
-"use client"
-
 import { Paper, Typography, IconButton, Box, Slider } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import type { SongType } from "../../models/songType"
