@@ -86,26 +86,46 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
   }, [volume])
 
   // Reset player when song changes
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
+useEffect(() => {
+  const audio = audioRef.current;
+  if (!audio) return;
 
-    // Reset state
-    setCurrentTime(0)
-    setIsPlaying(true)
+  setCurrentTime(0);
+  setIsPlaying(true);
 
-    // Load new song
-    audio.load()
-
-    // Play new song
-    const playPromise = audio.play()
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        console.error("Auto-play failed:", error)
-        setIsPlaying(false)
-      })
+  let songUrl = song.filePath;
+  
+  try {
+    const url = new URL(songUrl);
+    const pathParts = url.pathname.split('/');
+    
+    if (pathParts.some(part => part.includes('amazonaws.com'))) {
+      console.error('Invalid URL detected, attempting to fix:', songUrl);
+      
+      const fileName = pathParts[pathParts.length - 1];
+      
+      const baseUrl = `${url.protocol}//${url.host}`;
+      songUrl = `${baseUrl}/${fileName}`;
+      
+      console.log('Fixed URL:', songUrl);
     }
-  }, [song.filePath])
+  } catch (error) {
+    console.error('Error parsing URL:', error);
+  }
+
+  // Load new song with fixed URL
+  audio.src = songUrl;
+  audio.load();
+
+  // Play new song
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      console.error("Auto-play failed:", error);
+      setIsPlaying(false);
+    });
+  }
+}, [song.filePath]);
 
   const handlePlayPause = () => {
     const audio = audioRef.current
