@@ -8,7 +8,6 @@ using TuneYourMood.Core.DTOs;
 using TuneYourMood.Core.Entities;
 using TuneYourMood.Core.InterfaceRepository;
 using TuneYourMood.Core.InterfaceService;
-using TuneYourMood.Service;
 
 namespace TuneYourMood.Data.Repositories
 {

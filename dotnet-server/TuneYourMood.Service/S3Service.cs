@@ -61,7 +61,7 @@ namespace TuneYourMood.Service
             catch (Exception ex)
             {
                 Console.WriteLine($"Error generating pre-signed URL: {ex.Message}");
-                throw; // כדי שה-Controller יתפוס ויחזיר שגיאה עם הודעה
+                throw; 
             }
         }
 

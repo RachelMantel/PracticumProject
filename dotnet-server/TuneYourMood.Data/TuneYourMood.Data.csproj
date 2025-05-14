@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TuneYourMood.Core\TuneYourMood.Core.csproj" />
+    <ProjectReference Include="..\TuneYourMood.Service\TuneYourMood.Service.csproj" />
   </ItemGroup>
 
 </Project>
