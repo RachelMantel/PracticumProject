@@ -12,7 +12,7 @@ CORS(app)
 my_api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = my_api_key
 
-choices = ["happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
+choices = ["natural","happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
 default_mood = "natural" 
 
 my_model = "gpt-4o-mini"
