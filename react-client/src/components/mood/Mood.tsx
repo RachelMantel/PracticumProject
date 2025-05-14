@@ -66,7 +66,7 @@ const Mood = () => {
       if (!aiResponse) return
 
       try {
-        const songResponse = await axios.get(`https://localhost:7238/api/Song/random-song-by-mood`, {
+        const songResponse = await axios.get(`https://tuneyourmood-server.onrender.com/api/Song/random-song-by-mood`, {
           params: { mood: aiResponse },
           headers: getAuthHeaders(),
         })

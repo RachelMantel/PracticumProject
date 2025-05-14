@@ -27,7 +27,7 @@ namespace TuneYourMood.Service
         {
             var song = await _repositoryManager._songRepository.GetByIdAsync(id);
             var songDtos = _mapper.Map<SongDto>(song);
-
+            songDtos.FilePath =await _repositoryManager._songRepository.GetSongUrlAsync(songId: songDtos.Id);
             return songDtos;
         }
 
