@@ -50,7 +50,7 @@ namespace TuneYourMood.Data.Repositories
             if (string.IsNullOrEmpty(song.SongName))
                 throw new Exception("Song does not have a valid file path.");
 
-            var url = await _s3Service.GetDownloadUrlAsync(song.FilePath);
+            var url = await _s3Service.GeneratePresignedUrlAsync(song.FilePath, "audio/mpeg");
             return url;
         }
 
