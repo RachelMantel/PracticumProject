@@ -4,7 +4,6 @@ import {Card,CardContent,Box,Typography,IconButton,Menu,MenuItem,TextField,Chip,
 Fade,Select,FormControl,InputLabel,type SelectChangeEvent,} from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
-import PauseIcon from "@mui/icons-material/Pause"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -192,7 +191,7 @@ const SongCard = ({
               "&:hover": { background: "rgba(0,0,0,0.1)" },
             }}
           >
-            {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+            <PlayArrowIcon />
           </IconButton>
         </Box>
       </Box>
@@ -376,43 +375,6 @@ const SongCard = ({
                   />
                 )}
               </Box>
-
-              {/* Audio visualization (decorative) */}
-              {isPlaying && (
-                <Box
-                  sx={{
-                    mt: 1.5,
-                    display: "flex",
-                    alignItems: "flex-end",
-                    height: 20,
-                    gap: 0.5,
-                  }}
-                >
-                  {[...Array(12)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{
-                        height: [
-                          `${4 + Math.random() * 16}px`,
-                          `${4 + Math.random() * 16}px`,
-                          `${4 + Math.random() * 16}px`,
-                        ],
-                      }}
-                      transition={{
-                        duration: 0.8,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "reverse",
-                        delay: i * 0.05,
-                      }}
-                      style={{
-                        width: 3,
-                        borderRadius: 2,
-                        background: `linear-gradient(to top, ${songColor}, #E91E63)`,
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
             </motion.div>
           )}
         </AnimatePresence>

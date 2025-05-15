@@ -1,3 +1,5 @@
+"use client"
+
 import { Paper, Typography, IconButton, Box, Slider } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import type { SongType } from "../../models/songType"
@@ -16,15 +18,22 @@ interface MusicPlayerProps {
 }
 
 const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const [isPlaying, setIsPlaying] = useState(true)
+  // Use a direct reference to the audio element to avoid React re-renders affecting playback
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(0.7)
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null)
+  const [audioData, setAudioData] = useState<number[]>(Array(16).fill(0.3))
+  const [audioInitialized, setAudioInitialized] = useState(false)
 
+  // Fixed colors to match your site
+  const primaryColor = "#E91E63" // Pink
+  const secondaryColor = "#FF5722" // Orange
+
+  // Create portal element
   useEffect(() => {
-    // Create a portal element at the document body level
     const element = document.createElement("div")
     element.id = "music-player-portal"
     document.body.appendChild(element)
@@ -37,12 +46,33 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     }
   }, [])
 
+  // Initialize audio element only once
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
+    if (audioInitialized) return
+
+    // Create audio element
+    const audio = new Audio()
+    audioRef.current = audio
 
     // Set initial volume
     audio.volume = volume
+
+    // Mark as initialized
+    setAudioInitialized(true)
+
+    // Clean up on unmount
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ""
+      }
+    }
+  }, [audioInitialized, volume])
+
+  // Set up audio event listeners
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime)
@@ -58,97 +88,128 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
       setCurrentTime(audio.duration)
     }
 
-    // Add event listeners
+    const handlePlay = () => {
+      console.log("Audio play event")
+      setIsPlaying(true)
+    }
+
+    const handlePause = () => {
+      console.log("Audio pause event")
+      setIsPlaying(false)
+    }
+
     audio.addEventListener("timeupdate", handleTimeUpdate)
     audio.addEventListener("loadedmetadata", handleLoadedMetadata)
     audio.addEventListener("ended", handleEnded)
-
-    // Auto-play when component mounts
-    const playPromise = audio.play()
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        console.error("Auto-play failed:", error)
-        setIsPlaying(false)
-      })
-    }
-
-    // If the audio already has metadata loaded, set the duration immediately
-    if (audio.readyState >= 1) {
-      setDuration(audio.duration)
-    }
+    audio.addEventListener("play", handlePlay)
+    audio.addEventListener("pause", handlePause)
 
     return () => {
-      audio.pause()
       audio.removeEventListener("timeupdate", handleTimeUpdate)
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
       audio.removeEventListener("ended", handleEnded)
+      audio.removeEventListener("play", handlePlay)
+      audio.removeEventListener("pause", handlePause)
     }
-  }, [volume])
+  }, [audioInitialized])
 
-  // Reset player when song changes
-useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
+  // Handle visualization animation - SLOWER as requested
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout
 
-  setCurrentTime(0);
-  setIsPlaying(true);
-
-  let songUrl = song.filePath;
-  
-  try {
-    const url = new URL(songUrl);
-    const pathParts = url.pathname.split('/');
-    
-    if (pathParts.some(part => part.includes('amazonaws.com'))) {
-      console.error('Invalid URL detected, attempting to fix:', songUrl);
-      
-      const fileName = pathParts[pathParts.length - 1];
-      
-      const baseUrl = `${url.protocol}//${url.host}`;
-      songUrl = `${baseUrl}/${fileName}`;
-      
-      console.log('Fixed URL:', songUrl);
+    if (isPlaying) {
+      // Simulate audio visualization with slower movement
+      intervalId = setInterval(() => {
+        setAudioData((prevData) =>
+          prevData.map((value) => {
+            // Smaller changes for slower movement
+            const change = Math.random() * 0.2 - 0.1
+            return Math.max(0.2, Math.min(0.8, value + change))
+          }),
+        )
+      }, 400) // Slower update interval (400ms instead of 200ms)
     }
-  } catch (error) {
-    console.error('Error parsing URL:', error);
-  }
 
-  // Load new song with fixed URL
-  audio.src = songUrl;
-  audio.load();
+    return () => {
+      if (intervalId) clearInterval(intervalId)
+    }
+  }, [isPlaying])
 
-  // Play new song
-  const playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise.catch((error) => {
-      console.error("Auto-play failed:", error);
-      setIsPlaying(false);
-    });
-  }
-}, [song.filePath]);
+  // Load and play song when it changes
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !audioInitialized) return
+
+    console.log("Loading song:", song.filePath)
+
+    // Reset state
+    setCurrentTime(0)
+
+    // Process the URL to fix any issues
+    let songUrl = song.filePath
+
+    try {
+      const url = new URL(songUrl)
+      const pathParts = url.pathname.split("/")
+
+      if (pathParts.some((part) => part.includes("amazonaws.com"))) {
+        console.log("Fixing Amazon URL")
+        const fileName = pathParts[pathParts.length - 1]
+        const baseUrl = `${url.protocol}//${url.host}`
+        songUrl = `${baseUrl}/${fileName}`
+      }
+    } catch (error) {
+      console.log("URL parsing error, using original URL:", error)
+    }
+
+    // Set the source and load
+    audio.src = songUrl
+    audio.load()
+
+    // Try to play
+    audio
+      .play()
+      .then(() => {
+        console.log("Audio started playing successfully")
+        setIsPlaying(true)
+      })
+      .catch((error) => {
+        console.error("Auto-play failed:", error)
+        setIsPlaying(false)
+      })
+  }, [song.filePath, audioInitialized])
 
   const handlePlayPause = () => {
     const audio = audioRef.current
     if (!audio) return
 
+    console.log("Play/Pause button clicked. Current state:", isPlaying)
+
     if (isPlaying) {
       audio.pause()
     } else {
-      const playPromise = audio.play()
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error("Play failed:", error)
+      audio
+        .play()
+        .then(() => {
+          console.log("Play successful from button click")
         })
-      }
+        .catch((err) => {
+          console.error("Play failed from button click:", err)
+        })
     }
-    setIsPlaying(!isPlaying)
   }
 
   const handleVolumeChange = (_: Event, newValue: number | number[]) => {
     const newVolume = newValue as number
     setVolume(newVolume)
+
     if (audioRef.current) {
       audioRef.current.volume = newVolume
+
+      // If audio was paused due to volume change, try to resume
+      if (!audioRef.current.paused && !isPlaying) {
+        setIsPlaying(true)
+      }
     }
   }
 
@@ -163,10 +224,48 @@ useEffect(() => {
   const handleSeek = (_: Event, newValue: number | number[]) => {
     const newTime = newValue as number
     setCurrentTime(newTime)
+
     if (audioRef.current) {
       audioRef.current.currentTime = newTime
     }
   }
+
+  // Container variants for animation
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+        delayChildren: 0.1,
+        staggerChildren: 0.05,
+      },
+    },
+  }
+
+  // Item variants for staggered animations
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" },
+    },
+  }
+
+  // Musical notes data - MORE NOTES as requested
+  const musicalNotes = [
+    { x: 40, y: 80, size: "1.5rem", color: primaryColor, delay: 0 },
+    { x: 40, y: 70, size: "1.8rem", color: secondaryColor, delay: 1 },
+    { x: 60, y: 120, size: "1.3rem", color: primaryColor, delay: 0.5 },
+    { x: 80, y: 60, size: "1.6rem", color: secondaryColor, delay: 1.5 },
+    { x: 100, y: 140, size: "1.4rem", color: primaryColor, delay: 0.7 },
+    { x: 120, y: 90, size: "1.7rem", color: secondaryColor, delay: 1.2 },
+    { x: 140, y: 110, size: "1.5rem", color: primaryColor, delay: 0.3 },
+    { x: 160, y: 70, size: "1.3rem", color: secondaryColor, delay: 0.9 },
+  ]
 
   const playerContent = (
     <>
@@ -178,7 +277,7 @@ useEffect(() => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(255, 255, 255, 0.6)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           backdropFilter: "blur(5px)",
           zIndex: 1000,
         }}
@@ -198,21 +297,67 @@ useEffect(() => {
         onClick={(e) => e.stopPropagation()}
       >
         <Paper
-          elevation={8}
+          component={motion.div}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           sx={{
             borderRadius: 6,
             overflow: "hidden",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+            boxShadow: `0 10px 40px ${primaryColor}40`,
             backgroundColor: "white",
+            position: "relative",
           }}
         >
-          {/* Header with gradient */}
+          {/* Background elements inspired by mood-result */}
           <Box
             sx={{
-              background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.05,
+              background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
+              zIndex: 0,
+            }}
+          />
+
+          {/* Circular glow */}
+          <Box
+            component={motion.div}
+            animate={{
+              scale: [1, 1.05, 1],
+              opacity: [0.6, 0.8, 0.6],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+            }}
+            sx={{
+              position: "absolute",
+              top: "40%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "200px",
+              height: "200px",
+              borderRadius: "50%",
+              background: `radial-gradient(circle, ${primaryColor}20 0%, transparent 70%)`,
+              zIndex: 0,
+            }}
+          />
+
+          {/* Header with gradient */}
+          <Box
+            component={motion.div}
+            variants={itemVariants}
+            sx={{
+              background: `linear-gradient(90deg, ${primaryColor} 0%, ${secondaryColor} 100%)`,
               color: "white",
               p: 2,
               position: "relative",
+              zIndex: 1,
             }}
           >
             <IconButton
@@ -234,114 +379,243 @@ useEffect(() => {
           </Box>
 
           {/* Content */}
-          <Box sx={{ p: 4, textAlign: "center" }}>
-            {/* Album art / music icon */}
-            <motion.div
-              animate={{
-                scale: isPlaying ? [1, 1.1, 1] : 1,
-                rotate: isPlaying ? [0, 10, 0] : 0,
+          <Box sx={{ p: 4, textAlign: "center", position: "relative", zIndex: 1 }}>
+            {/* Audio visualization bars - styled like mood-result but SLOWER */}
+            <Box
+              component={motion.div}
+              variants={itemVariants}
+              sx={{
+                height: 100,
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                gap: 1,
+                mb: 4,
+                mt: 1,
+                position: "relative",
               }}
-              transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5, ease: "easeInOut" }}
             >
+              {audioData.map((value, i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    height: `${10 + value * 80}px`,
+                  }}
+                  transition={{
+                    duration: 0.6, // SLOWER animation
+                    ease: "easeInOut",
+                  }}
+                  style={{
+                    width: 5,
+                    borderRadius: 4,
+                    background: `linear-gradient(to top, ${primaryColor}, ${secondaryColor})`,
+                    boxShadow: `0 0 8px ${primaryColor}50`,
+                    opacity: 0.9,
+                  }}
+                />
+              ))}
+
+              {/* Glow under the bars */}
               <Box
                 sx={{
-                  width: 150,
-                  height: 150,
+                  position: "absolute",
+                  bottom: -10,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "80%",
+                  height: 20,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "3rem",
-                  margin: "0 auto 24px",
-                  boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-                  border: "4px solid white",
+                  filter: "blur(10px)",
+                  background: `radial-gradient(ellipse, ${primaryColor}30 0%, transparent 70%)`,
                 }}
-              >
-                🎵
-              </Box>
-            </motion.div>
+              />
+            </Box>
 
             {/* Song info */}
-            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-              {song.songName}
-            </Typography>
-            <Typography variant="subtitle1" sx={{ color: "text.secondary", mb: 3 }}>
-              {song.artist}
-            </Typography>
-
-            {/* Audio controls */}
-            <Box sx={{ mb: 2 }}>
-              <audio ref={audioRef} src={song.filePath} preload="metadata" />
-
-              {/* Progress bar */}
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Typography
-                  variant="caption"
-                  sx={{ mr: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
-                >
-                  {formatTime(currentTime)}
-                </Typography>
-                <Slider
-                  value={currentTime}
-                  min={0}
-                  max={duration || 100}
-                  onChange={handleSeek}
-                  sx={{
-                    color: "#E91E63",
-                    "& .MuiSlider-thumb": {
-                      width: 12,
-                      height: 12,
-                    },
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ ml: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
-                >
-                  {formatTime(duration)}
-                </Typography>
-              </Box>
-
-              {/* Play/Pause button */}
-              <IconButton
-                onClick={handlePlayPause}
+            <motion.div variants={itemVariants}>
+              <Typography
+                variant="h5"
                 sx={{
-                  backgroundColor: "#E91E63",
-                  color: "white",
-                  "&:hover": { backgroundColor: "#d81b60" },
-                  width: 56,
-                  height: 56,
-                  mb: 2,
+                  fontWeight: "bold",
+                  mb: 0.5,
+                  color: "text.primary",
+                  textShadow: `0 2px 10px ${primaryColor}20`,
                 }}
               >
-                {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-              </IconButton>
+                {song.songName}
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  color: "text.secondary",
+                  mb: 3,
+                }}
+              >
+                {song.artist}
+              </Typography>
+            </motion.div>
+
+            {/* Audio controls */}
+            <Box sx={{ mb: 2, position: "relative", zIndex: 2 }}>
+              {/* Progress bar */}
+              <motion.div variants={itemVariants}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ mr: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
+                  >
+                    {formatTime(currentTime)}
+                  </Typography>
+                  <Slider
+                    value={currentTime}
+                    min={0}
+                    max={duration || 100}
+                    onChange={handleSeek}
+                    sx={{
+                      color: primaryColor,
+                      "& .MuiSlider-thumb": {
+                        width: 12,
+                        height: 12,
+                        "&:hover, &.Mui-focusVisible": {
+                          boxShadow: `0px 0px 0px 8px ${primaryColor}30`,
+                        },
+                      },
+                      "& .MuiSlider-rail": {
+                        opacity: 0.3,
+                      },
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ ml: 1, color: "text.secondary", minWidth: 35, textAlign: "center" }}
+                  >
+                    {formatTime(duration)}
+                  </Typography>
+                </Box>
+              </motion.div>
+
+              {/* Play/Pause button */}
+              <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.05 }}>
+                <IconButton
+                  onClick={handlePlayPause}
+                  sx={{
+                    backgroundColor: primaryColor,
+                    color: "white",
+                    "&:hover": { backgroundColor: secondaryColor },
+                    width: 56,
+                    height: 56,
+                    mb: 2,
+                    boxShadow: `0 4px 12px ${primaryColor}50`,
+                  }}
+                >
+                  {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+                </IconButton>
+              </motion.div>
 
               {/* Volume control */}
-              <Box sx={{ display: "flex", alignItems: "center", width: "80%", margin: "0 auto" }}>
-                <IconButton onClick={() => setVolume(volume === 0 ? 0.5 : 0)} sx={{ color: "text.secondary" }}>
-                  {volume === 0 ? <VolumeMuteIcon /> : volume < 0.5 ? <VolumeDownIcon /> : <VolumeUpIcon />}
-                </IconButton>
-                <Slider
-                  value={volume}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onChange={handleVolumeChange}
-                  sx={{
-                    color: "#E91E63",
-                    "& .MuiSlider-thumb": {
-                      width: 12,
-                      height: 12,
-                    },
-                  }}
-                />
-              </Box>
+              <motion.div variants={itemVariants}>
+                <Box sx={{ display: "flex", alignItems: "center", width: "80%", margin: "0 auto" }}>
+                  <IconButton onClick={() => setVolume(volume === 0 ? 0.5 : 0)} sx={{ color: "text.secondary" }}>
+                    {volume === 0 ? <VolumeMuteIcon /> : volume < 0.5 ? <VolumeDownIcon /> : <VolumeUpIcon />}
+                  </IconButton>
+                  <Slider
+                    value={volume}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    onChange={handleVolumeChange}
+                    sx={{
+                      color: primaryColor,
+                      "& .MuiSlider-thumb": {
+                        width: 12,
+                        height: 12,
+                      },
+                    }}
+                  />
+                </Box>
+              </motion.div>
             </Box>
+
+            {/* Decorative elements inspired by mood-result */}
+            <Box
+              component={motion.div}
+              animate={{
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              }}
+              sx={{
+                position: "absolute",
+                top: -20,
+                right: -20,
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                background: `radial-gradient(circle, ${primaryColor}20 0%, transparent 70%)`,
+                zIndex: 0,
+              }}
+            />
+
+            <Box
+              component={motion.div}
+              animate={{
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+                delay: 1,
+              }}
+              sx={{
+                position: "absolute",
+                bottom: -30,
+                left: -30,
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                background: `radial-gradient(circle, ${secondaryColor}20 0%, transparent 70%)`,
+                zIndex: 0,
+              }}
+            />
+
+            {/* MORE musical notes on the card as requested */}
+            {isPlaying &&
+              musicalNotes.map((note, index) => (
+                <Box
+                  key={index}
+                  component={motion.div}
+                  animate={{
+                    y: [-5, 5, -5],
+                    opacity: [0.2, 0.3, 0.2],
+                  }}
+                  transition={{
+                    duration: 5 + Math.random() * 2, // Varied durations
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                    delay: note.delay,
+                  }}
+                  sx={{
+                    position: "absolute",
+                    top: note.y,
+                    left: note.x,
+                    fontSize: note.size,
+                    color: note.color,
+                    zIndex: 0,
+                  }}
+                >
+                  {["♪", "♫", "♬", "♩"][index % 4]}
+                </Box>
+              ))}
           </Box>
         </Paper>
       </Box>
+
+      {/* Hidden audio element for debugging */}
+      <audio id="debug-audio" ref={audioRef} style={{ display: "none" }} controls />
     </>
   )
 

@@ -109,18 +109,14 @@ namespace TuneYourMood.Service
         {
             try
             {
-                // בדיקה אם fileName הוא כבר URL מלא
                 if (fileName.StartsWith("http"))
                 {
                     Console.WriteLine($"Warning: fileName appears to be a full URL: {fileName}");
 
                     try
                     {
-                        // נסה לחלץ את שם הקובץ האמיתי מה-URL
                         Uri uri = new Uri(fileName);
                         string path = uri.AbsolutePath;
-
-                        // חלץ את החלק האחרון של הנתיב (שם הקובץ)
                         string actualFileName = path.Split('/').Last();
 
                         Console.WriteLine($"Extracted actual filename: {actualFileName}");
@@ -129,14 +125,10 @@ namespace TuneYourMood.Service
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Failed to parse URL: {ex.Message}");
-                        // המשך עם הערך המקורי אם הפרסור נכשל
                     }
                 }
 
-                // טיפול בשמות קבצים בעברית
                 string encodedFileName = fileName;
-
-                // בדיקה אם הקובץ קיים
                 try
                 {
                     var metadata = await _s3Client.GetObjectMetadataAsync(new GetObjectMetadataRequest
@@ -149,7 +141,6 @@ namespace TuneYourMood.Service
                 {
                     Console.WriteLine($"File not found with original name: {fileName}");
 
-                    // אם הקובץ לא נמצא, ננסה לקודד את שם הקובץ
                     try
                     {
                         encodedFileName = System.Web.HttpUtility.UrlDecode(fileName);
@@ -164,8 +155,6 @@ namespace TuneYourMood.Service
                     catch (Exception innerEx)
                     {
                         Console.WriteLine($"Still not found with decoded name: {innerEx.Message}");
-
-                        // נסה אפשרות נוספת - החלפת רווחים
                         encodedFileName = fileName.Replace(" ", "+");
                         Console.WriteLine($"Trying with spaces replaced: {encodedFileName}");
                     }
