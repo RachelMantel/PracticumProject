@@ -1,5 +1,3 @@
-"use client"
-
 import { Paper, Typography, IconButton, Box, Slider } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import type { SongType } from "../../models/songType"
@@ -18,21 +16,18 @@ interface MusicPlayerProps {
 }
 
 const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
-  // Use a direct reference to the audio element to avoid React re-renders affecting playback
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.7)
+  const [volume, setVolume] = useState(0.5)
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null)
   const [audioData, setAudioData] = useState<number[]>(Array(16).fill(0.3))
   const [audioInitialized, setAudioInitialized] = useState(false)
 
-  // Fixed colors to match your site
-  const primaryColor = "#E91E63" // Pink
-  const secondaryColor = "#FF5722" // Orange
+  const primaryColor = "#E91E63" 
+  const secondaryColor = "#FF5722" 
 
-  // Create portal element
   useEffect(() => {
     const element = document.createElement("div")
     element.id = "music-player-portal"
@@ -46,18 +41,13 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     }
   }, [])
 
-  // Initialize audio element only once
   useEffect(() => {
     if (audioInitialized) return
 
-    // Create audio element
     const audio = new Audio()
     audioRef.current = audio
-
-    // Set initial volume
     audio.volume = volume
 
-    // Mark as initialized
     setAudioInitialized(true)
 
     // Clean up on unmount
