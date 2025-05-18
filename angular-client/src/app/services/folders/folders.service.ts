@@ -1,5 +1,6 @@
-import { Injectable, inject } from "@angular/core"
+import { Injectable, inject, PLATFORM_ID } from "@angular/core"
 import { HttpClient, HttpHeaders } from "@angular/common/http"
+import { isPlatformBrowser } from "@angular/common"
 import type { Observable } from "rxjs"
 import { Folder } from "../../models/folder.model"
 
@@ -8,6 +9,7 @@ import { Folder } from "../../models/folder.model"
 })
 export class FolderService {
   private http = inject(HttpClient)
+  private platformId = inject(PLATFORM_ID)
   private API_BASE_URL = "https://tuneyourmood-server.onrender.com/api/Folder/"
 
   getUserFolders(userId: number): Observable<Folder[]> {
@@ -41,10 +43,15 @@ export class FolderService {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem("token")
+    let token = ""
+    if (isPlatformBrowser(this.platformId)) {
+      token = localStorage.getItem("token") || ""
+    }
+
     return new HttpHeaders({
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     })
   }
 }
+

@@ -1,17 +1,28 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly tokenKey = 'authToken';
+  private isBrowser: boolean;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   saveToken(token: string): void {
-    localStorage.setItem(this.tokenKey, token);
+    if (this.isBrowser) {
+      localStorage.setItem(this.tokenKey, token);
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    if (this.isBrowser) {
+      return localStorage.getItem(this.tokenKey);
+    }
+    return null;
   }
 
   isLoggedIn(): boolean {
@@ -19,7 +30,9 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
+    if (this.isBrowser) {
+      localStorage.removeItem(this.tokenKey);
+    }
   }
 
   getUserRole(): string | null {
@@ -29,11 +42,11 @@ export class AuthService {
       const payloadBase64 = token.split('.')[1];
       const payloadJson = atob(payloadBase64);
       const payload = JSON.parse(payloadJson);
-      
-    if (Array.isArray(payload.role)) {
-      return payload.role.includes("Admin") ? "Admin" : "User";
-    } 
-    return null;
+
+      if (Array.isArray(payload.role)) {
+        return payload.role.includes("Admin") ? "Admin" : "User";
+      }
+      return null;
     } catch (error) {
       console.error('Invalid token format', error);
       return null;

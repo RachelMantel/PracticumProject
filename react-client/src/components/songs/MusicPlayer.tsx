@@ -103,21 +103,18 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     }
   }, [audioInitialized])
 
-  // Handle visualization animation - SLOWER as requested
   useEffect(() => {
     let intervalId: NodeJS.Timeout
 
     if (isPlaying) {
-      // Simulate audio visualization with slower movement
       intervalId = setInterval(() => {
         setAudioData((prevData) =>
           prevData.map((value) => {
-            // Smaller changes for slower movement
             const change = Math.random() * 0.2 - 0.1
             return Math.max(0.2, Math.min(0.8, value + change))
           }),
         )
-      }, 400) // Slower update interval (400ms instead of 200ms)
+      }, 400) 
     }
 
     return () => {
@@ -125,7 +122,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     }
   }, [isPlaying])
 
-  // Load and play song when it changes
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !audioInitialized) return
@@ -135,7 +131,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     // Reset state
     setCurrentTime(0)
 
-    // Process the URL to fix any issues
     let songUrl = song.filePath
 
     try {
@@ -152,11 +147,9 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
       console.log("URL parsing error, using original URL:", error)
     }
 
-    // Set the source and load
     audio.src = songUrl
     audio.load()
 
-    // Try to play
     audio
       .play()
       .then(() => {
@@ -196,7 +189,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     if (audioRef.current) {
       audioRef.current.volume = newVolume
 
-      // If audio was paused due to volume change, try to resume
       if (!audioRef.current.paused && !isPlaying) {
         setIsPlaying(true)
       }
@@ -220,7 +212,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     }
   }
 
-  // Container variants for animation
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
@@ -235,7 +226,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     },
   }
 
-  // Item variants for staggered animations
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: {
@@ -245,7 +235,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
     },
   }
 
-  // Musical notes data - MORE NOTES as requested
   const musicalNotes = [
     { x: 40, y: 80, size: "1.5rem", color: primaryColor, delay: 0 },
     { x: 40, y: 70, size: "1.8rem", color: secondaryColor, delay: 1 },
@@ -259,7 +248,6 @@ const MusicPlayer = ({ song, onClose }: MusicPlayerProps) => {
 
   const playerContent = (
     <>
-      {/* Background overlay */}
       <Box
         sx={{
           position: "fixed",

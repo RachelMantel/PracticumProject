@@ -136,7 +136,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// מוסיף את המשתנים ל-AppSettings בצורה דינאמית
 builder.Configuration["AWS:BucketName"] = Env.GetString("AWS_BUCKET_NAME");
 builder.Configuration["AWS:Region"] = Env.GetString("AWS_REGION");
 builder.Configuration["AWS:AccessKey"] = Env.GetString("AWS_ACCESS_KEY");
@@ -145,7 +144,7 @@ builder.Configuration["AWS:SecretKey"] = Env.GetString("AWS_SECRET_KEY");
 var app = builder.Build();
 
 
-// ?? סידור ה-Middleware לפי הסדר הנכון
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

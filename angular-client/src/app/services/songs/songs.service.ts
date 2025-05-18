@@ -21,10 +21,7 @@ export class SongsService {
   private _duration = new BehaviorSubject<number>(0)
   private _volume = new BehaviorSubject<number>(1)
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object,
-  ) {
+  constructor(private http: HttpClient,@Inject(PLATFORM_ID) platformId: Object, ) {
     this.isBrowser = isPlatformBrowser(platformId)
 
     // Only initialize audio player if in browser environment

@@ -1,24 +1,6 @@
-<!-- <div class="dashboard-container">
-    <h2>Graphical Dashboard</h2>
-  
-    <div class="chart-container">
-      <canvas #userChartCanvas></canvas>
-    </div>
-  
-    <div class="chart-container">
-      <canvas #songChartCanvas></canvas>
-    </div>
-  </div>
-   -->
-
-   <div class="charts-container">
-    <canvas id="userChart"></canvas>
-    <canvas id="songChart"></canvas>
-  </div>
-
-  <!-- <div style="display: grid; gap: 2rem;">
-    <canvas #userChartCanvas id="userChart"></canvas>
-    <canvas #songChartCanvas id="songChart"></canvas>
-  </div>
-   -->
-  
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; padding: 20px;">
+  <canvas id="userLineChart"></canvas>
+  <canvas id="songBarChart"></canvas>
+  <canvas id="userByDayChart"></canvas>
+  <canvas id="songByHourChart"></canvas>
+</div>
