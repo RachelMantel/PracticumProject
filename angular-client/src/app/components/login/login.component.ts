@@ -35,7 +35,7 @@ export class LoginComponent {
   user: Admin = new Admin("", "", "")
   hidePassword = true
   isLoading = false
-  currentUrl = "https://localhost:7238/api"
+  currentUrl = "https://tuneyourmood-server.onrender.com/api"
   private isBrowser: boolean
 
   constructor(
