@@ -7,7 +7,7 @@ import { User } from '../../models/user.model';
   providedIn: 'root'
 })
 export class UsersService {
-  private baseUrl = 'https://localhost:7238/api/User';
+  private baseUrl = 'https://tuneyourmood-server.onrender.com/api/User';
   public users: BehaviorSubject<User[]> = new BehaviorSubject<User[]>([]);
 
   constructor(private http: HttpClient) {}
