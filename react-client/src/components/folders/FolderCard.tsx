@@ -5,29 +5,12 @@ import { motion } from "framer-motion"
 import type { AppDispatch } from "../redux/store"
 import { fetchSongsByFolder } from "../redux/FolderSlice"
 import type { FolderType } from "../../models/folderType"
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  IconButton,
-  Menu,
-  MenuItem,
-  Divider,
-  Button,
-  CircularProgress,
-  Tooltip,
-} from "@mui/material"
-import {
-  MoreVert as MoreVertIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
+import {Card,CardContent,Typography,Box,IconButton,Menu,
+  MenuItem,Divider,Button,CircularProgress,Tooltip,} from "@mui/material"
+import {MoreVert as MoreVertIcon,Edit as EditIcon,Delete as DeleteIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
-  LibraryMusic,
-  MusicNote,
-  Refresh as RefreshIcon,
-} from "@mui/icons-material"
+  KeyboardArrowUp as KeyboardArrowUpIcon,LibraryMusic,
+  MusicNote,Refresh as RefreshIcon,} from "@mui/icons-material"
 import ShowSongs from "../songs/ShowSongs"
 import EditFolderDialog from "./EditFolderDialog"
 import DeleteFolderDialog from "./DeleteFolderDialog"
@@ -47,23 +30,20 @@ const FolderCard = ({ folder }: FolderCardProps) => {
   const [isHovered, setIsHovered] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [songCount, setSongCount] = useState(folder.songs?.length || 0)
-  const [refreshKey, setRefreshKey] = useState(0) // Add a refresh key to force re-render
+  const [refreshKey, setRefreshKey] = useState(0)
   const [localSongs, setLocalSongs] = useState(songs)
 
-  // Function to refresh songs data
   const refreshSongs = useCallback(async () => {
     if (folder?.id) {
       setLoading(true)
       await dispatch(fetchSongsByFolder(folder.id))
       setLoading(false)
-      setRefreshKey((prev) => prev + 1) // Increment refresh key to force re-render
+      setRefreshKey((prev) => prev + 1) 
     }
   }, [dispatch, folder?.id])
 
-  // Fetch songs count when component mounts or when folder is opened
   useEffect(() => {
     const fetchSongsCount = async () => {
-      // Only fetch if we don't already have the songs and the folder has an ID
       if ((songs.length === 0 || isOpen) && folder?.id) {
         setLoading(true)
         await dispatch(fetchSongsByFolder(folder.id))
