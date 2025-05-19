@@ -2,16 +2,15 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchUserSongs } from "../redux/SongSlice"
-import {Box,Button,Typography,CircularProgress,Dialog,IconButton,useMediaQuery,
-useTheme,Paper,InputBase,} from "@mui/material"
+import { Box, Button, Typography, CircularProgress, Paper, InputBase } from "@mui/material"
 import { motion } from "framer-motion"
 import AddIcon from "@mui/icons-material/Add"
-import CloseIcon from "@mui/icons-material/Close"
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic"
 import MusicNoteIcon from "@mui/icons-material/MusicNote"
 import SearchIcon from "@mui/icons-material/Search"
 import ShowSongs from "./ShowSongs"
 import SongUploader from "./SongUploader"
+
 
 const AllSongs = () => {
   const dispatch = useDispatch()
@@ -21,8 +20,6 @@ const AllSongs = () => {
   const [user] = useState(() => JSON.parse(localStorage.getItem("user") || "null"))
   const [isUploadOpen, setUploadOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
     if (user && user.id) {
@@ -32,6 +29,17 @@ const AllSongs = () => {
 
   const handleCloseUpload = () => {
     setUploadOpen(false)
+  }
+
+  const handleUploadSuccess = () => {
+    // Refresh songs after successful upload
+    if (user && user.id) {
+      dispatch(fetchUserSongs(user.id) as any)
+    }
+    // Close uploader after a delay to show success message
+    setTimeout(() => {
+      setUploadOpen(false)
+    }, 2000)
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +76,7 @@ const AllSongs = () => {
 
   if (loading) {
     return (
-      <Box>       
+      <Box>
         <Box sx={{ position: "relative", zIndex: 1, textAlign: "center" }}>
           <CircularProgress
             sx={{
@@ -245,7 +253,6 @@ const AllSongs = () => {
         </Paper>
       </Box>
 
-      
       {/* Songs List */}
       <Box component={motion.div} variants={itemVariants}>
         {filteredSongs.length > 0 ? (
@@ -297,40 +304,8 @@ const AllSongs = () => {
         )}
       </Box>
 
-      {/* Upload Dialog */}
-      <Dialog
-        open={isUploadOpen}
-        onClose={handleCloseUpload}
-        maxWidth="md"
-        fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            overflow: "visible",
-          },
-        }}
-      >
-        <Box sx={{ position: "relative" }}>
-          <IconButton
-            onClick={handleCloseUpload}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              zIndex: 10,
-              backgroundColor: "rgba(255,255,255,0.9)",
-              color: "#E91E63",
-              "&:hover": {
-                backgroundColor: "rgba(233,30,99,0.1)",
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <SongUploader onUploadSuccess={handleCloseUpload} />
-        </Box>
-      </Dialog>
+      {/* Render SongUploader as a modal when isUploadOpen is true */}
+      {isUploadOpen && <SongUploader onClose={handleCloseUpload} onUploadSuccess={handleUploadSuccess} />}
     </Box>
   )
 }

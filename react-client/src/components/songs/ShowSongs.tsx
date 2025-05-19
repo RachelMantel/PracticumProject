@@ -1,21 +1,23 @@
-import { useState } from "react"
+"use client"
+
+import { useState, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Stack, Typography, Box, Alert } from "@mui/material"
+import { Stack, Typography, Box, Alert, CircularProgress } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import SongCard from "./SongCard"
 import type { SongType } from "../../models/songType"
 import type { AppDispatch } from "../redux/store"
 import { deleteSong, updateSong } from "../redux/SongSlice"
 import { addSongToFolder, deleteSongFromFolder } from "../redux/FolderSlice"
-import MusicPlayer from "./MusicPlayer"
 import { useLocation } from "react-router-dom"
 
 interface ShowSongsProps {
   songs: Array<SongType>
   folderId?: number // Add folderId prop to know if we're in a folder view
+  onSongRemoved?: (songId: number) => void // Callback for when a song is removed (for folder synchronization)
 }
 
-const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
+const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const folders = useSelector((state: any) => state.folders.folders || [])
   const loading = useSelector((state: any) => state.songs?.loading || false)
@@ -24,64 +26,147 @@ const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
 
   const [playingSong, setPlayingSong] = useState<SongType | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
 
   // Determine if we're in a folder/playlist view
   const isInFolderView = Boolean(folderId) || location.pathname.includes("/my-playlists")
 
-  const handleMoveSong = (song: SongType, targetFolderId: number) => {
-    if (targetFolderId) {
-      const updatedSong = { ...song, folderId: targetFolderId }
-      dispatch(addSongToFolder({ folderId: targetFolderId, song: updatedSong }))
-      showSuccessMessage("Song successfully added to playlist")
-    }
-  }
+  const handleMoveSong = useCallback(
+    (song: SongType, targetFolderId: number) => {
+      if (targetFolderId) {
+        const updatedSong = { ...song, folderId: targetFolderId }
+        dispatch(addSongToFolder({ folderId: targetFolderId, song: updatedSong }))
+        showSuccessMessage("Song successfully added to playlist")
+      }
+    },
+    [dispatch],
+  )
 
-  const handleDeleteSong = (songId: number) => {    
-    if (isInFolderView && folderId) {
-      // Remove song from folder/playlist
-      dispatch(deleteSongFromFolder({ folderId, songId }))
-      showSuccessMessage("Song removed from playlist")
-    } else {
-      // Delete song completely
-      dispatch(deleteSong(songId))
-      showSuccessMessage("Song deleted successfully")
-    }
-  }
+  const handleDeleteSong = useCallback(
+    (songId: number) => {
+      if (isInFolderView && folderId) {
+        // Remove song from folder/playlist
+        dispatch(deleteSongFromFolder({ folderId, songId }))
+        showSuccessMessage("Song removed from playlist")
 
-  const handlePlaySong = (song: SongType) => {
-    setPlayingSong(song)
-  }
+        // Call the callback to notify parent component (FolderCard) that a song was removed
+        if (onSongRemoved) {
+          onSongRemoved(songId)
+        }
+      } else {
+        // Delete song completely
+        dispatch(deleteSong(songId))
+        showSuccessMessage("Song deleted successfully")
+      }
+    },
+    [dispatch, folderId, isInFolderView, onSongRemoved],
+  )
 
-  const handleEditSong = (updatedSong: SongType) => {
-    dispatch(updateSong(updatedSong))
-    showSuccessMessage("Song updated successfully")
-  }
+  const handlePlaySong = useCallback((song: SongType) => {
+    // Close any currently playing song first
+    setPlayingSong(null)
 
-  const handleDownloadSong = async (song: SongType) => {
-    try {
-      const response = await fetch(song.filePath)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = song.songName || "downloaded_song.mp3"
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+    // Small delay to ensure clean state before opening new player
+    setTimeout(() => {
+      setPlayingSong(song)
+    }, 50)
+  }, [])
 
-      window.URL.revokeObjectURL(url)
-      showSuccessMessage("Song successfully downloaded")
-    } catch (error) {
-      console.error("Error downloading the file:", error)
-    }
-  }
+  const handleEditSong = useCallback(
+    (updatedSong: SongType) => {
+      dispatch(updateSong(updatedSong))
+      showSuccessMessage("Song updated successfully")
+    },
+    [dispatch],
+  )
 
-  const showSuccessMessage = (message: string) => {
+  const showSuccessMessage = useCallback((message: string) => {
+    setErrorMessage(null)
     setSuccessMessage(message)
     setTimeout(() => {
       setSuccessMessage(null)
     }, 3000)
-  }
+  }, [])
+
+  const showErrorMessage = useCallback((message: string) => {
+    setSuccessMessage(null)
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }, [])
+
+  const handleDownloadSong = useCallback(
+    async (song: SongType) => {
+      if (!song.filePath) {
+        showErrorMessage("Song file path is missing")
+        return
+      }
+
+      setIsDownloading(true)
+      setDownloadProgress(0)
+
+      try {
+        showSuccessMessage("Downloading song...")
+
+        // Create a new XMLHttpRequest to track progress
+        const xhr = new XMLHttpRequest()
+        xhr.open("GET", song.filePath, true)
+        xhr.responseType = "blob"
+
+        // Track download progress
+        xhr.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100)
+            setDownloadProgress(progress)
+          }
+        }
+
+        // Handle completion
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const blob = xhr.response
+            const url = window.URL.createObjectURL(blob)
+            const filename = song.songName || "downloaded_song.mp3"
+
+            // Create a temporary link element
+            const a = document.createElement("a")
+            a.href = url
+            a.download = filename
+            document.body.appendChild(a)
+
+            // Trigger the download
+            a.click()
+
+            // Clean up
+            setTimeout(() => {
+              document.body.removeChild(a)
+              window.URL.revokeObjectURL(url)
+              setIsDownloading(false)
+              showSuccessMessage("Song successfully downloaded")
+            }, 100)
+          } else {
+            throw new Error(`Failed to download: ${xhr.status} ${xhr.statusText}`)
+          }
+        }
+
+        // Handle errors
+        xhr.onerror = () => {
+          throw new Error("Network error occurred during download")
+        }
+
+        // Start the download
+        xhr.send()
+      } catch (error) {
+        console.error("Error downloading the file:", error)
+        setIsDownloading(false)
+        showErrorMessage(`Download failed: ${error instanceof Error ? error.message : "Unknown error"}`)
+      }
+    },
+    [showSuccessMessage, showErrorMessage],
+  )
 
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
@@ -109,13 +194,59 @@ const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
               }}
             >
               {successMessage}
+              {isDownloading && (
+                <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                  <Box sx={{ width: "100%", mr: 1 }}>
+                    <LinearProgress variant="determinate" value={downloadProgress} />
+                  </Box>
+                  <Box sx={{ minWidth: 35 }}>
+                    <Typography variant="body2" color="text.secondary">{`${downloadProgress}%`}</Typography>
+                  </Box>
+                </Box>
+              )}
+            </Alert>
+          </motion.div>
+        )}
+
+        {errorMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{
+              position: "fixed",
+              top: 20,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 9999,
+              width: "auto",
+              maxWidth: "90%",
+            }}
+          >
+            <Alert
+              severity="error"
+              sx={{
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                borderRadius: "12px",
+              }}
+            >
+              {errorMessage}
             </Alert>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {loading && <Typography variant="h6">Loading songs...</Typography>}
-      {error && <Typography color="error">Error: {error}</Typography>}
+      {loading && (
+        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+          <CircularProgress sx={{ color: "#E91E63" }} />
+        </Box>
+      )}
+
+      {error && (
+        <Box sx={{ p: 3, bgcolor: "rgba(244, 67, 54, 0.1)", borderRadius: 2, mb: 3 }}>
+          <Typography color="error">Error: {error}</Typography>
+        </Box>
+      )}
 
       {songs.length > 0 ? (
         <Stack spacing={2}>
@@ -135,13 +266,21 @@ const ShowSongs = ({ songs, folderId }: ShowSongsProps) => {
           ))}
         </Stack>
       ) : (
-        !loading && <Typography>No songs available</Typography>
+        !loading && (
+          <Box sx={{ p: 4, textAlign: "center", bgcolor: "rgba(0,0,0,0.02)", borderRadius: 2 }}>
+            <Typography>No songs available</Typography>
+          </Box>
+        )
       )}
 
-      {/* Render MusicPlayer as a portal outside the component hierarchy */}
+      {/* Render MusicPlayer as a modal when a song is selected */}
       {playingSong && <MusicPlayer song={playingSong} onClose={() => setPlayingSong(null)} />}
     </Box>
   )
 }
+
+// Add missing import
+import { LinearProgress } from "@mui/material"
+import MusicPlayer from "./MusicPlayer"
 
 export default ShowSongs

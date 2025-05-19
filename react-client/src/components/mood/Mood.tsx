@@ -39,7 +39,10 @@ const Mood = () => {
         { headers: { "Content-Type": "application/json" } },
       )
 
+      
       const moodCategory = aiResponse.data.moodCategory
+      console.log(moodCategory);
+
       setAiResponse(moodCategory)
 
       // Add to recent moods if not already present

@@ -1,21 +1,39 @@
+"use client"
+
 import type React from "react"
-import { useState, useEffect } from "react"
-import {Card,CardContent,Box,Typography,IconButton,Menu,MenuItem,TextField,Chip,Tooltip,
-Fade,Select,FormControl,InputLabel,type SelectChangeEvent,} from "@mui/material"
-import { motion, AnimatePresence } from "framer-motion"
+
+import { useState, useCallback } from "react"
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Chip,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Select,
+  FormControl,
+  InputLabel,
+  type SelectChangeEvent,
+} from "@mui/material"
+import { motion } from "framer-motion"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
-import DownloadIcon from "@mui/icons-material/Download"
-import AddCircleIcon from "@mui/icons-material/AddCircle"
-import LibraryMusicIcon from "@mui/icons-material/LibraryMusic"
-import CheckIcon from "@mui/icons-material/Check"
-import CloseIcon from "@mui/icons-material/Close"
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload"
+import FolderIcon from "@mui/icons-material/Folder"
 import MusicNoteIcon from "@mui/icons-material/MusicNote"
-import AlbumIcon from "@mui/icons-material/Album"
-import CategoryIcon from "@mui/icons-material/Category"
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline"
 import type { SongType } from "../../models/songType"
 import type { FolderType } from "../../models/folderType"
 
@@ -23,10 +41,10 @@ interface SongCardProps {
   song: SongType
   folders: FolderType[]
   onPlay: (song: SongType) => void
-  onMoveSong: (song: SongType, folderId: number) => void
   onDelete: () => void
   onEdit: (updatedSong: SongType) => void
   onDownload: () => void
+  onMoveSong: (song: SongType, folderId: number) => void
   isInFolderView?: boolean
   folderId?: number
 }
@@ -35,523 +53,331 @@ const SongCard = ({
   song,
   folders,
   onPlay,
-  onMoveSong,
   onDelete,
   onEdit,
   onDownload,
+  onMoveSong,
   isInFolderView = false,
+  folderId,
 }: SongCardProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [subMenuOpen, setSubMenuOpen] = useState<null | HTMLElement>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false)
   const [editedSong, setEditedSong] = useState<SongType>({ ...song })
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [, setIsHovered] = useState(false)
+  const [selectedFolderId, setSelectedFolderId] = useState<number>(-1)
+  const [isHovered, setIsHovered] = useState(false)
 
-  // Mood choices
-  const moodChoices = ["happy", "sad", "excited", "angry", "relaxed", "hopeful", "grateful", "nervous"]
-
-  // Generate a color based on the song name
-  const generateColor = (str: string) => {
-    let hash = 0
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash)
-    }
-
-    // Generate colors in the pink/orange range to match the E91E63/FF5722 gradient
-    const h = ((hash % 30) + 340) % 360 // Hue between 340-370 (pinks/reds/oranges)
-    return `hsl(${h}, 80%, 65%)`
-  }
-
-  const songColor = generateColor(song.songName)
-
-  useEffect(() => {
-    setEditedSong({ ...song })
-  }, [song])
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     setAnchorEl(event.currentTarget)
-  }
+  }, [])
 
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null)
-    setSubMenuOpen(null)
-  }
+  }, [])
 
-  const handleMoveOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setSubMenuOpen(event.currentTarget)
-  }
+  const handlePlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      onPlay(song)
+    },
+    [onPlay, song],
+  )
 
-  const handleEditClick = () => {
-    setIsEditing(true)
+  const handleEditClick = useCallback(() => {
+    setEditDialogOpen(true)
     handleMenuClose()
-  }
+  }, [handleMenuClose])
 
-  const handleSaveEdit = () => {
+  const handleDeleteClick = useCallback(() => {
+    setDeleteDialogOpen(true)
+    handleMenuClose()
+  }, [handleMenuClose])
+
+  const handleMoveClick = useCallback(() => {
+    setMoveDialogOpen(true)
+    handleMenuClose()
+  }, [handleMenuClose])
+
+  const handleDownloadClick = useCallback(() => {
+    onDownload()
+    handleMenuClose()
+  }, [onDownload, handleMenuClose])
+
+  const handleEditChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setEditedSong((prev) => ({ ...prev, [name]: value }))
+  }, [])
+
+  const handleMoodChange = useCallback((e: SelectChangeEvent<string>) => {
+    setEditedSong((prev) => ({ ...prev, mood_category: e.target.value }))
+  }, [])
+
+  const handleFolderChange = useCallback((e: SelectChangeEvent<number>) => {
+    setSelectedFolderId(e.target.value as number)
+  }, [])
+
+  const handleEditSave = useCallback(() => {
     onEdit(editedSong)
-    setIsEditing(false)
-  }
+    setEditDialogOpen(false)
+  }, [editedSong, onEdit])
 
-  const handleCancelEdit = () => {
-    setEditedSong({ ...song })
-    setIsEditing(false)
-  }
+  const handleDeleteConfirm = useCallback(() => {
+    onDelete()
+    setDeleteDialogOpen(false)
+  }, [onDelete])
 
-  const handleInputChange = (field: keyof SongType, value: string) => {
-    setEditedSong((prev) => ({ ...prev, [field]: value }))
-  }
+  const handleMoveConfirm = useCallback(() => {
+    if (selectedFolderId !== -1) {
+      onMoveSong(song, selectedFolderId)
+    }
+    setMoveDialogOpen(false)
+  }, [onMoveSong, selectedFolderId, song])
 
-  const handleMoodChange = (event: SelectChangeEvent) => {
-    handleInputChange("mood_category", event.target.value)
-  }
+  const getMoodColor = useCallback((mood: string) => {
+    const moodColors: Record<string, string> = {
+      happy: "#4CAF50",
+      sad: "#2196F3",
+      excited: "#FF9800",
+      angry: "#F44336",
+      relaxed: "#9C27B0",
+      natural: "#607D8B",
+      hopeful: "#00BCD4",
+      grateful: "#8BC34A",
+      nervous: "#FF5722",
+    }
+    return moodColors[mood] || "#757575"
+  }, [])
 
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsPlaying(!isPlaying)
-    onPlay(song)
-  }
+  // Filter out the current folder from the list of available folders
+  const availableFolders = folders.filter((folder) => folder.id !== folderId)
 
   return (
     <Card
       component={motion.div}
-      whileHover={{
-        translateY: -4,
-        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-        transition: { duration: 0.3 },
-      }}
-      initial={{ opacity: 0, y: 10 }}
+      whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      sx={{
+        borderRadius: "12px",
+        overflow: "hidden",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        border: "1px solid rgba(0,0,0,0.05)",
+        position: "relative",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        p: 2,
-        borderRadius: "16px",
-        background: isEditing
-          ? "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9))"
-          : "rgba(255,255,255,0.9)",
-        backdropFilter: "blur(10px)",
-        border: isEditing ? "2px solid #E91E63" : "1px solid rgba(233,30,99,0.1)",
-        boxShadow: isEditing ? "0 4px 20px rgba(233,30,99,0.15)" : "0 4px 16px rgba(0,0,0,0.05)",
-        position: "relative",
-        overflow: "hidden",
-      }}
     >
-      {/* Background gradient accent */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          opacity: 0.03,
-          background: `linear-gradient(135deg, ${songColor}, #E91E63)`,
-          zIndex: 0,
-        }}
-      />
-
-      {/* Left side - Play button */}
-      <Box
-        sx={{
-          display: "flex",
-          mr: 2,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <Box
-          component={motion.div}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          sx={{
-            position: "relative",
-            width: 50,
-            height: 50,
-            borderRadius: "12px",
-            overflow: "hidden",
-            background: `linear-gradient(135deg, ${songColor}, #E91E63)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
-          <IconButton
-            onClick={handlePlayClick}
-            sx={{
-              color: "white",
-              p: 0,
-              width: "100%",
-              height: "100%",
-              borderRadius: "12px",
-              "&:hover": { background: "rgba(0,0,0,0.1)" },
-            }}
-          >
-            <PlayArrowIcon />
-          </IconButton>
-        </Box>
-      </Box>
-
-      {/* Middle - Song info */}
-      <CardContent
-        sx={{
-          flex: 1,
-          py: 1,
-          position: "relative",
-          zIndex: 1,
-          "&:last-child": { pb: 1 },
-        }}
-      >
-        <AnimatePresence mode="wait">
-          {isEditing ? (
-            <motion.div
-              key="editing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+      <CardContent sx={{ p: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(233,30,99,0.1)",
+                color: "#E91E63",
+                mr: 2,
+                flexShrink: 0,
+              }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  label="Song Name"
-                  value={editedSong.songName}
-                  onChange={(e) => handleInputChange("songName", e.target.value)}
-                  InputProps={{
-                    startAdornment: <MusicNoteIcon sx={{ mr: 1, color: "#E91E63" }} />,
-                    sx: {
-                      borderRadius: "10px",
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "rgba(233,30,99,0.3)",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "rgba(233,30,99,0.5)",
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#E91E63",
-                      },
-                    },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      color: "rgba(0,0,0,0.6)",
-                      "&.Mui-focused": {
-                        color: "#E91E63",
-                      },
-                    },
-                  }}
-                />
-                <Box sx={{ display: "flex", gap: 1.5 }}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    label="Artist"
-                    value={editedSong.artist}
-                    onChange={(e) => handleInputChange("artist", e.target.value)}
-                    InputProps={{
-                      startAdornment: <AlbumIcon sx={{ mr: 1, color: "#E91E63" }} />,
-                      sx: {
-                        borderRadius: "10px",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgba(233,30,99,0.3)",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgba(233,30,99,0.5)",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#E91E63",
-                        },
-                      },
-                    }}
-                    InputLabelProps={{
-                      sx: {
-                        color: "rgba(0,0,0,0.6)",
-                        "&.Mui-focused": {
-                          color: "#E91E63",
-                        },
-                      },
-                    }}
-                  />
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "rgba(233,30,99,0.3)",
-                        borderRadius: "10px",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "rgba(233,30,99,0.5)",
-                      },
-                      "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#E91E63",
-                      },
-                      "& .MuiInputLabel-root.Mui-focused": {
-                        color: "#E91E63",
-                      },
-                    }}
-                  >
-                    <InputLabel id="mood-select-label" sx={{ display: "flex", alignItems: "center" }}>
-                      <CategoryIcon sx={{ mr: 1, color: "#E91E63", fontSize: "1.2rem" }} /> Mood
-                    </InputLabel>
-                    <Select
-                      labelId="mood-select-label"
-                      value={editedSong.mood_category || ""}
-                      onChange={handleMoodChange}
-                      label="Mood"
-                      sx={{
-                        borderRadius: "10px",
-                        "& .MuiSelect-select": {
-                          display: "flex",
-                          alignItems: "center",
-                          pl: 1,
-                        },
-                      }}
-                    >
-                      {moodChoices.map((mood) => (
-                        <MenuItem key={mood} value={mood}>
-                          {mood.charAt(0).toUpperCase() + mood.slice(1)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Box>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="display"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+              <MusicNoteIcon />
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography
                 variant="subtitle1"
                 sx={{
-                  fontWeight: 600,
-                  color: "#333",
-                  fontSize: "1.1rem",
+                  fontWeight: "bold",
                   mb: 0.5,
-                  display: "-webkit-box",
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: "vertical",
+                  whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                 }}
               >
                 {song.songName}
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                    fontWeight: 500,
-                  }}
-                >
-                  {song.artist}
-                </Typography>
-                {song.mood_category && (
-                  <Chip
-                    label={song.mood_category}
-                    size="small"
-                    sx={{
-                      height: 22,
-                      fontSize: "0.7rem",
-                      fontWeight: 500,
-                      background: `linear-gradient(135deg, ${songColor}40, rgba(233,30,99,0.2))`,
-                      color: "#E91E63",
-                      border: "1px solid rgba(233,30,99,0.1)",
-                      backdropFilter: "blur(4px)",
-                    }}
-                  />
-                )}
-              </Box>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </CardContent>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {song.artist}
+              </Typography>
+            </Box>
+          </Box>
 
-      {/* Right side - Actions */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {isEditing ? (
-          <>
-            <Tooltip title="Save" arrow>
-              <IconButton
-                onClick={handleSaveEdit}
-                sx={{
-                  color: "white",
-                  bgcolor: "#4CAF50",
-                  "&:hover": {
-                    bgcolor: "#388E3C",
-                    transform: "scale(1.1)",
-                  },
-                  width: 40,
-                  height: 40,
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 2px 8px rgba(76,175,80,0.3)",
-                }}
-              >
-                <CheckIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancel" arrow>
-              <IconButton
-                onClick={handleCancelEdit}
-                sx={{
-                  color: "white",
-                  bgcolor: "#9e9e9e",
-                  "&:hover": {
-                    bgcolor: "#757575",
-                    transform: "scale(1.1)",
-                  },
-                  width: 40,
-                  height: 40,
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                }}
-              >
-                <CloseIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            </Tooltip>
-          </>
-        ) : (
-          <Tooltip title="Options" arrow>
-            <IconButton
-              onClick={handleMenuOpen}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Chip
+              label={song.mood_category}
+              size="small"
               sx={{
-                color: "rgba(0,0,0,0.6)",
-                "&:hover": {
-                  bgcolor: "rgba(233,30,99,0.1)",
-                  color: "#E91E63",
-                },
-                transition: "all 0.2s ease",
+                backgroundColor: `${getMoodColor(song.mood_category)}20`,
+                color: getMoodColor(song.mood_category),
+                fontWeight: 500,
+                mr: 1,
+                display: { xs: "none", sm: "flex" },
+              }}
+            />
+
+            <Tooltip title="Play">
+              <IconButton
+                onClick={handlePlayClick}
+                sx={{
+                  color: "white",
+                  backgroundColor: "#E91E63",
+                  "&:hover": { backgroundColor: "#D81B60" },
+                  mr: 1,
+                  transition: "transform 0.2s",
+                  transform: isHovered ? "scale(1.1)" : "scale(1)",
+                }}
+                size="small"
+              >
+                <PlayArrowIcon />
+              </IconButton>
+            </Tooltip>
+
+            <IconButton onClick={handleMenuOpen} size="small">
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              PaperProps={{
+                elevation: 3,
+                sx: { borderRadius: 2, minWidth: 180 },
               }}
             >
-              <MoreVertIcon sx={{ fontSize: 22 }} />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Box>
-
-      {/* Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        TransitionComponent={Fade}
-        PaperProps={{
-          elevation: 3,
-          sx: {
-            borderRadius: "12px",
-            minWidth: 180,
-            overflow: "hidden",
-            mt: 1,
-            "& .MuiMenuItem-root": {
-              py: 1.2,
-              px: 2,
-              "&:hover": {
-                bgcolor: "rgba(233,30,99,0.08)",
-              },
-            },
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            onDownload()
-            handleMenuClose()
-          }}
-        >
-          <DownloadIcon fontSize="small" sx={{ mr: 1.5, color: "#E91E63" }} /> Download
-        </MenuItem>
-
-        <MenuItem onClick={handleEditClick}>
-          <EditIcon fontSize="small" sx={{ mr: 1.5, color: "#E91E63" }} /> Edit
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            onDelete()
-            handleMenuClose()
-          }}
-          sx={{ color: isInFolderView ? "#FF9800" : "#e53935" }}
-        >
-          {isInFolderView ? (
-            <>
-              <RemoveCircleOutlineIcon fontSize="small" sx={{ mr: 1.5 }} /> Remove from Playlist
-            </>
-          ) : (
-            <>
-              <DeleteIcon fontSize="small" sx={{ mr: 1.5 }} /> Delete
-            </>
-          )}
-        </MenuItem>
-
-        {!isInFolderView && (
-          <MenuItem onClick={handleMoveOpen}>
-            <AddCircleIcon fontSize="small" sx={{ mr: 1.5, color: "#E91E63" }} /> Add to Playlist
-          </MenuItem>
-        )}
-
-        <Menu
-          anchorEl={subMenuOpen}
-          open={Boolean(subMenuOpen)}
-          onClose={handleMenuClose}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "left" }}
-          TransitionComponent={Fade}
-          PaperProps={{
-            elevation: 3,
-            sx: {
-              borderRadius: "12px",
-              minWidth: 180,
-              overflow: "hidden",
-              ml: 1,
-              "& .MuiMenuItem-root": {
-                py: 1.2,
-                px: 2,
-                "&:hover": {
-                  bgcolor: "rgba(233,30,99,0.08)",
-                },
-              },
-            },
-          }}
-        >
-          {folders.length > 0 ? (
-            folders.map((folder) => (
-              <MenuItem
-                key={folder.id}
-                onClick={() => {
-                  onMoveSong(song, folder?.id ?? 0)
-                  handleMenuClose()
-                }}
-              >
-                <LibraryMusicIcon fontSize="small" sx={{ mr: 1.5, color: "#E91E63" }} /> {folder.folderName}
+              <MenuItem onClick={handleEditClick}>
+                <ListItemIcon>
+                  <EditIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Edit</ListItemText>
               </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled>No available folders</MenuItem>
-          )}
-        </Menu>
-      </Menu>
+
+              {!isInFolderView && (
+                <MenuItem onClick={handleMoveClick}>
+                  <ListItemIcon>
+                    <FolderIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Add to Playlist</ListItemText>
+                </MenuItem>
+              )}
+
+              <MenuItem onClick={handleDownloadClick}>
+                <ListItemIcon>
+                  <CloudDownloadIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Download</ListItemText>
+              </MenuItem>
+
+              <MenuItem onClick={handleDeleteClick} sx={{ color: "#f44336" }}>
+                <ListItemIcon>
+                  <DeleteIcon fontSize="small" sx={{ color: "#f44336" }} />
+                </ListItemIcon>
+                <ListItemText>{isInFolderView ? "Remove from Playlist" : "Delete"}</ListItemText>
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+      </CardContent>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Song</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Song Name"
+            name="songName"
+            value={editedSong.songName}
+            onChange={handleEditChange}
+          />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Artist"
+            name="artist"
+            value={editedSong.artist}
+            onChange={handleEditChange}
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Mood</InputLabel>
+            <Select value={editedSong.mood_category} label="Mood" onChange={handleMoodChange}>
+              <MenuItem value="natural">Natural</MenuItem>
+              <MenuItem value="happy">Happy</MenuItem>
+              <MenuItem value="sad">Sad</MenuItem>
+              <MenuItem value="excited">Excited</MenuItem>
+              <MenuItem value="angry">Angry</MenuItem>
+              <MenuItem value="relaxed">Relaxed</MenuItem>
+              <MenuItem value="hopeful">Hopeful</MenuItem>
+              <MenuItem value="grateful">Grateful</MenuItem>
+              <MenuItem value="nervous">Nervous</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleEditSave} variant="contained" color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{isInFolderView ? "Remove from Playlist" : "Delete Song"}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {isInFolderView
+              ? `Are you sure you want to remove "${song.songName}" from this playlist?`
+              : `Are you sure you want to delete "${song.songName}"? This action cannot be undone.`}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteConfirm} color="error">
+            {isInFolderView ? "Remove" : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Move to Folder Dialog */}
+      <Dialog open={moveDialogOpen} onClose={() => setMoveDialogOpen(false)}>
+        <DialogTitle>Add to Playlist</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Select Playlist</InputLabel>
+            <Select value={selectedFolderId} label="Select Playlist" onChange={handleFolderChange}>
+              <MenuItem value={-1} disabled>
+                Select a playlist
+              </MenuItem>
+              {availableFolders.map((folder) => (
+                <MenuItem key={folder.id} value={folder.id}>
+                  {folder.folderName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMoveDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleMoveConfirm} variant="contained" color="primary" disabled={selectedFolderId === -1}>
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   )
 }
