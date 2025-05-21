@@ -114,31 +114,7 @@
       <span>Delete</span>
     </button>
 
-    <!-- 
-    @if (!isInFolderView && folders.length > 0) {
-      <button mat-menu-item [matMenuTriggerFor]="folderMenu">
-        <mat-icon color="primary">add_circle</mat-icon>
-        <span>Add to playlist</span>
-      </button>
-    } 
-    -->
   </mat-menu>
 
-  <!-- 
-  <mat-menu #folderMenu="matMenu" class="folder-menu">
-    @if (folders.length > 0) {
-      @for (folder of folders; track folder.id) {
-        <button mat-menu-item (click)="handleMoveSong(folder.id || 0)">
-          <mat-icon color="primary">library_music</mat-icon>
-          <span>{{folder.folderName}}</span>
-        </button>
-      }
-    } @else {
-      <button mat-menu-item disabled>
-        <span>No playlist available</span>
-      </button>
-    }
-  </mat-menu> 
-  -->
 
 </mat-card>

@@ -24,20 +24,16 @@ export class GraphDashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userSub = this.userService.users.subscribe(users => {
+    this.userSub = this.userService.getUsers().subscribe(users => {
       const regDates = users.map(u => new Date(u.dateRegistration));
       this.createChart('userLineChart', 'line', this.countByMonth(regDates), 'Users Registered Per Month', '#E91E63');
       this.createChart('userByDayChart', 'bar', this.countByDayOfWeek(regDates), 'Registrations by Day of Week', '#9C27B0');
     });
 
-    this.songSub = this.songService.songs.subscribe(songs => {
+    this.songSub = this.songService.getAllSongs().subscribe(songs => {
       const songDates = songs.map(s => new Date(s.dateAdding));
       this.createChart('songBarChart', 'bar', this.countByMonth(songDates), 'Songs Uploaded Per Month', '#3F51B5');
-      this.createChart('songByHourChart', 'bar', this.countByHour(songDates), 'Uploads by Hour of Day', '#009688');
     });
-
-    this.userService.getUsers();
-    this.songService.getAllSongs();
   }
 
   ngOnDestroy(): void {
@@ -46,7 +42,13 @@ export class GraphDashboardComponent implements OnInit, OnDestroy {
     this.charts.forEach(chart => chart.destroy());
   }
 
-  private createChart(canvasId: string, type: 'bar' | 'line', data: { labels: string[], values: number[] }, title: string, color: string) {
+  private createChart(
+    canvasId: string,
+    type: 'bar' | 'line',
+    data: { labels: string[], values: number[] },
+    title: string,
+    color: string
+  ) {
     const existingChart = Chart.getChart(canvasId);
     if (existingChart) existingChart.destroy();
 
@@ -57,28 +59,73 @@ export class GraphDashboardComponent implements OnInit, OnDestroy {
         datasets: [{
           label: title,
           data: data.values,
-          backgroundColor: color,
+          backgroundColor: type === 'line' ? 'transparent' : color + '66',
           borderColor: color,
           borderWidth: 2,
           fill: type === 'line',
-          tension: 0.3,
-          pointRadius: 3
+          tension: 0.4,
+          pointRadius: 5,
+          pointHoverRadius: 7,
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 1000,
+          easing: 'easeOutQuart'
+        },
         plugins: {
           title: {
             display: true,
-            text: title
+            text: title,
+            color: '#333',
+            font: {
+              size: 18,
+              weight: 'bold',
+              family: 'Poppins'
+            },
+            padding: {
+              top: 10,
+              bottom: 20
+            }
+          },
+          tooltip: {
+            backgroundColor: '#fff',
+            titleColor: '#000',
+            bodyColor: '#333',
+            borderColor: '#ddd',
+            borderWidth: 1
           },
           legend: {
             display: false
           }
         },
         scales: {
+          x: {
+            ticks: {
+              color: '#555',
+              font: {
+                family: 'Poppins',
+                size: 12
+              }
+            },
+            grid: {
+              color: '#eee'
+            }
+          },
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            ticks: {
+              color: '#555',
+              font: {
+                family: 'Poppins',
+                size: 12
+              }
+            },
+            grid: {
+              color: '#eee'
+            }
           }
         }
       }
@@ -88,15 +135,18 @@ export class GraphDashboardComponent implements OnInit, OnDestroy {
   }
 
   private countByMonth(dates: Date[]): { labels: string[], values: number[] } {
-    const map = new Map<string, number>();
+    const allMonths = Array.from({ length: 12 }, (_, i) =>
+      new Date(2000, i).toLocaleString('default', { month: 'short' })
+    );
+
+    const counts = new Array(12).fill(0);
     dates.forEach(d => {
-      const key = d.toLocaleString('default', { month: 'short', year: 'numeric' });
-      map.set(key, (map.get(key) || 0) + 1);
+      counts[d.getMonth()]++;
     });
-    const sorted = [...map.entries()].sort();
+
     return {
-      labels: sorted.map(e => e[0]),
-      values: sorted.map(e => e[1])
+      labels: allMonths,
+      values: counts
     };
   }
 
@@ -109,14 +159,4 @@ export class GraphDashboardComponent implements OnInit, OnDestroy {
     return { labels: days, values: counts };
   }
 
-  private countByHour(dates: Date[]): { labels: string[], values: number[] } {
-    const counts = new Array(24).fill(0);
-    dates.forEach(d => {
-      counts[d.getHours()]++;
-    });
-    return {
-      labels: counts.map((_, i) => i.toString().padStart(2, '0') + ':00'),
-      values: counts
-    };
-  }
 }

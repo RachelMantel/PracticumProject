@@ -1,12 +1,43 @@
+:root {
+  --color-users: linear-gradient(135deg, #E91E63, #F06292);
+  --color-users-day: linear-gradient(135deg, #9C27B0, #BA68C8);
+  --color-songs: linear-gradient(135deg, #3F51B5, #7986CB);
+}
+
 .charts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  padding: 40px 20px;
+  background: #f9f9fb;
+}
+
+.chart-card {
+  position: relative;
+  background: white;
+  border-radius: 24px;
+  padding: 25px 30px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  animation: fadeSlideUp 0.6s ease-in-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+canvas {
+  width: 100% !important;
+  height: 400px !important;
+}
+
+@keyframes fadeSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  canvas {
-    max-width: 100%;
-    max-height: 400px;
-  }
-  
+}
