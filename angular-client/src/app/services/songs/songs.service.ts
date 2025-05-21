@@ -1,9 +1,9 @@
 import { Injectable, PLATFORM_ID, Inject } from "@angular/core"
 import { isPlatformBrowser } from "@angular/common"
-import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { BehaviorSubject, type Observable, of } from "rxjs"
 import { catchError, tap, map } from "rxjs/operators"
 import type { Song } from "../../models/song.model"
+import { HttpClient } from "@angular/common/http"
 
 @Injectable({
   providedIn: "root",
@@ -22,13 +22,16 @@ export class SongsService {
   private _isPlaying = new BehaviorSubject<boolean>(false)
   private _currentTime = new BehaviorSubject<number>(0)
   private _duration = new BehaviorSubject<number>(0)
-  private _volume = new BehaviorSubject<number>(1);
+  private _volume = new BehaviorSubject<number>(1)
+
+  // הוספת BehaviorSubject לניהול פתיחת המודל
+  private _shouldOpenModal = new BehaviorSubject<boolean>(false);
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.isBrowser = isPlatformBrowser(platformId);
+    this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
       this.initAudioPlayer();
     }
@@ -71,7 +74,7 @@ export class SongsService {
     this.audioPlayer.addEventListener("error", (e) => {
       console.error("Audio error:", e)
       this.isAudioLoaded = false
-      
+
       // אם יש שגיאה בטעינת האודיו, ננסה שוב אם לא הגענו למספר הניסיונות המקסימלי
       if (this.retryCount < this.maxRetries && this._currentPlayingSong.value) {
         this.retryCount++
@@ -89,16 +92,18 @@ export class SongsService {
 
   private retryPlayback(): void {
     if (!this.isBrowser || !this.audioPlayer || !this._currentPlayingSong.value) return
-    
+
     const song = this._currentPlayingSong.value
     console.log("Retrying playback for:", song.songName)
-    
+
     this.audioPlayer.src = song.filePath
     this.audioPlayer.load()
     this.audioPlayer.play().catch((error) => {
       console.error("Error in retry playback:", error)
       if (this.retryCount >= this.maxRetries) {
-        alert("Failed to play the song after multiple attempts. The file might be unavailable or in an unsupported format.")
+        alert(
+          "Failed to play the song after multiple attempts. The file might be unavailable or in an unsupported format.",
+        )
         this.retryCount = 0
       }
     })
@@ -126,6 +131,11 @@ export class SongsService {
 
   get currentPlayingSong(): Observable<Song | null> {
     return this._currentPlayingSong.asObservable()
+  }
+
+  // הוספת getter לאירוע פתיחת המודל
+  get shouldOpenModal(): Observable<boolean> {
+    return this._shouldOpenModal.asObservable()
   }
 
   getAllSongs(): Observable<Song[]> {
@@ -164,31 +174,30 @@ export class SongsService {
   }
 
   getDownloadUrl(fileName: string): Observable<string> {
-    return this.http.get<string>(`/api/songs/download-url?fileName=${encodeURIComponent(fileName)}`);
-  }  
+    return this.http.get<string>(`/api/songs/download-url?fileName=${encodeURIComponent(fileName)}`)
+  }
 
   downloadSong(filePath: string): Observable<any> {
-    return this.http.get(filePath, { responseType: 'blob' }).pipe(
+    return this.http.get(filePath, { responseType: "blob" }).pipe(
       tap((blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = this.getFileNameFromPath(filePath);
-        a.click();
-        window.URL.revokeObjectURL(url);
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = this.getFileNameFromPath(filePath)
+        a.click()
+        window.URL.revokeObjectURL(url)
       }),
       map(() => ({ success: true })),
       catchError((err) => {
-        console.error('Download error:', err);
-        return of({ success: false, error: true, message: 'Download failed' });
-      })
-    );
+        console.error("Download error:", err)
+        return of({ success: false, error: true, message: "Download failed" })
+      }),
+    )
   }
-  
+
   private getFileNameFromPath(path: string): string {
-    return path.split('/').pop() || 'song.mp3';
+    return path.split("/").pop() || "song.mp3"
   }
-  
 
   playSong(songOrPath: Song | string): void {
     if (!this.isBrowser || !this.audioPlayer) return
@@ -220,7 +229,7 @@ export class SongsService {
     console.log("Playing song:", song)
     console.log("File path:", filePath)
 
-    // בדיקה אם זה אותו שיר שכבר מנוגן
+    // בדיקה אם זה אותו שיר שכבר מנגן
     const currentSong = this._currentPlayingSong.value
     const isSameSong = currentSong && currentSong.filePath === filePath
 
@@ -231,21 +240,25 @@ export class SongsService {
     } else if (isSameSong && !this._isPlaying.value) {
       // אם זה אותו שיר אבל הוא מושהה, נמשיך את הנגינה
       this.resumeSong()
+      // שינוי חשוב: פתיחת המודל גם כאשר ממשיכים נגינה של שיר קיים
+      this._shouldOpenModal.next(true)
       return
     }
 
     // Always update the current playing song
     this._currentPlayingSong.next(song)
+    // שינוי חשוב: פתיחת המודל בכל פעם שמנגנים שיר
+    this._shouldOpenModal.next(true)
 
     // Always set a new source and play
     this.audioPlayer.src = filePath
     this.audioPlayer.load()
-    
+
     // נוסיף השהייה קצרה לפני הנגינה כדי לתת לדפדפן זמן לטעון את הקובץ
     setTimeout(() => {
       this.audioPlayer!.play().catch((error) => {
         console.error("Error playing audio:", error)
-        
+
         // אם יש שגיאה, ננסה שוב אחרי השהייה קצרה
         setTimeout(() => {
           if (!this.isAudioLoaded && this.retryCount < this.maxRetries) {
@@ -269,9 +282,13 @@ export class SongsService {
 
   resumeSong(): void {
     if (!this.isBrowser || !this.audioPlayer) return
-    this.audioPlayer.play().catch(error => {
+
+    // שינוי חשוב: פתיחת המודל גם כאשר ממשיכים נגינה
+    this._shouldOpenModal.next(true)
+
+    this.audioPlayer.play().catch((error) => {
       console.error("Error resuming playback:", error)
-      
+
       // אם יש שגיאה בהמשך הנגינה, ננסה לטעון מחדש את השיר
       if (this._currentPlayingSong.value) {
         this.retryCount = 0
@@ -299,22 +316,10 @@ export class SongsService {
     this._volume.next(newVolume)
   }
 
-  addSongToFolder(songId: number, folderId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}add-to-folder`, { songId, folderId })
-  }
-
-  removeSongFromFolder(songId: number, folderId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}remove-from-folder`, { songId, folderId })
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    if (!this.isBrowser) return new HttpHeaders()
-
-    const token = localStorage.getItem("token")
-
-    return new HttpHeaders({
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    })
+  // פונקציה חדשה לפתיחת המודל באופן מפורש
+  openPlayerModal(): void {
+    if (this._currentPlayingSong.value) {
+      this._shouldOpenModal.next(true)
+    }
   }
 }

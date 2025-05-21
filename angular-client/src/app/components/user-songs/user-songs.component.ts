@@ -84,6 +84,8 @@ export class UserSongsComponent implements OnInit {
   }
 
   playSong(song: Song): void {
+    console.log(song+"++++");
+    
     this.songsService.playSong(song)
   }
 

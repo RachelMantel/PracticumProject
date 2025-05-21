@@ -32,8 +32,7 @@ import { MatDividerModule } from '@angular/material/divider';
         <span>Home</span>
       </a>
 
-      @if(isLoggedIn()){
-      <ng-container>
+      <ng-container *ngIf="isLoggedIn()">
         <a mat-list-item routerLink="/users" routerLinkActive="active-link">
           <mat-icon>people</mat-icon>
           <span>Users</span>
@@ -42,35 +41,30 @@ import { MatDividerModule } from '@angular/material/divider';
           <mat-icon>music_note</mat-icon>
           <span>Songs</span>
         </a>
-
         <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
           <mat-icon>dashboard</mat-icon>
           <span>Dashboard</span>
         </a>
       </ng-container>
-      }
     </mat-nav-list>
 
     <div class="sidebar-footer">
       <mat-divider></mat-divider>
 
-      @if(isLoggedIn()){
-      <ng-container>
+      <ng-container *ngIf="isLoggedIn(); else loginTemplate">
         <button class="action-button" (click)="logout()">
           <mat-icon>logout</mat-icon>
           <span>Logout</span>
         </button>
       </ng-container>
-      }
-      <ng-template #loginButton>
+
+      <ng-template #loginTemplate>
         <button class="action-button" (click)="goToLogin()">
           <mat-icon>login</mat-icon>
           <span>Login</span>
         </button>
       </ng-template>
     </div>
-
-    <ng-template #loginLink></ng-template>
   `,
   styles: [`
     .sidebar-header {

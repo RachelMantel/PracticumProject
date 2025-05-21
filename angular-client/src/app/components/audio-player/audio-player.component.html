@@ -1,50 +1,71 @@
-<div class="audio-player-container" *ngIf="currentSong" @fadeIn>
-  <div class="audio-player" [class.expanded]="isExpanded">
-    <div class="song-info">
-      <div class="song-thumbnail" [style.--song-color]="currentSong.mood_category || 'pink'">
-        <mat-icon>music_note</mat-icon>
-      </div>
-      <div class="song-details">
-        <div class="song-name">{{ currentSong.songName }}</div>
-        <div class="song-artist">{{ currentSong.artist }}</div>
-      </div>
-      <button mat-icon-button class="expand-button" (click)="toggleExpand()" matTooltip="{{isExpanded ? 'Collapse' : 'Expand'}}">
-        <mat-icon>{{ isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-      </button>
-    </div>
-    
-    <div class="player-controls" [class.expanded-controls]="isExpanded">
-      <button mat-icon-button matTooltip="Stop" (click)="stop()">
-        <mat-icon>stop</mat-icon>
-      </button>
-      
-      <button mat-icon-button matTooltip="{{isPlaying ? 'Pause' : 'Play'}}" (click)="togglePlay()" class="play-button">
-        <mat-icon>{{isPlaying ? 'pause' : 'play_arrow'}}</mat-icon>
-      </button>
-      
-      <div class="time-slider">
-        <span class="current-time">{{formatTime(currentTime)}}</span>
-        <mat-slider class="progress-slider">
-          <input matSliderThumb
-            [min]="0"
-            [max]="duration || 1"
-            [value]="currentTime"
-            (valueChange)="seek($event)">
-        </mat-slider>
-        <span class="duration">{{formatTime(duration)}}</span>
+@if (currentSong && isModalOpen) {
+  <div class="audio-player-container" @fadeIn>
+    <div class="audio-player-modal" @slideUp>
+      <div class="modal-header">
+        <h2 class="modal-title">Now Playing</h2>
+        <button mat-icon-button class="close-button" (click)="closeModal()" matTooltip="Close">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
       
-      <div class="volume-control">
-        <mat-icon>volume_up</mat-icon>
-        <mat-slider class="volume-slider">
-          <input matSliderThumb
-            [min]="0"
-            [max]="1"
-            [step]="0.01"
-            [value]="volume"
-            (valueChange)="setVolume($event)">
-        </mat-slider>
+      <div class="song-info">
+        <div class="song-thumbnail" [style.background]="'linear-gradient(135deg, ' + getMoodColor() + ', #FF5722)'">
+          <mat-icon>music_note</mat-icon>
+        </div>
+        <div class="song-details">
+          <h3 class="song-name">{{ currentSong.songName || 'Unknown Song' }}</h3>
+          <p class="song-artist">{{ currentSong.artist || 'Unknown Artist' }}</p>
+          @if (currentSong.mood_category) {
+            <span class="song-mood">{{ currentSong.mood_category }}</span>
+          }
+        </div>
+      </div>
+      
+      <div class="player-controls">
+        <div class="time-display">
+          <span class="current-time">{{ formatTime(currentTime) }}</span>
+          <span class="duration">{{ formatTime(duration) }}</span>
+        </div>
+        
+        <div class="progress-bar">
+          <div class="progress-background"></div>
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+          <mat-slider class="time-slider" color="accent">
+            <input matSliderThumb
+              [min]="0"
+              [max]="duration || 1"
+              [value]="currentTime"
+              (input)="startDraggingTime()"
+              (valueChange)="stopDraggingTime($event)">
+          </mat-slider>
+        </div>
+        
+        <div class="control-buttons">
+          <div class="volume-control">
+            <button mat-icon-button (click)="toggleMute()" matTooltip="{{isMuted ? 'Unmute' : 'Mute'}}">
+              <mat-icon>{{ getVolumeIcon() }}</mat-icon>
+            </button>
+            <mat-slider class="volume-slider" color="accent">
+              <input matSliderThumb
+                [min]="0"
+                [max]="1"
+                [step]="0.01"
+                [value]="volume"
+                (input)="startDraggingVolume()"
+                (valueChange)="stopDraggingVolume($event)">
+            </mat-slider>
+          </div>
+          
+          <div class="main-controls">
+            <button mat-icon-button (click)="stop()" matTooltip="Stop">
+              <mat-icon>stop</mat-icon>
+            </button>
+            <button mat-fab color="primary" (click)="togglePlay()" class="play-button" matTooltip="{{isPlaying ? 'Pause' : 'Play'}}">
+              <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+}
