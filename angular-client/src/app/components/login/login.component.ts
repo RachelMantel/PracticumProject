@@ -62,7 +62,7 @@ export class LoginComponent {
 
         if (this.authService.isAdmin()) {
           this.snackBar.open("Logged in successfully as admin", "Close", { duration: 3000 })
-          this.router.navigate(["/users"])
+          this.router.navigate(["/home"])
         } else {
           this.snackBar.open("You are not an admin", "Close", { duration: 3000 })
           this.authService.logout()

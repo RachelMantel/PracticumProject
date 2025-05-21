@@ -1,4 +1,5 @@
-<div class="audio-player" *ngIf="currentSong">
+<div class="audio-player-container" *ngIf="currentSong" @fadeIn>
+  <div class="audio-player" [class.expanded]="isExpanded">
     <div class="song-info">
       <div class="song-thumbnail" [style.--song-color]="currentSong.mood_category || 'pink'">
         <mat-icon>music_note</mat-icon>
@@ -7,20 +8,22 @@
         <div class="song-name">{{ currentSong.songName }}</div>
         <div class="song-artist">{{ currentSong.artist }}</div>
       </div>
+      <button mat-icon-button class="expand-button" (click)="toggleExpand()" matTooltip="{{isExpanded ? 'Collapse' : 'Expand'}}">
+        <mat-icon>{{ isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
     </div>
     
-    <div class="player-controls">
+    <div class="player-controls" [class.expanded-controls]="isExpanded">
       <button mat-icon-button matTooltip="Stop" (click)="stop()">
         <mat-icon>stop</mat-icon>
       </button>
       
-      <button mat-icon-button matTooltip="{{isPlaying ? 'Pause' : 'Play'}}" (click)="togglePlay()">
+      <button mat-icon-button matTooltip="{{isPlaying ? 'Pause' : 'Play'}}" (click)="togglePlay()" class="play-button">
         <mat-icon>{{isPlaying ? 'pause' : 'play_arrow'}}</mat-icon>
       </button>
       
       <div class="time-slider">
         <span class="current-time">{{formatTime(currentTime)}}</span>
-        <!-- Updated mat-slider syntax for Angular Material 15+ -->
         <mat-slider class="progress-slider">
           <input matSliderThumb
             [min]="0"
@@ -33,7 +36,6 @@
       
       <div class="volume-control">
         <mat-icon>volume_up</mat-icon>
-        <!-- Updated mat-slider syntax for Angular Material 15+ -->
         <mat-slider class="volume-slider">
           <input matSliderThumb
             [min]="0"
@@ -45,4 +47,4 @@
       </div>
     </div>
   </div>
-  
+</div>

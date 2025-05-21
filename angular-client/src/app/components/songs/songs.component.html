@@ -1,58 +1,23 @@
-<!-- <div class="users-container">
-    <div class="header">
-      <h1 class="page-title">Users Management</h1>
+@if(loading) {
+  <div class="spinner-container">
+    <mat-spinner color="accent"></mat-spinner>
+  </div>
+} @else {
+  <div class="songs-container">
+    <div class="header-container">
+      <h2 class="header">All Songs</h2>
     </div>
     
-    <div class="users-grid">
-      @for(song of songs$.value;track song.songName){
-      <mat-card class="user-card">
-        <div class="user-content">
-
-          <div class="user-info">
-            <h3 class="user-name">{{ song.songName }}</h3>
-            <p class="user-email">{{song.artist }}</p>
-          </div>
-        </div>
-        
-        <mat-divider></mat-divider>
-        
-        <div class="user-actions">
-          <button mat-icon-button color="warn" matTooltip="Delete User" (click)="deleteSong(song.id||0, $event)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </mat-card>
-    }
+    <div class="songs-grid">
+      @for(song of songs; track song.id) {
+        <app-song-card
+          [song]="song"
+          (play)="playSong($event)"
+          (delete)="deleteSong($event)"
+          (edit)="updateSong($event)"
+          (download)="downloadSong($event)">
+        </app-song-card>
+      }
     </div>
-  </div> -->
-
-  @if(loading) {
-    <div class="spinner-container">
-      <mat-spinner color="accent"></mat-spinner>
-    </div>
-  } @else {
-    <div class="songs-container">
-      <h2 class="header">All Songs</h2>
-      
-      <div class="songs-grid">
-        @for(song of songs ; track song.id) {
-          <app-song-card
-            [song]="song"
-            (play)="playSong($event)"
-            (delete)="deleteSong($event)"
-            (edit)="updateSong($event)"
-            (download)="downloadSong($event)">
-          </app-song-card>
-        }
-      </div>
-      
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="router.navigate(['/upload'])">
-          <mat-icon>add</mat-icon>
-          Upload New Song
-        </button>
-      </div>
-    </div>
-  }
-  
-  
+  </div>
+}

@@ -1,0 +1,121 @@
+.add-user-container {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    position: relative;
+  }
+  
+  .modal-header {
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.05) 0%, rgba(255, 87, 34, 0.05) 100%);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(233, 30, 99, 0.1);
+  }
+  
+  .modal-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #e91e63;
+  }
+  
+  .close-button {
+    color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .close-button:hover {
+    color: #e91e63;
+    background-color: rgba(233, 30, 99, 0.1);
+  }
+  
+  .modal-content {
+    padding: 24px;
+  }
+  
+  .avatar-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  
+  .avatar-preview {
+    position: relative;
+  }
+  
+  .avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e91e63 0%, #ff5722 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: 500;
+    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .input-error {
+    border-color: #f44336;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 16px 24px 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .add-button {
+    background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
+    color: white;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .add-button:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(233, 30, 99, 0.3);
+  }
+  
+  .button-spinner {
+    margin-right: 8px;
+  }
+  
+  @media (max-width: 600px) {
+    .add-user-container {
+      width: 100%;
+      max-width: none;
+      border-radius: 0;
+    }
+  
+    .modal-actions {
+      flex-direction: column-reverse;
+    }
+  
+    .modal-actions button {
+      width: 100%;
+    }
+  }
+  

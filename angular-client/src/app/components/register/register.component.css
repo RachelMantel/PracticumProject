@@ -36,7 +36,6 @@
     font-weight: 700;
     margin: 0;
     background: linear-gradient(90deg, #e91e63, #ff5722);
-    -webkit-text-fill-color: transparent;
   }
   
   .register-subtitle {

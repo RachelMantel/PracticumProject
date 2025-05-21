@@ -22,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
             <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
               <mat-icon>menu</mat-icon>
             </button>
-            <h1 class="app-title">AI Music</h1>
+            <!-- <h1 class="app-title">Tune Your Mood!2</h1> -->
           </div>
           
           <div class="main-content">
@@ -64,7 +64,7 @@ import { MatIconModule } from '@angular/material/icon';
       display: flex;
       align-items: center;
       padding: 0 16px;
-      height: 64px;
+      height: 88px;
       background-color: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     }

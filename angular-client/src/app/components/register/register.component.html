@@ -8,17 +8,19 @@
       <h2 class="register-subtitle">Create Account</h2>
       
       <form (ngSubmit)="register()" #registerForm="ngForm">
+        
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
           <input 
             matInput 
             [(ngModel)]="user.name" 
             name="name" 
+            type="name" 
             required
-            placeholder="Enter your name">
-          <mat-icon matPrefix>person</mat-icon>
+            placeholder="Enter your email">
+          <mat-icon matPrefix>Name</mat-icon>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input 
@@ -52,14 +54,14 @@
         </mat-form-field>
         
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Confirm Password</mat-label>
+          <mat-label>secret code</mat-label>
           <input 
             matInput 
-            [(ngModel)]="confirmPassword" 
-            name="confirmPassword" 
+            [(ngModel)]="user.adminSecretCode" 
+            name="secret code" 
             [type]="hideConfirmPassword ? 'password' : 'text'" 
             required
-            placeholder="Confirm your password">
+            placeholder="type secret code">
           <mat-icon matPrefix>lock</mat-icon>
           <button 
             type="button" 

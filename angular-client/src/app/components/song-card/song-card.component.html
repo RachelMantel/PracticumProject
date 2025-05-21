@@ -3,10 +3,10 @@
   [ngClass]="{'editing': isEditing}"
   (click)="navigateToSongDetails($event)"
   [style.--song-color]="generateColor(song.songName)">
-  
+
   <!-- Background gradient accent -->
   <div class="card-background"></div>
-  
+
   <!-- Left side - Play button -->
   <div class="play-button-container">
     <div class="play-button" [ngClass]="{'playing': isPlaying}">
@@ -15,26 +15,26 @@
       </button>
     </div>
   </div>
-  
+
   <!-- Middle - Song info -->
   <mat-card-content class="song-content">
     @if (isEditing) {
       <div class="edit-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>שם השיר</mat-label>
+          <mat-label>Song name</mat-label>
           <input matInput [(ngModel)]="editedSong.songName">
           <mat-icon matPrefix>music_note</mat-icon>
         </mat-form-field>
-        
+
         <div class="form-row">
           <mat-form-field appearance="outline" class="half-width">
-            <mat-label>אמן</mat-label>
+            <mat-label>Artist</mat-label>
             <input matInput [(ngModel)]="editedSong.artist">
             <mat-icon matPrefix>album</mat-icon>
           </mat-form-field>
-          
+
           <mat-form-field appearance="outline" class="half-width">
-            <mat-label>מצב רוח</mat-label>
+            <mat-label>Mood</mat-label>
             <mat-select [(ngModel)]="editedSong.mood_category">
               @for (mood of moodChoices; track mood) {
                 <mat-option [value]="mood">
@@ -48,14 +48,14 @@
       </div>
     } @else {
       <div class="song-info">
-        <h3 class="song-title">{{song.songName || 'שיר ללא שם'}}</h3>
+        <h3 class="song-title">{{song.songName || 'Untitled Song'}}</h3>
         <div class="song-details">
-          <span class="artist-name">{{song.artist || 'אמן לא ידוע'}}</span>
+          <span class="artist-name">{{song.artist || 'Unknown Artist'}}</span>
           @if (song.mood_category) {
             <div class="mood-chip">{{song.mood_category}}</div>
           }
         </div>
-        
+
         <!-- Audio visualization (decorative) -->
         @if (isPlaying) {
           <div class="audio-visualization">
@@ -67,14 +67,14 @@
       </div>
     }
   </mat-card-content>
-  
+
   <!-- Right side - Actions -->
   <div class="card-actions">
     @if (isEditing) {
       <button 
         mat-mini-fab 
         color="primary" 
-        matTooltip="שמור" 
+        matTooltip="Save" 
         class="save-button"
         (click)="handleSaveEdit()">
         <mat-icon>check</mat-icon>
@@ -82,7 +82,7 @@
       <button 
         mat-mini-fab 
         color="basic" 
-        matTooltip="בטל" 
+        matTooltip="Cancel" 
         class="cancel-button"
         (click)="handleCancelEdit()">
         <mat-icon>close</mat-icon>
@@ -96,32 +96,35 @@
       </button>
     }
   </div>
-  
+
   <!-- Menu -->
   <mat-menu #menu="matMenu" xPosition="before" class="song-menu">
     <button mat-menu-item (click)="handleDownloadClick($event)" [disabled]="isDownloading">
-      <mat-icon color="primary">{{ isDownloading ? 'hourglass_empty' : 'download' }}</mat-icon>
-      <span>{{ isDownloading ? 'מוריד...' : 'הורד' }}</span>
+      <mat-icon color="accent">{{ isDownloading ? 'hourglass_empty' : 'download' }}</mat-icon>
+      <span>{{ isDownloading ? 'Downloading...' : 'Download' }}</span>
     </button>
-    
+
     <button mat-menu-item (click)="handleEditClick()">
-      <mat-icon color="primary">edit</mat-icon>
-      <span>ערוך</span>
+      <mat-icon color="accent">edit</mat-icon>
+      <span>Edit</span>
     </button>
-    
+
     <button mat-menu-item (click)="handleDeleteClick($event)">
-      <mat-icon color="warn">{{isInFolderView ? 'remove_circle_outline' : 'delete'}}</mat-icon>
-      <span>{{isInFolderView ? 'הסר מהפלייליסט' : 'מחק'}}</span>
+      <mat-icon color="accent">{{isInFolderView ? 'remove_circle_outline' : 'delete'}}</mat-icon>
+      <span>Delete</span>
     </button>
-    
+
+    <!-- 
     @if (!isInFolderView && folders.length > 0) {
       <button mat-menu-item [matMenuTriggerFor]="folderMenu">
         <mat-icon color="primary">add_circle</mat-icon>
-        <span>הוסף לפלייליסט</span>
+        <span>Add to playlist</span>
       </button>
-    }
+    } 
+    -->
   </mat-menu>
-  
+
+  <!-- 
   <mat-menu #folderMenu="matMenu" class="folder-menu">
     @if (folders.length > 0) {
       @for (folder of folders; track folder.id) {
@@ -132,8 +135,10 @@
       }
     } @else {
       <button mat-menu-item disabled>
-        <span>אין תיקיות זמינות</span>
+        <span>No playlist available</span>
       </button>
     }
-  </mat-menu>
+  </mat-menu> 
+  -->
+
 </mat-card>

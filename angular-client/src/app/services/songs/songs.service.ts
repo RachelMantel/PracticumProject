@@ -2,7 +2,7 @@ import { Injectable, PLATFORM_ID, Inject } from "@angular/core"
 import { isPlatformBrowser } from "@angular/common"
 import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { BehaviorSubject, type Observable, of } from "rxjs"
-import { catchError, tap } from "rxjs/operators"
+import { catchError, tap, map } from "rxjs/operators"
 import type { Song } from "../../models/song.model"
 
 @Injectable({
@@ -14,26 +14,29 @@ export class SongsService {
   private audioPlayer: HTMLAudioElement | null = null
   private _currentPlayingSong = new BehaviorSubject<Song | null>(null)
   private isBrowser: boolean
+  private isAudioLoaded = false
+  private retryCount = 0
+  private maxRetries = 2
 
-  // Audio player state
+  // Audio player state - מוגדרים כ-BehaviorSubject כדי לאפשר שימוש ב-next
   private _isPlaying = new BehaviorSubject<boolean>(false)
   private _currentTime = new BehaviorSubject<number>(0)
   private _duration = new BehaviorSubject<number>(0)
-  private _volume = new BehaviorSubject<number>(1)
+  private _volume = new BehaviorSubject<number>(1);
 
-  constructor(private http: HttpClient,@Inject(PLATFORM_ID) platformId: Object, ) {
-    this.isBrowser = isPlatformBrowser(platformId)
-
-    // Only initialize audio player if in browser environment
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
     if (this.isBrowser) {
-      this.initAudioPlayer()
+      this.initAudioPlayer();
     }
   }
 
   private initAudioPlayer(): void {
     this.audioPlayer = new Audio()
 
-    // Set up audio player event listeners
     this.audioPlayer.addEventListener("timeupdate", () => {
       this._currentTime.next(this.audioPlayer!.currentTime)
     })
@@ -55,8 +58,50 @@ export class SongsService {
       this._currentTime.next(0)
     })
 
-    // Initialize volume
+    this.audioPlayer.addEventListener("loadeddata", () => {
+      this.isAudioLoaded = true
+      console.log("Audio loaded successfully")
+    })
+
+    this.audioPlayer.addEventListener("canplay", () => {
+      this.isAudioLoaded = true
+      console.log("Audio can play now")
+    })
+
+    this.audioPlayer.addEventListener("error", (e) => {
+      console.error("Audio error:", e)
+      this.isAudioLoaded = false
+      
+      // אם יש שגיאה בטעינת האודיו, ננסה שוב אם לא הגענו למספר הניסיונות המקסימלי
+      if (this.retryCount < this.maxRetries && this._currentPlayingSong.value) {
+        this.retryCount++
+        console.log(`Retrying playback (attempt ${this.retryCount})...`)
+        setTimeout(() => {
+          this.retryPlayback()
+        }, 1000)
+      } else {
+        this.retryCount = 0
+      }
+    })
+
     this.audioPlayer.volume = 1
+  }
+
+  private retryPlayback(): void {
+    if (!this.isBrowser || !this.audioPlayer || !this._currentPlayingSong.value) return
+    
+    const song = this._currentPlayingSong.value
+    console.log("Retrying playback for:", song.songName)
+    
+    this.audioPlayer.src = song.filePath
+    this.audioPlayer.load()
+    this.audioPlayer.play().catch((error) => {
+      console.error("Error in retry playback:", error)
+      if (this.retryCount >= this.maxRetries) {
+        alert("Failed to play the song after multiple attempts. The file might be unavailable or in an unsupported format.")
+        this.retryCount = 0
+      }
+    })
   }
 
   get songs(): Observable<Song[]> {
@@ -118,77 +163,50 @@ export class SongsService {
     return this.http.delete(`${this.apiUrl}${id}`)
   }
 
-  getUploadUrl(fileName: string, contentType: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}upload-url`, {
-      params: { fileName, contentType },
-    })
-  }
+  getDownloadUrl(fileName: string): Observable<string> {
+    return this.http.get<string>(`/api/songs/download-url?fileName=${encodeURIComponent(fileName)}`);
+  }  
 
-  getDownloadUrl(fileName: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}download-url/${encodeURIComponent(fileName)}`)
-  }
-
-  // Fixed download function that works directly with URLs
   downloadSong(filePath: string): Observable<any> {
-    if (!this.isBrowser) return of({ success: false })
-
-    // Extract filename from filepath
-    const fileName = filePath.split("/").pop() || ""
-
-    // First try to get a download URL from the API
-    return this.getDownloadUrl(fileName).pipe(
-      tap((response) => {
-        if (response && response.downloadUrl) {
-          // Create a temporary anchor element to trigger download
-          const link = document.createElement("a")
-          link.href = response.downloadUrl
-          link.download = fileName
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        }
+    return this.http.get(filePath, { responseType: 'blob' }).pipe(
+      tap((blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.getFileNameFromPath(filePath);
+        a.click();
+        window.URL.revokeObjectURL(url);
       }),
-      catchError((error) => {
-        console.error("Error getting download URL:", error)
-
-        // Fallback: try direct download with the original URL
-        try {
-          const link = document.createElement("a")
-          link.href = filePath
-          link.download = fileName
-          link.target = "_blank" // Open in new tab if direct download fails
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        } catch (directError) {
-          console.error("Error with direct download:", directError)
-        }
-
-        // Return an error object that components can handle
-        return of({
-          error: true,
-          message: "Error downloading song. Attempted fallback download.",
-        })
-      }),
-    )
+      map(() => ({ success: true })),
+      catchError((err) => {
+        console.error('Download error:', err);
+        return of({ success: false, error: true, message: 'Download failed' });
+      })
+    );
   }
+  
+  private getFileNameFromPath(path: string): string {
+    return path.split('/').pop() || 'song.mp3';
+  }
+  
 
-  // Enhanced audio player methods that accept either a Song object or a file path string
   playSong(songOrPath: Song | string): void {
     if (!this.isBrowser || !this.audioPlayer) return
+
+    // איפוס מונה הניסיונות בכל פעם שמנגנים שיר חדש
+    this.retryCount = 0
+    this.isAudioLoaded = false
 
     let song: Song
     let filePath: string
 
-    // Handle both Song object and string path
     if (typeof songOrPath === "string") {
       filePath = songOrPath
-      // Create a minimal song object if only path is provided
       song = {
         id: 0,
-        userId:0,
-        folderId:0,
-        dateAdding:new Date(),
+        userId: 0,
+        folderId: 0,
+        dateAdding: new Date(),
         songName: filePath.split("/").pop() || "Unknown Song",
         artist: "Unknown Artist",
         filePath: filePath,
@@ -202,29 +220,46 @@ export class SongsService {
     console.log("Playing song:", song)
     console.log("File path:", filePath)
 
-    // Check if it's the same song that's currently playing
-    if (this._currentPlayingSong.value && this._currentPlayingSong.value.filePath === filePath) {
-      // Toggle play/pause if it's the same song
-      if (this.audioPlayer.paused) {
-        this.audioPlayer.play().catch((error) => {
-          console.error("Error playing audio:", error)
-          alert("Failed to play the song. The file might be unavailable or in an unsupported format.")
-        })
-      } else {
-        this.audioPlayer.pause()
-      }
-    } else {
-      // Load and play new song
-      this._currentPlayingSong.next(song)
+    // בדיקה אם זה אותו שיר שכבר מנוגן
+    const currentSong = this._currentPlayingSong.value
+    const isSameSong = currentSong && currentSong.filePath === filePath
 
-      // Make sure the URL is properly encoded
-      this.audioPlayer.src = filePath
-      this.audioPlayer.load()
-      this.audioPlayer.play().catch((error) => {
-        console.error("Error playing audio:", error)
-        alert("Failed to play the song. The file might be unavailable or in an unsupported format.")
-      })
+    if (isSameSong && this._isPlaying.value) {
+      // אם זה אותו שיר וכבר מנגן, נעצור אותו
+      this.pauseSong()
+      return
+    } else if (isSameSong && !this._isPlaying.value) {
+      // אם זה אותו שיר אבל הוא מושהה, נמשיך את הנגינה
+      this.resumeSong()
+      return
     }
+
+    // Always update the current playing song
+    this._currentPlayingSong.next(song)
+
+    // Always set a new source and play
+    this.audioPlayer.src = filePath
+    this.audioPlayer.load()
+    
+    // נוסיף השהייה קצרה לפני הנגינה כדי לתת לדפדפן זמן לטעון את הקובץ
+    setTimeout(() => {
+      this.audioPlayer!.play().catch((error) => {
+        console.error("Error playing audio:", error)
+        
+        // אם יש שגיאה, ננסה שוב אחרי השהייה קצרה
+        setTimeout(() => {
+          if (!this.isAudioLoaded && this.retryCount < this.maxRetries) {
+            this.retryCount++
+            console.log(`Auto-retrying playback (attempt ${this.retryCount})...`)
+            this.audioPlayer!.play().catch((retryError) => {
+              console.error("Error in auto-retry playback:", retryError)
+              alert("Failed to play the song. The file might be unavailable or in an unsupported format.")
+              this.retryCount = 0
+            })
+          }
+        }, 1000)
+      })
+    }, 300)
   }
 
   pauseSong(): void {
@@ -234,7 +269,15 @@ export class SongsService {
 
   resumeSong(): void {
     if (!this.isBrowser || !this.audioPlayer) return
-    this.audioPlayer.play()
+    this.audioPlayer.play().catch(error => {
+      console.error("Error resuming playback:", error)
+      
+      // אם יש שגיאה בהמשך הנגינה, ננסה לטעון מחדש את השיר
+      if (this._currentPlayingSong.value) {
+        this.retryCount = 0
+        this.playSong(this._currentPlayingSong.value)
+      }
+    })
   }
 
   stopSong(): void {
@@ -251,7 +294,6 @@ export class SongsService {
 
   setVolume(volume: number): void {
     if (!this.isBrowser || !this.audioPlayer) return
-    // Volume should be between 0 and 1
     const newVolume = Math.max(0, Math.min(1, volume))
     this.audioPlayer.volume = newVolume
     this._volume.next(newVolume)
@@ -265,11 +307,11 @@ export class SongsService {
     return this.http.post(`${this.apiUrl}remove-from-folder`, { songId, folderId })
   }
 
-  // Helper method to get auth headers
   private getAuthHeaders(): HttpHeaders {
     if (!this.isBrowser) return new HttpHeaders()
 
     const token = localStorage.getItem("token")
+
     return new HttpHeaders({
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

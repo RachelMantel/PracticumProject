@@ -5,6 +5,19 @@
 }
 
 @if(!loading && !loadingSongs) {
+
+  <div class="actions">
+    <button mat-stroked-button color="accent" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to User
+    </button>
+  
+    <button mat-stroked-button color="accent" (click)="goToUsers()">
+      <mat-icon>group</mat-icon>
+      All Users
+    </button>
+  </div>
+
   <div class="user-songs-container">
     <h2 class="header">
       {{ user?.name }}'s Songs ({{ songs.length }})
@@ -27,17 +40,5 @@
         }
       </div>
     }
-
-    <div class="actions">
-      <button mat-stroked-button color="accent" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Back to User
-      </button>
-
-      <button mat-stroked-button color="primary" (click)="goToUsers()">
-        <mat-icon>group</mat-icon>
-        All Users
-      </button>
-    </div>
   </div>
 }

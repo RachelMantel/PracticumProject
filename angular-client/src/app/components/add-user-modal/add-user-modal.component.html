@@ -1,0 +1,94 @@
+<div class="add-user-container" @slideIn>
+    <div class="modal-header">
+      <h2 class="modal-title">Add New User</h2>
+      <button mat-icon-button class="close-button" (click)="cancel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  
+    <div class="modal-content">
+      <div class="avatar-container">
+        <div class="avatar-preview">
+            <div class="avatar-circle" style="background-color: #E91E63; display: flex; justify-content: center; align-items: center; width: 64px; height: 64px; border-radius: 50%;">
+                <svg xmlns="http://www.w3.org/2000/svg" height="32" width="32" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>              
+        </div>
+      </div>
+  
+      <div class="form-container" @fadeIn>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newUser.name" 
+            placeholder="Enter name" 
+            required
+            [class.input-error]="formSubmitted && !newUser.name">
+          <mat-icon matPrefix>person</mat-icon>
+          @if(formSubmitted && !newUser.name) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newUser.email" 
+            type="email" 
+            placeholder="example@email.com" 
+            required
+            [class.input-error]="formSubmitted && !newUser.email">
+          <mat-icon matPrefix>email</mat-icon>
+          @if(formSubmitted && !newUser.email) {
+            <mat-error>Email is required</mat-error>
+          }
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newUser.password" 
+            [type]="hidePassword ? 'password' : 'text'" 
+            placeholder="Enter password" 
+            required
+            [class.input-error]="formSubmitted && !newUser.password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if(formSubmitted && !newUser.password) {
+            <mat-error>Password is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+  
+    <div class="modal-actions">
+      <button 
+        mat-stroked-button 
+        (click)="cancel()" 
+        [disabled]="loading">
+        Cancel
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="addUser()" 
+        [disabled]="loading" 
+        class="add-button">
+        <mat-icon>person_add</mat-icon>
+        @if(loading) {
+          <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+          Adding...
+        } @else {
+          Add User
+        }
+      </button>
+    </div>
+  </div>
+  

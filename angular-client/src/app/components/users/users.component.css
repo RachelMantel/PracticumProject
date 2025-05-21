@@ -1,94 +1,3 @@
-/* .users-container {
-    padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .header {
-    margin-bottom: 32px;
-  }
-  
-  .page-title {
-    font-size: 28px;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 2px solid #6a11cb;
-    padding-bottom: 8px;
-    display: inline-block;
-  }
-  
-  .users-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-  }
-  
-  .user-card {
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .user-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-  
-  .user-content {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .user-avatar {
-    margin-right: 16px;
-  }
-  
-  .avatar-circle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 600;
-  }
-  
-  .user-info {
-    flex: 1;
-  }
-  
-  .user-name {
-    margin: 0 0 4px 0;
-    font-size: 18px;
-    font-weight: 500;
-  }
-  
-  .user-email {
-    margin: 0;
-    color: #666;
-    font-size: 14px;
-  }
-  
-  .user-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding: 12px 16px;
-    gap: 8px;
-  }
-  
-  /* Responsive adjustments */
-  /* @media (max-width: 768px) {
-    .users-grid {
-      grid-template-columns: 1fr;
-    }
-  } */
-
   .users-container {
     padding: 20px;
   }
@@ -103,9 +12,8 @@
   .page-title {
     font-size: 28px;
     font-weight: 600;
-    margin: 0;
-    background: linear-gradient(90deg, #E91E63 0%, #FF5722 100%);
-    -webkit-text-fill-color: transparent;
+    margin: 3px;
+    background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
   }
   
   .add-button {

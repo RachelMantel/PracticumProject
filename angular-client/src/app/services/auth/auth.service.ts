@@ -56,4 +56,25 @@ export class AuthService {
   isAdmin(): boolean {
     return this.getUserRole() === 'Admin';
   }
+
+  isAuthenticated(): boolean {
+    return this.hasToken() ;
+    // && !this.isTokenExpired();
+  }
+
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
+  }
+
+  // private isTokenExpired(): boolean {
+  //   const token = this.getToken();
+  //   if (!token) return true;
+    
+  //   try {
+  //     return this.jwtHelper.isTokenExpired(token);
+  //   } catch (error) {
+  //     console.error('Error checking token expiration:', error);
+  //     return true;
+  //   }
+  // }
 }

@@ -11,6 +11,8 @@ import type { User } from "../../models/user.model"
 import { HttpClient } from "@angular/common/http"
 import { Router } from "@angular/router"
 import { MatSnackBar } from "@angular/material/snack-bar"
+import { Admin } from "../../models/admin.model"
+import { AuthService } from "../../services/auth/auth.service"
 
 @Component({
   selector: "app-register",
@@ -29,42 +31,46 @@ import { MatSnackBar } from "@angular/material/snack-bar"
   styleUrl: "./register.component.css",
 })
 export class RegisterComponent {
-  user: User = {
-    name: "",
-    email: "",
-    password: "",
-    id:0,
-    dateRegistration: new Date()
-  }
+ user: Admin = new Admin("", "", "")
   confirmPassword = ""
   hidePassword = true
   hideConfirmPassword = true
   isLoading = false
-  currentUrl = "https://localhost:7238/api"
+  currentUrl = "https://tuneyourmood-server.onrender.com/api"
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private snackBar: MatSnackBar,
+    private authService: AuthService,
+
   ) {}
 
   register() {
-    if (!this.user.name || !this.user.email || !this.user.password) {
+    if (!this.user.name||!this.user.email || !this.user.adminSecretCode || !this.user.password) {
       this.snackBar.open("Please fill in all required fields", "Close", { duration: 3000 })
       return
     }
 
-    if (this.user.password !== this.confirmPassword) {
-      this.snackBar.open("Passwords do not match", "Close", { duration: 3000 })
-      return
-    }
 
     this.isLoading = true
     this.http.post<any>(`${this.currentUrl}/Auth/register`, this.user).subscribe({
       next: (res) => {
+
+          this.authService.saveToken(res.token)
+          this.isLoading = false
+  
+          if (this.authService.isAdmin()) {
+            this.snackBar.open("registered successfully as admin", "Close", { duration: 3000 })
+            this.router.navigate(["/home"])
+          } else {
+            this.snackBar.open("You are not an admin", "Close", { duration: 3000 })
+            this.authService.logout()
+
         this.isLoading = false
-        this.snackBar.open("Registration successful! Please login.", "Close", { duration: 3000 })
-        this.router.navigate(["/login"])
+        this.snackBar.open("Registration successful! ", "Close", { duration: 3000 })
+        this.router.navigate(["/home"])
+          }
       },
       error: (err) => {
         console.error(err)

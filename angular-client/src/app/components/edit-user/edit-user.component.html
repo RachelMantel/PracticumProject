@@ -1,32 +1,34 @@
-    <div class="card-header">
-      <mat-card-header>
-        <mat-card-title>Edit User</mat-card-title>
-        <button mat-icon-button class="close-button" (click)="cancel()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-card-header>
-    </div>
-
-    <mat-card-content>
-      @if(loading){
+<div class="edit-card">
+  <div class="card-header">
+    <mat-card-header>
+      <mat-card-title>Edit User</mat-card-title>
+      <button mat-icon-button class="close-button" (click)="cancel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-card-header>
+  </div>
+  
+  <mat-card-content>
+    @if(loading) {
       <div class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
-      </div>}
-      
-      @if(!loading){
+      </div>
+    }
+    
+    @if(!loading) {
       <div class="form-content">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
           <input matInput [(ngModel)]="user.name" placeholder="Enter your name" required>
           <mat-icon matSuffix>person</mat-icon>
         </mat-form-field>
-
+        
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput [(ngModel)]="user.email" type="email" placeholder="example@email.com" required>
           <mat-icon matSuffix>email</mat-icon>
         </mat-form-field>
-
+        
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Password</mat-label>
           <input matInput [(ngModel)]="user.password" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your password" required>
@@ -36,11 +38,12 @@
         </mat-form-field>
       </div>
     }
-    </mat-card-content>
-
-    <mat-card-actions>
-      <div class="action-buttons">
-        <button mat-stroked-button (click)="cancel()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="saveUser()" [disabled]="loading">Save</button>
-      </div>
-    </mat-card-actions>
+  </mat-card-content>
+  
+  <mat-card-actions>
+    <div class="action-buttons">
+      <button mat-stroked-button (click)="cancel()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="saveUser()" [disabled]="loading">Save</button>
+    </div>
+  </mat-card-actions>
+</div>

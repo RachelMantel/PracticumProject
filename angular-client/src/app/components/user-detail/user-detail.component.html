@@ -1,75 +1,130 @@
 <div class="detail-container">
     <div class="back-button-container">
-        <button mat-button color="primary" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon> Back to Users
-        </button>
+      <button mat-button color="accent" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon> Back to Users
+      </button>
     </div>
-
-    @if(loading){
-    <div class="loading-container">
+    
+    @if(loading) {
+      <div class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
-    </div>
+      </div>
     }
-
-    @if(!loading&&user){
-    <mat-card  class="user-detail-card">
+    
+    @if(!loading && user) {
+      <mat-card class="user-detail-card" [ngClass]="{'editing': isEditing}">
         <div class="card-header">
-            <mat-card-header>
-                <mat-card-title>User Details</mat-card-title>
-            </mat-card-header>
+          <mat-card-header>
+            <mat-card-title>User Details</mat-card-title>
+          </mat-card-header>
         </div>
-
+        
         <mat-card-content>
+          @if(isEditing) {
+            <!-- Edit Form -->
+            <div class="edit-form">
+              <div class="user-avatar-large">
+                <div class="avatar-circle-large">
+                  {{ editedUser?.name?.charAt(0) | uppercase }}
+                </div>
+              </div>
+              
+              <div class="form-fields">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Name</mat-label>
+                  <input matInput [(ngModel)]="editedUser!.name" placeholder="Enter name" required>
+                  <mat-icon matSuffix>person</mat-icon>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Email</mat-label>
+                  <input matInput [(ngModel)]="editedUser!.email" type="email" placeholder="example@email.com" required>
+                  <mat-icon matSuffix>email</mat-icon>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Password</mat-label>
+                  <input matInput [(ngModel)]="editedUser!.password" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter password">
+                  <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                </mat-form-field>
+              </div>
+            </div>
+          } @else {
+            <!-- View Mode -->
             <div class="user-profile">
-                <div class="user-avatar-large">
-                    <div class="avatar-circle-large">
-                        {{ user.name.charAt(0) | uppercase }}
-                    </div>
+              <div class="user-avatar-large">
+                <div class="avatar-circle-large">
+                  {{ user.name.charAt(0) | uppercase }}
                 </div>
-
-                <div class="user-info-container">
-                    <div class="info-item">
-                        <span class="info-label">Name:</span>
-                        <span class="info-value">{{ user.name }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Email:</span>
-                        <span class="info-value">{{ user.email }}</span>
-                    </div>
-
-                    <!-- Add more user details as needed -->
+              </div>
+              
+              <div class="user-info-container">
+                <div class="info-item">
+                  <span class="info-label">Name:</span>
+                  <span class="info-value">{{ user.name }}</span>
                 </div>
+                
+                <div class="info-item">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">{{ user.email }}</span>
+                </div>
+                
+                <div class="info-item">
+                  <span class="info-label">Registration Date:</span>
+                  <span class="info-value">{{ user.dateRegistration | date:'medium' }}</span>
+                </div>
+              </div>
             </div>
+          }
         </mat-card-content>
-
+        
         <mat-divider></mat-divider>
-
+        
         <mat-card-actions>
-            <div class="detail-actions">
-                <button mat-raised-button color="primary" (click)="viewSongs()">
-                    <mat-icon>music_note</mat-icon> View Songs
-                </button>
-                <button mat-raised-button color="accent" (click)="editUser()">
-                    <mat-icon>edit</mat-icon> Edit User
-                </button>
-            </div>
+          <div class="detail-actions">
+            @if(isEditing) {
+              <button mat-raised-button color="primary" (click)="saveUser()">
+                <mat-icon>save</mat-icon> Save Changes
+              </button>
+              
+              <button mat-stroked-button (click)="cancelEdit()">
+                <mat-icon>cancel</mat-icon> Cancel
+              </button>
+            } @else {
+              <button mat-raised-button color="primary" (click)="viewSongs()">
+                <mat-icon>music_note</mat-icon> View Songs
+              </button>
+              
+              <button mat-raised-button color="accent" (click)="startEdit()">
+                <mat-icon>edit</mat-icon> Edit User
+              </button>
+              
+              <button mat-raised-button color="warn" (click)="deleteUser()">
+                <mat-icon>delete</mat-icon> Delete User
+              </button>
+            }
+          </div>
         </mat-card-actions>
-    </mat-card>}
-
-    @if(!loading&&!user){
-    <div class="error-container">
+      </mat-card>
+    }
+    
+    @if(!loading && !user) {
+      <div class="error-container">
         <mat-card class="error-card">
-            <mat-card-content>
-                <div class="error-message">
-                    <mat-icon>error</mat-icon>
-                    <p>User not found</p>
-                </div>
-            </mat-card-content>
-            <mat-card-actions>
-                <button mat-button color="primary" (click)="goBack()">Return to Users</button>
-            </mat-card-actions>
+          <mat-card-content>
+            <div class="error-message">
+              <mat-icon>error</mat-icon>
+              <p>User not found</p>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="goBack()">Return to Users</button>
+          </mat-card-actions>
         </mat-card>
-    </div>
-}
-</div>
+      </div>
+    }
+  </div>
+  

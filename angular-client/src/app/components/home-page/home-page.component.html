@@ -1,0 +1,169 @@
+<div class="admin-home-container">
+    <!-- Background elements -->
+    <div class="background-elements">
+      <div class="bg-circle bg-circle-1"></div>
+      <div class="bg-circle bg-circle-2"></div>
+    </div>
+  
+    <!-- Main header -->
+    <div class="admin-header" @fadeIn>
+      <div class="welcome-section">
+        <h1 class="welcome-title">{{ getGreeting() }}, {{ adminName }}</h1>
+        <p class="welcome-subtitle">Welcome to your Admin Dashboard</p>
+        <p class="date-display">{{ formatDate(currentDate) }}</p>
+      </div>
+    </div>
+  
+    <!-- Quick statistics -->
+    <div class="quick-stats" @staggerFadeIn>
+      <mat-card class="stat-card" *ngFor="let stat of quickStats">
+        <div class="stat-icon" [style.background]="stat.color">
+          <mat-icon>{{ stat.icon }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value">{{ stat.value }}</h3>
+          <p class="stat-label">{{ stat.label }}</p>
+          <div class="stat-trend" *ngIf="stat.increase">
+            <span class="trend-value">+{{ stat.increase }}%</span>
+            <mat-icon class="trend-icon">trending_up</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  
+    <!-- Quick actions -->
+    <div class="section-title" @fadeIn>
+      <h2>Quick Actions</h2>
+      <div class="title-underline"></div>
+    </div>
+  
+    <div class="quick-actions" @staggerFadeIn>
+      <mat-card class="action-card" *ngFor="let action of quickActions" [routerLink]="action.route" matRipple>
+        <div class="action-icon" [style.background]="action.color">
+          <mat-icon>{{ action.icon }}</mat-icon>
+        </div>
+        <div class="action-content">
+          <h3 class="action-title">{{ action.title }}</h3>
+          <p class="action-description">{{ action.description }}</p>
+        </div>
+        <mat-icon class="action-arrow">arrow_forward</mat-icon>
+      </mat-card>
+    </div>
+  
+    <!-- System health -->
+    <div class="section-title" @fadeIn>
+      <h2>System Health</h2>
+      <div class="title-underline"></div>
+    </div>
+  
+    <div class="system-health" @fadeIn>
+      <mat-card class="health-card">
+        <mat-card-content>
+          <div class="health-metrics">
+            <div class="health-metric">
+              <div class="metric-header">
+                <span class="metric-label">CPU Usage</span>
+                <span class="metric-value">{{ systemHealth.cpu }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="systemHealth.cpu" color="primary"></mat-progress-bar>
+            </div>
+            
+            <div class="health-metric">
+              <div class="metric-header">
+                <span class="metric-label">Memory Usage</span>
+                <span class="metric-value">{{ systemHealth.memory }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="systemHealth.memory" color="accent"></mat-progress-bar>
+            </div>
+            
+            <div class="health-metric">
+              <div class="metric-header">
+                <span class="metric-label">Storage Usage</span>
+                <span class="metric-value">{{ systemHealth.storage }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="systemHealth.storage" color="primary"></mat-progress-bar>
+            </div>
+            
+            <div class="health-metric">
+              <div class="metric-header">
+                <span class="metric-label">Network Load</span>
+                <span class="metric-value">{{ systemHealth.network }}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="systemHealth.network" color="warn"></mat-progress-bar>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  
+    <!-- Tasks and updates -->
+    <div class="admin-dashboard-grid">
+      <!-- Admin tasks -->
+      <div class="admin-tasks-section" @fadeIn>
+        <div class="section-title">
+          <h2>Pending Tasks</h2>
+          <div class="title-underline"></div>
+        </div>
+        
+        <mat-card class="tasks-card">
+          <mat-card-content>
+            <div class="task-list">
+              <div class="task-item" *ngFor="let task of adminTasks" [routerLink]="task.route" matRipple>
+                <div class="task-icon">
+                  <mat-icon>{{ task.icon }}</mat-icon>
+                </div>
+                <div class="task-content">
+                  <h3 class="task-title">{{ task.title }}</h3>
+                </div>
+                <div class="task-count">
+                  <span class="count-badge">{{ task.count }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <!-- Recent updates -->
+      <div class="recent-updates-section" @fadeIn>
+        <div class="section-title">
+          <h2>Recent Updates</h2>
+          <div class="title-underline"></div>
+        </div>
+        
+        <mat-card class="updates-card">
+          <mat-card-content>
+            <div class="updates-list">
+              <div class="update-item" *ngFor="let update of recentUpdates">
+                <div class="update-icon">
+                  <mat-icon>{{ update.icon }}</mat-icon>
+                </div>
+                <div class="update-content">
+                  <h3 class="update-title">{{ update.title }}</h3>
+                  <p class="update-date">{{ update.date }}</p>
+                  <p class="update-description">{{ update.description }}</p>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  
+    <!-- Call to action -->
+    <div class="cta-section" @fadeIn>
+      <mat-card class="cta-card">
+        <mat-card-content>
+          <h2 class="cta-title">Want to see the full data?</h2>
+          <p class="cta-description">View detailed reports and complete system graphs</p>
+          <div class="cta-actions">
+            <button mat-raised-button color="primary" routerLink="/reports" class="cta-button">
+              <mat-icon>bar_chart</mat-icon>
+              View Reports
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  

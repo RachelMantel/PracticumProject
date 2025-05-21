@@ -1,51 +1,13 @@
 <div class="users-container">
   <div class="header">
     <h1 class="page-title">Users Management</h1>
-  </div>
-  
-  <div class="users-grid">
-    @for(user of users$.value;track user.name){
-    <mat-card class="user-card"  (click)="viewUserDetails(user.id)">
-      <div class="user-content">
-        <div class="user-avatar">
-          <div class="avatar-circle">
-            {{ user.name.charAt(0) | uppercase }}
-          </div>
-        </div>
-        <div class="user-info">
-          <h3 class="user-name">{{ user.name }}</h3>
-          <p class="user-email">{{ user.email }}</p>
-        </div>
-      </div>
-      
-      <mat-divider></mat-divider>
-      
-      <div class="user-actions">
-        <button mat-icon-button color="primary" matTooltip="View Songs" (click)="viewUserSongs(user.id, $event)">
-          <mat-icon>music_note</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" matTooltip="Edit User" (click)="editUser(user.id, $event)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" matTooltip="Delete User" (click)="deleteUser(user.id, $event)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
-    </mat-card>
-  }
-  </div>
-</div>
-
-<!-- <div class="users-container">
-  <div class="header">
-    <h1 class="page-title">Users Management</h1>
-    <button mat-raised-button color="primary" class="add-button">
+    <button mat-raised-button color="primary" class="add-button" (click)="openAddUserModal()">
       <mat-icon>add</mat-icon> Add User
     </button>
   </div>
   
   <div class="users-grid">
-    @for(user of users$.value; track user.name) {
+    @for(user of users$.value; track user.id) {
       <mat-card class="user-card" (click)="viewUserDetails(user.id)">
         <div class="user-content">
           <div class="user-avatar">
@@ -62,17 +24,25 @@
         <mat-divider></mat-divider>
         
         <div class="user-actions">
-          <button mat-icon-button color="primary" matTooltip="View Songs" (click)="viewUserSongs(user.id, $event)">
+          <button 
+            mat-icon-button 
+            color="accent" 
+            matTooltip="View Songs" 
+            (click)="viewUserSongs(user.id, $event)"
+          >
             <mat-icon>music_note</mat-icon>
           </button>
-          <button mat-icon-button color="accent" matTooltip="Edit User" (click)="editUser(user.id, $event)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" matTooltip="Delete User" (click)="deleteUser(user.id, $event)">
-            <mat-icon>delete</mat-icon>
+          
+          <button 
+            mat-icon-button 
+            color="accent" 
+            matTooltip="View Details" 
+            (click)="viewUserDetails(user.id); $event.stopPropagation()"
+          >
+            <mat-icon>visibility</mat-icon>
           </button>
         </div>
       </mat-card>
     }
   </div>
-</div> -->
+</div>

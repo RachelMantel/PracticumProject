@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
     {
+        path: '',
+        loadComponent: () =>
+            import('./components/home-page/home-page.component').then(m => m.HomePageComponent) 
+    },
+    {
         path: 'login',
         loadComponent: () =>
             import('./components/login/login.component').then(m => m.LoginComponent) 
@@ -40,7 +45,11 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
             import('./components/graph-dashboard/graph-dashboard.component').then(m => m.GraphDashboardComponent) 
-      }
-
+      },
+      {
+        path: 'home',
+        loadComponent: () =>
+            import('./components/home-page/home-page.component').then(m => m.HomePageComponent) 
+      },
 
 ];
