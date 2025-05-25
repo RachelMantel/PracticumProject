@@ -84,31 +84,10 @@ export class UserSongsComponent implements OnInit {
   }
 
   playSong(song: Song): void {
-    console.log(song+"++++");
-    
+    console.log("Playing song+++++: " + JSON.stringify(song))
     this.songsService.playSong(song)
   }
 
-  downloadSong(filePath: string): void {
-    this.songsService.downloadSong(filePath).subscribe({
-      next: (response) => {
-        if (response && response.downloadUrl) {
-          const link = document.createElement("a")
-          link.href = response.downloadUrl
-          link.download = filePath.split("/").pop() || "song"
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        } else {
-          this.snackBar.open("Failed to get download URL", "Close", { duration: 3000 })
-        }
-      },
-      error: (error) => {
-        console.error("Error getting download URL:", error)
-        this.snackBar.open("Error downloading song", "Close", { duration: 3000 })
-      },
-    })
-  }
 
   deleteSong(songId: number): void {
     if (confirm("Are you sure you want to delete this song?")) {

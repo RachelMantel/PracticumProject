@@ -39,7 +39,7 @@ namespace TuneYourMood.Data.Repositories
         public async Task<List<SongEntity>> GetSongsByFolder(int folderId)
         {
             var folder = await _context.foldersList
-                .Include(f => f.Songs)  // טוען את השירים יחד עם התיקייה
+                .Include(f => f.Songs) 
                 .FirstOrDefaultAsync(f => f.Id == folderId);
 
             if (folder == null)
@@ -53,7 +53,7 @@ namespace TuneYourMood.Data.Repositories
         public void AddSongToFolder(int folderId, SongEntity songDto)
         {
             var folder = _context.foldersList
-                .Include(f => f.Songs) // חשוב מאוד – כדי שהקשר יטען!
+                .Include(f => f.Songs) 
                 .FirstOrDefault(f => f.Id == folderId);
 
             if (folder == null)
@@ -61,7 +61,6 @@ namespace TuneYourMood.Data.Repositories
                 throw new Exception("Folder not found");
             }
 
-            // ננסה למצוא את השיר הקיים במסד לפי מזהה
             var existingSong = _context.songsList.FirstOrDefault(s => s.Id == songDto.Id);
 
             if (existingSong == null)
@@ -69,10 +68,9 @@ namespace TuneYourMood.Data.Repositories
                 throw new Exception("Song not found");
             }
 
-            // נוודא שלא קיים כבר קשר בין השיר לתקייה
             if (folder.Songs.Any(s => s.Id == existingSong.Id))
             {
-                return; // כבר קיים, לא צריך להוסיף שוב
+                return; 
             }
 
             folder.Songs.Add(existingSong);

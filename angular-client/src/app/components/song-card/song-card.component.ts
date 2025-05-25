@@ -47,7 +47,6 @@ export class SongCardComponent implements OnInit, OnDestroy {
   @Output() play = new EventEmitter<Song>()
   @Output() delete = new EventEmitter<number>()
   @Output() edit = new EventEmitter<Song>()
-  @Output() download = new EventEmitter<string>()
 
   isEditing = false
   isPlaying = false
@@ -88,13 +87,16 @@ export class SongCardComponent implements OnInit, OnDestroy {
   }
 
   handlePlayClick(event: Event): void {
+    console.log("=====================");
+    console.log(this.song+"===");
+    
     event.stopPropagation()
     this.play.emit(this.song)
     try {
       this.songsService.playSong(this.song)
       // אין צורך להוסיף קוד כאן כי הסרוויס כבר מטפל בפתיחת המודל
     } catch (err) {
-      this.snackBar.open("שגיאה בהפעלת השיר", "סגור", { duration: 3000 })
+      this.snackBar.open("error..", "close", { duration: 3000 })
     }
   }
 
@@ -117,24 +119,6 @@ export class SongCardComponent implements OnInit, OnDestroy {
     this.delete.emit(this.song.id)
   }
 
-  handleDownloadClick(event: Event): void {
-    event.stopPropagation()
-
-    this.songsService.getDownloadUrl(this.song.filePath).subscribe({
-      next: (url: string) => {
-        const link = document.createElement("a")
-        link.href = url
-        link.setAttribute("download", this.song.filePath)
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      },
-      error: (err) => {
-        console.error("Failed to get download URL", err)
-        this.snackBar.open("ההורדה נכשלה", "סגור", { duration: 3000 })
-      },
-    })
-  }
 
   navigateToSongDetails(event: Event): void {
     if (!this.isEditing) {

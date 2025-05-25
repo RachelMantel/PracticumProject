@@ -4,10 +4,10 @@
       <mat-icon class="login-icon">headphones</mat-icon>
       <h1 class="login-title">AI Music</h1>
     </div>
-    
+
     <h2 class="login-subtitle">Admin Login</h2>
-    
-    <form (ngSubmit)="login()" #loginForm="ngForm">
+
+    <form (ngSubmit)="login()" #loginForm="ngForm" class="login-form">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Email</mat-label>
         <input 
@@ -15,11 +15,11 @@
           [(ngModel)]="user.UserNameOrEmail" 
           name="email" 
           type="email" 
-          required
+          required 
           placeholder="Enter your email">
         <mat-icon matPrefix>email</mat-icon>
       </mat-form-field>
-      
+
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Password</mat-label>
         <input 
@@ -27,43 +27,39 @@
           [(ngModel)]="user.password" 
           name="password" 
           [type]="hidePassword ? 'password' : 'text'" 
-          required
+          required 
           placeholder="Enter your password">
         <mat-icon matPrefix>lock</mat-icon>
-        <button 
-          type="button" 
-          mat-icon-button 
-          matSuffix 
-          (click)="hidePassword = !hidePassword">
+        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
           <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
       </mat-form-field>
-      
+
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Admin Secret Code</mat-label>
         <input 
           matInput 
           [(ngModel)]="user.adminSecretCode" 
           name="adminSecretCode" 
-          type="password"
-          required
+          type="password" 
+          required 
           placeholder="Enter admin secret code">
         <mat-icon matPrefix>admin_panel_settings</mat-icon>
       </mat-form-field>
-      
+
       <button 
         mat-raised-button 
         color="primary" 
         type="submit" 
-        class="login-button"
+        class="login-button" 
         [disabled]="isLoading || !loginForm.form.valid">
         <mat-icon>login</mat-icon>
-        {{isLoading ? 'Logging in...' : 'Login'}}
+        {{ isLoading ? 'Logging in...' : 'Login' }}
       </button>
     </form>
-    
+
     <mat-divider class="login-divider"></mat-divider>
-    
+
     <div class="register-prompt">
       <span>Don't have an account?</span>
       <button mat-button color="accent" (click)="navigateToRegister()">Register</button>

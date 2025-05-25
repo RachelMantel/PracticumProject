@@ -1,6 +1,21 @@
+"use client"
+
 import { useState } from "react"
-import {Box,Typography,Grid,Button,Paper,Container,Avatar,Divider,Accordion,AccordionSummary,AccordionDetails,
-  Card,CardContent,} from "@mui/material"
+import {
+  Box,
+  Typography,
+  Grid,
+  Button,
+  Paper,
+  Container,
+  Avatar,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Card,
+  CardContent,
+} from "@mui/material"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import {
@@ -189,22 +204,25 @@ const About = () => {
           </motion.div>
 
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <Grid container spacing={4} justifyContent="center">
+            <Grid container spacing={4} justifyContent="center" sx={{ alignItems: "stretch" }}>
               {/* About the Company */}
-              <Grid item xs={12} md={6}>
-                <motion.div variants={fadeIn}>
+              <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+                <motion.div variants={fadeIn} style={{ width: "100%", display: "flex" }}>
                   <Paper
                     elevation={3}
                     sx={{
                       p: 4,
                       borderRadius: "16px",
                       height: "100%",
+                      width: "100%",
                       background: "linear-gradient(145deg, #ffffff, #f5f5f5)",
                       position: "relative",
                       overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
-                    <Box sx={{ position: "relative", zIndex: 1 }}>
+                    <Box sx={{ position: "relative", zIndex: 1, flexGrow: 1 }}>
                       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                         <Avatar sx={{ bgcolor: "#E91E63", mr: 2 }}>
                           <People />
@@ -244,20 +262,23 @@ const About = () => {
               </Grid>
 
               {/* Vision and Goals */}
-              <Grid item xs={12} md={6}>
-                <motion.div variants={fadeIn}>
+              <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+                <motion.div variants={fadeIn} style={{ width: "100%", display: "flex" }}>
                   <Paper
                     elevation={3}
                     sx={{
                       p: 4,
                       borderRadius: "16px",
                       height: "100%",
+                      width: "100%",
                       background: "linear-gradient(145deg, #ffffff, #f5f5f5)",
                       position: "relative",
                       overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
-                    <Box sx={{ position: "relative", zIndex: 1 }}>
+                    <Box sx={{ position: "relative", zIndex: 1, flexGrow: 1 }}>
                       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                         <Avatar sx={{ bgcolor: "#E91E63", mr: 2 }}>
                           <Lightbulb />
@@ -323,9 +344,9 @@ const About = () => {
           </Typography>
         </motion.div>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={4} sx={{ alignItems: "stretch" }}>
           {features.map((feature, index) => (
-            <Grid item xs={12} md={4} key={index}>
+            <Grid item xs={12} md={4} key={index} sx={{ display: "flex" }}>
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -338,25 +359,31 @@ const About = () => {
                     transition: { delay: index * 0.2, duration: 0.5 },
                   },
                 }}
+                style={{ width: "100%", display: "flex" }}
               >
                 <Card
                   elevation={2}
                   sx={{
                     height: "100%",
+                    width: "100%",
                     borderRadius: "16px",
                     transition: "transform 0.3s, box-shadow 0.3s",
+                    display: "flex",
+                    flexDirection: "column",
                     "&:hover": {
                       transform: "translateY(-8px)",
                       boxShadow: "0 12px 20px rgba(0,0,0,0.1)",
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 4, textAlign: "center" }}>
+                  <CardContent
+                    sx={{ p: 4, textAlign: "center", flexGrow: 1, display: "flex", flexDirection: "column" }}
+                  >
                     <Box sx={{ mb: 2 }}>{feature.icon}</Box>
                     <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
                       {feature.title}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" sx={{ flexGrow: 1 }}>
                       {feature.description}
                     </Typography>
                   </CardContent>
@@ -391,9 +418,9 @@ const About = () => {
           </Typography>
         </motion.div>
 
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center" sx={{ alignItems: "stretch" }}>
           {teamMembers.map((member, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -406,6 +433,7 @@ const About = () => {
                     transition: { delay: index * 0.1, duration: 0.4 },
                   },
                 }}
+                style={{ width: "100%", display: "flex" }}
               >
                 <Paper
                   elevation={2}
@@ -414,6 +442,10 @@ const About = () => {
                     textAlign: "center",
                     borderRadius: "16px",
                     transition: "transform 0.3s",
+                    height: "100%",
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
                     "&:hover": {
                       transform: "translateY(-5px)",
                     },

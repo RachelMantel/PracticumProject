@@ -21,7 +21,7 @@ namespace TuneYourMood.Service
             var folders = await _repositoryManager._folderRepository.GetFullAsync();
             return _mapper.Map<List<FolderDto>>(folders);
         }
-
+        
         public async Task<FolderDto>? getByIdAsync(int id)
         {
             var folder = await _repositoryManager._folderRepository.GetByIdAsync(id);

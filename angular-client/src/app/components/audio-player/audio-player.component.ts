@@ -84,12 +84,10 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
       this.songsService.currentPlayingSong.subscribe((song) => {
         if (song) {
           this.currentSong = song
-          // פתיחת המודל כאשר יש שיר חדש
           this.isModalOpen = true
         }
       }),
 
-      // מאזין לאירוע פתיחת המודל
       this.songsService.shouldOpenModal.subscribe((shouldOpen) => {
         if (shouldOpen && this.currentSong) {
           this.isModalOpen = true
@@ -175,11 +173,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   closeModal(): void {
     // רק סוגרים את המודל, לא מאפסים את השיר הנוכחי
     this.isModalOpen = false
-    // לא מוחקים את currentSong כדי שנוכל לפתוח את המודל שוב
-    // this.currentSong = null  <-- זו הבעיה, מחקנו שורה זו
 
-    // עוצרים את השיר אבל לא מאפסים את המצב
-    this.songsService.pauseSong() // במקום stopSong
+    // לא עוצרים את השיר, רק משהים אותו
+    this.songsService.pauseSong()
   }
 
   // Helper method to get mood color for styling
@@ -194,6 +190,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
       case "sad":
         return "#64B5F6"
       case "energetic":
+      case "excited":
         return "#FF8A65"
       case "calm":
         return "#81C784"

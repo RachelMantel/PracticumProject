@@ -99,10 +99,6 @@
 
   <!-- Menu -->
   <mat-menu #menu="matMenu" xPosition="before" class="song-menu">
-    <button mat-menu-item (click)="handleDownloadClick($event)" [disabled]="isDownloading">
-      <mat-icon color="accent">{{ isDownloading ? 'hourglass_empty' : 'download' }}</mat-icon>
-      <span>{{ isDownloading ? 'Downloading...' : 'Download' }}</span>
-    </button>
 
     <button mat-menu-item (click)="handleEditClick()">
       <mat-icon color="accent">edit</mat-icon>

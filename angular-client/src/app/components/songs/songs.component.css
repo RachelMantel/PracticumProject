@@ -25,6 +25,9 @@
   font-weight: 600;
   margin: 2px;
   background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .actions {
@@ -35,29 +38,99 @@
 .actions button {
   background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
 }
 
+.actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+}
+
+/* 🔥 FULL WIDTH SONGS LIST - NO GRID */
 .songs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 24px;
 }
 
-@media (max-width: 600px) {
+/* Ensure each song card takes full width */
+.songs-grid app-song-card,
+.songs-grid .song-card {
+  width: 100% !important;
+  max-width: none !important;
+  flex: none !important;
+}
+
+/* Override any Material Design grid behavior */
+::ng-deep .songs-grid .mat-grid-list {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+::ng-deep .songs-grid .mat-grid-tile {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (max-width: 768px) {
+  .songs-container {
+    padding: 16px;
+  }
+  
   .header-container {
     flex-direction: column;
     align-items: flex-start;
   }
 
+  .header {
+    font-size: 24px;
+  }
+
   .actions {
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .actions button {
     flex: 1;
+    min-width: 120px;
   }
+}
 
-  .songs-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .songs-container {
+    padding: 12px;
+  }
+  
+  .header {
+    font-size: 20px;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .actions button {
+    width: 100%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .songs-container {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .header {
+    color: #ffffff;
   }
 }

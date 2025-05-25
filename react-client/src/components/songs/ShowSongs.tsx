@@ -1,14 +1,13 @@
-"use client"
-
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Stack, Typography, Box, Alert, CircularProgress } from "@mui/material"
+import { Stack, Typography, Box, Alert, CircularProgress, LinearProgress } from "@mui/material"
 import { motion, AnimatePresence } from "framer-motion"
 import SongCard from "./SongCard"
+import MusicPlayer from "./MusicPlayer"
 import type { SongType } from "../../models/songType"
 import type { AppDispatch } from "../redux/store"
 import { deleteSong, updateSong } from "../redux/SongSlice"
-import { addSongToFolder, deleteSongFromFolder } from "../redux/FolderSlice"
+import { addSongToFolder, deleteSongFromFolder, fetchUserFolders } from "../redux/FolderSlice"
 import { useLocation } from "react-router-dom"
 
 interface ShowSongsProps {
@@ -20,6 +19,7 @@ interface ShowSongsProps {
 const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const folders = useSelector((state: any) => state.folders.folders || [])
+  const foldersLoading = useSelector((state: any) => state.folders?.loading || false)
   const loading = useSelector((state: any) => state.songs?.loading || false)
   const error = useSelector((state: any) => state.songs?.error || null)
   const location = useLocation()
@@ -30,33 +30,44 @@ const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState(0)
 
-  // Determine if we're in a folder/playlist view
   const isInFolderView = Boolean(folderId) || location.pathname.includes("/my-playlists")
+
+  useEffect(() => {
+
+    if (!folders || folders.length === 0) {
+      dispatch(fetchUserFolders())
+    } else {
+    }
+  }, [dispatch, folders, foldersLoading])
+
 
   const handleMoveSong = useCallback(
     (song: SongType, targetFolderId: number) => {
+      console.log("🎵 Moving song to folder:", { songId: song.id, targetFolderId, availableFolders: folders.length })
+
       if (targetFolderId) {
         const updatedSong = { ...song, folderId: targetFolderId }
         dispatch(addSongToFolder({ folderId: targetFolderId, song: updatedSong }))
         showSuccessMessage("Song successfully added to playlist")
+
+        setTimeout(() => {
+          dispatch(fetchUserFolders())
+        }, 500)
       }
     },
-    [dispatch],
+    [dispatch, folders],
   )
 
   const handleDeleteSong = useCallback(
     (songId: number) => {
       if (isInFolderView && folderId) {
-        // Remove song from folder/playlist
         dispatch(deleteSongFromFolder({ folderId, songId }))
         showSuccessMessage("Song removed from playlist")
 
-        // Call the callback to notify parent component (FolderCard) that a song was removed
         if (onSongRemoved) {
           onSongRemoved(songId)
         }
       } else {
-        // Delete song completely
         dispatch(deleteSong(songId))
         showSuccessMessage("Song deleted successfully")
       }
@@ -65,10 +76,8 @@ const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
   )
 
   const handlePlaySong = useCallback((song: SongType) => {
-    // Close any currently playing song first
     setPlayingSong(null)
 
-    // Small delay to ensure clean state before opening new player
     setTimeout(() => {
       setPlayingSong(song)
     }, 50)
@@ -168,8 +177,35 @@ const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
     [showSuccessMessage, showErrorMessage],
   )
 
+  useEffect(() => {
+    console.log("📁 Folders state updated:", {
+      foldersCount: folders?.length || 0,
+      folders: folders,
+      loading: foldersLoading,
+    })
+  }, [folders, foldersLoading])
+
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
+      {foldersLoading && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 2,
+            p: 2,
+            bgcolor: "rgba(233, 30, 99, 0.1)",
+            borderRadius: 2,
+          }}
+        >
+          <CircularProgress size={16} sx={{ color: "#E91E63" }} />
+          <Typography variant="body2" color="#E91E63">
+            Loading playlists... ({folders?.length || 0} available)
+          </Typography>
+        </Box>
+      )}
+
       <AnimatePresence>
         {successMessage && (
           <motion.div
@@ -278,9 +314,5 @@ const ShowSongs = ({ songs, folderId, onSongRemoved }: ShowSongsProps) => {
     </Box>
   )
 }
-
-// Add missing import
-import { LinearProgress } from "@mui/material"
-import MusicPlayer from "./MusicPlayer"
 
 export default ShowSongs

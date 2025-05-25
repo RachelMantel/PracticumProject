@@ -23,7 +23,6 @@ namespace TuneYourMood.Core.Entities
         public string FilePath { get; set; }
         public string mood_category { get; set; }
         public int FolderId { get; set; } = -1;
-        //public List<FolderEntity> FolderIds { get; set; }
 
         public UserEntity User { get; set; }
         public SongEntity()

@@ -13,46 +13,168 @@
 
 .header {
   font-size: 24px;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 24px;
   color: #333;
   border-bottom: 2px solid rgba(233, 30, 99, 0.2);
   padding-bottom: 8px;
+  background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .no-songs {
-  background-color: rgba(0, 0, 0, 0.03);
-  border-radius: 12px;
-  padding: 32px;
+  background: linear-gradient(135deg, rgba(233, 30, 99, 0.05), rgba(255, 87, 34, 0.05));
+  border: 1px solid rgba(233, 30, 99, 0.1);
+  border-radius: 16px;
+  padding: 40px 32px;
   text-align: center;
   color: rgba(0, 0, 0, 0.6);
   font-size: 18px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
 }
 
+.no-songs::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #e91e63 0%, #ff5722 100%);
+}
+
+/* 🔥 FULL WIDTH SONGS LIST - NO GRID */
 .songs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
   margin-bottom: 32px;
+}
+
+/* Ensure each song card takes full width */
+.songs-grid app-song-card,
+.songs-grid .song-card {
+  width: 100% !important;
+  max-width: none !important;
+  flex: none !important;
+}
+
+/* Override any Material Design grid behavior */
+::ng-deep .songs-grid .mat-grid-list {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+::ng-deep .songs-grid .mat-grid-tile {
+  width: 100% !important;
+  max-width: none !important;
 }
 
 .actions {
   display: flex;
   gap: 16px;
   margin-top: 24px;
+  flex-wrap: wrap;
 }
 
 .actions button {
-  border-radius: 8px;
-  padding: 8px 16px;
+  padding: 10px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color:#ff5722;
 }
 
+
+
 @media (max-width: 768px) {
-  .songs-grid {
-    grid-template-columns: 1fr;
+  .user-songs-container {
+    padding: 16px;
+  }
+  
+  .header {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .no-songs {
+    padding: 32px 24px;
+    font-size: 16px;
   }
 
   .actions {
     flex-direction: column;
+    gap: 12px;
+  }
+  
+  .actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-songs-container {
+    padding: 12px;
+  }
+  
+  .header {
+    font-size: 18px;
+  }
+  
+  .no-songs {
+    padding: 24px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .user-songs-container {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .header {
+    color: #ffffff;
+    border-bottom-color: rgba(233, 30, 99, 0.3);
+  }
+  
+  .no-songs {
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(255, 87, 34, 0.1));
+    border-color: rgba(233, 30, 99, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .actions button.secondary {
+    color: #ff6b9d;
+    border-color: rgba(233, 30, 99, 0.4);
+  }
+  
+  .actions button.secondary:hover {
+    background: rgba(233, 30, 99, 0.2);
+    border-color: #ff6b9d;
+  }
+}
+
+/* Loading animation */
+.spinner-container .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(233, 30, 99, 0.1);
+  border-left-color: #e91e63;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

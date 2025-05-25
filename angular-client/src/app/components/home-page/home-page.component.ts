@@ -174,12 +174,14 @@ export class HomePageComponent implements OnInit {
 
   getGreeting(): string {
     const hour = this.currentDate.getHours()
-    if (hour < 12) {
+    if (hour < 12 && hour>5) {
       return "Good Morning"
-    } else if (hour < 18) {
+    } else if (hour > 12  && hour < 18) {
       return "Good Afternoon"
-    } else {
+    } else if (hour >18 && hour <20 ) {
       return "Good Evening"
+    } else {
+      return "Good night"
     }
   }
 
