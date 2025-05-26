@@ -1,101 +1,418 @@
+/* Container full-screen height, no scroll */
 .register-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Card slightly taller and well spaced */
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background accent */
+.register-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e91e63, #ff5722);
+}
+
+/* Header with logo */
+.register-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.register-icon {
+  padding-right: 10px;
+  padding-bottom: 10px;
+  font-size: 38px;
+  color: #e91e63;
+  margin-right: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.register-title {
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(90deg, #e91e63, #ff5722);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtitle */
+.register-subtitle {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 26px;
+  line-height: 1.4;
+}
+
+/* Form inputs */
+.full-width {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+/* Enhanced form field styling */
+::ng-deep .register-card .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .register-card .mat-mdc-text-field-wrapper {
+  border-radius: 12px;
+  background-color: rgba(233, 30, 99, 0.02);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .register-card .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
+  background-color: rgba(233, 30, 99, 0.05);
+}
+
+::ng-deep .register-card .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: rgba(233, 30, 99, 0.08);
+  box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.2);
+}
+
+/* Register button */
+.register-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #e91e63, #ff5722);
+  color: white;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.register-button:hover:not([disabled])::before {
+  left: 100%;
+}
+
+.register-button:hover:not([disabled]) {
+  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.35);
+  transform: translateY(-2px);
+}
+
+.register-button:active:not([disabled]) {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.25);
+}
+
+.register-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.register-button mat-icon {
+  margin-right: 8px;
+}
+
+/* Loading state */
+.register-button.loading {
+  pointer-events: none;
+}
+
+.register-button.loading mat-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divider and login prompt */
+.register-divider {
+  margin: 26px 0;
+  position: relative;
+}
+
+.register-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.2), transparent);
+}
+
+.login-prompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.login-prompt span {
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.login-prompt button {
+  color: #e91e63;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.login-prompt button:hover {
+  background-color: rgba(233, 30, 99, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Error and success messages */
+.message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.message.success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Password strength indicator */
+.password-strength {
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.strength-bar {
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.strength-fill.weak {
+  width: 33%;
+  background: linear-gradient(90deg, #f44336, #ff5722);
+}
+
+.strength-fill.medium {
+  width: 66%;
+  background: linear-gradient(90deg, #ff9800, #ffc107);
+}
+
+.strength-fill.strong {
+  width: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+}
+
+.strength-text {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.strength-text.weak {
+  color: #f44336;
+}
+
+.strength-text.medium {
+  color: #ff9800;
+}
+
+.strength-text.strong {
+  color: #4caf50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 16px;
+  }
+
   .register-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    background: white;
+    padding: 32px 24px;
+    max-width: 100%;
   }
-  
-  .register-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
-  }
-  
-  .register-icon {
-    font-size: 36px;
-    height: 36px;
-    width: 36px;
-    color: #e91e63;
-    margin-right: 12px;
-  }
-  
+
   .register-title {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0;
-    background: linear-gradient(90deg, #e91e63, #ff5722);
+    font-size: 26px;
   }
-  
+
   .register-subtitle {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 24px;
+    font-size: 18px;
+    margin-bottom: 20px;
   }
-  
+
+  .register-icon {
+    font-size: 32px;
+    margin-right: 8px;
+  }
+
   .full-width {
-    width: 100%;
     margin-bottom: 16px;
   }
-  
-  .register-button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    background: linear-gradient(90deg, #e91e63, #ff5722);
-    transition: all 0.3s ease;
-  }
-  
-  .register-button:hover:not([disabled]) {
-    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
-    transform: translateY(-2px);
-  }
-  
-  .register-button mat-icon {
-    margin-right: 8px;
-  }
-  
+
   .register-divider {
-    margin: 24px 0;
+    margin: 20px 0;
   }
-  
-  .login-prompt {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 16px;
+}
+
+@media (max-width: 360px) {
+  .register-card {
+    padding: 24px 20px;
   }
-  
+
+  .register-title {
+    font-size: 24px;
+  }
+
+  .register-subtitle {
+    font-size: 16px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .register-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+  }
+
+  .register-card {
+    background: #2d3748;
+    color: #ffffff;
+  }
+
+  .register-subtitle {
+    color: #e2e8f0;
+  }
+
   .login-prompt span {
-    color: rgba(0, 0, 0, 0.6);
-    margin-right: 8px;
+    color: rgba(255, 255, 255, 0.7);
   }
-  
-  @media (max-width: 480px) {
-    .register-card {
-      padding: 20px;
-    }
-  
-    .register-title {
-      font-size: 24px;
-    }
-  
-    .register-subtitle {
-      font-size: 18px;
-    }
+
+  .login-prompt button {
+    color: #ff6b9d;
   }
-  
+
+  .login-prompt button:hover {
+    background-color: rgba(255, 107, 157, 0.1);
+  }
+
+  ::ng-deep .register-card .mat-mdc-text-field-wrapper {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  ::ng-deep .register-card .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  ::ng-deep .register-card .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Accessibility improvements */
+.register-button:focus-visible {
+  outline: 2px solid #e91e63;
+  outline-offset: 2px;
+}
+
+.login-prompt button:focus-visible {
+  outline: 2px solid #e91e63;
+  outline-offset: 2px;
+}
+
+/* Animation for card entrance */
+.register-card {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

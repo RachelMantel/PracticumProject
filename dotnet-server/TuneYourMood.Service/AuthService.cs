@@ -11,6 +11,7 @@ using TuneYourMood.Core.InterfaceRepository;
 using TuneYourMood.Core.InterfaceService;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Google.Apis.Auth;
 
 namespace TuneYourMood.Service
 {
@@ -133,6 +134,90 @@ namespace TuneYourMood.Service
             };
 
             return Result<LoginResponseDto>.Success(response);
+        }
+
+        public async Task<Result<LoginResponseDto>> GoogleLogin(string googleToken)
+        {
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(googleToken, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] { _configuration["Google:ClientId"] }
+                });
+
+                var users = await _repositoryManager._userRepository.GetAsync();
+                var existingUser = users.FirstOrDefault(u => u.Email == payload.Email);
+
+                if (existingUser != null)
+                {
+                    var token = GenerateJwtToken(existingUser);
+
+                    var userDto = new UserDto
+                    {
+                        Id = existingUser.Id,
+                        Name = existingUser.Name,
+                        Email = existingUser.Email,
+                        Password = existingUser.Password,
+                        Roles = existingUser.Roles.Select(r => r.RoleName).ToList()
+                    };
+
+                    var response = new LoginResponseDto
+                    {
+                        User = userDto,
+                        Token = token
+                    };
+
+                    return Result<LoginResponseDto>.Success(response);
+                }
+                else
+                {
+                    var randomPassword = Guid.NewGuid().ToString("N")[..8]; 
+
+                    var newUser = new UserEntity
+                    {
+                        Name = payload.Name,
+                        Email = payload.Email,
+                        Password = randomPassword, 
+                        DateRegistration = DateTime.UtcNow,
+                        Roles = new List<RoleEntity> { new RoleEntity { RoleName = "User" } }
+                    };
+
+                    var result = await _repositoryManager._userRepository.AddAsync(newUser);
+                    if (result == null)
+                    {
+                        return Result<LoginResponseDto>.Failure("Failed to register user with Google.");
+                    }
+
+                    _repositoryManager.save();
+
+                    var token = GenerateJwtToken(newUser);
+
+                    var userDto = new UserDto
+                    {
+                        Id = newUser.Id,
+                        Name = newUser.Name,
+                        Email = newUser.Email,
+                        Password = newUser.Password,
+                        Roles = newUser.Roles.Select(r => r.RoleName).ToList()
+                    };
+
+                    var response = new LoginResponseDto
+                    {
+                        User = userDto,
+                        Token = token
+                    };
+
+                    return Result<LoginResponseDto>.Success(response);
+                }
+            }
+            catch (InvalidJwtException)
+            {
+                return Result<LoginResponseDto>.Failure("Invalid Google token.");
+            }
+            catch (Exception ex)
+            {
+                return Result<LoginResponseDto>.Failure($"Google authentication failed: {ex.Message}");
+            }
         }
     }
 }

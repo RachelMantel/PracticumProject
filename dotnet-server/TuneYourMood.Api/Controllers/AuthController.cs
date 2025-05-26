@@ -20,7 +20,6 @@ namespace TuneYourMood.Api.Controllers
         {
             const string secret = "Aa5040";
 
-            // אם הקוד נשלח, נבדוק שהוא תקין
             if (!string.IsNullOrWhiteSpace(model.AdminSecretCode) && model.AdminSecretCode != secret)
             {
                 return BadRequest("Invalid secret code");
@@ -63,6 +62,30 @@ namespace TuneYourMood.Api.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginModel model)
+        {
+            if (string.IsNullOrEmpty(model.GoogleToken))
+            {
+                return BadRequest("Google token is required.");
+            }
+
+            var result = await _authService.GoogleLogin(model.GoogleToken);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+
+            return Unauthorized(result.ErrorMessage);
+        }
+
+
+    }
+
+    public class GoogleLoginModel
+    {
+        public string GoogleToken { get; set; }
     }
 
     public class LoginModel

@@ -81,7 +81,6 @@ export class SongsComponent implements OnInit, OnDestroy {
   }
 
   playSong(song: Song): void {
-    console.log("Playing song----: " + JSON.stringify(song))
     this.songsService.playSong(song)
   }
 

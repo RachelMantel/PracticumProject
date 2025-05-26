@@ -1,3 +1,4 @@
+// redux/AuthSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { UserType } from "../../models/userType";
@@ -6,7 +7,7 @@ import { UserType } from "../../models/userType";
 const API_URL ="https://tuneyourmood-server.onrender.com/api/Auth"
 // const API_URL = "https://localhost:7238/api/Auth";
 
-// Validate email format
+
 const validateEmail = (email: string) => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailPattern.test(email);
@@ -63,12 +64,27 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const googleLogin = createAsyncThunk(
+  "auth/googleLogin",
+  async (googleToken: string, thunkAPI) => {
+    try {
+      const response = await axios.post(`${API_URL}/google-login`, { googleToken });
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      return { token, user };
+    } catch (e: any) {
+      return thunkAPI.rejectWithValue(e.response?.data || "Google login failed");
+    }
+  }
+);
+
 export const logout = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
 });
 
-// 🎯 Auth Slice
 const AuthSlice = createSlice({
   name: "auth",
   initialState,
@@ -101,6 +117,19 @@ const AuthSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(googleLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(logout.fulfilled, (state) => {
         state.token = null;
         state.user = null;
@@ -109,4 +138,3 @@ const AuthSlice = createSlice({
 });
 
 export default AuthSlice;
-

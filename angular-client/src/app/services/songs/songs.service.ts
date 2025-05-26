@@ -16,9 +16,8 @@ export class SongsService {
   private isBrowser: boolean
   private isAudioLoaded = false
   private retryCount = 0
-  private maxRetries = 1 // הפחתנו את מספר הניסיונות ל-1 בלבד
+  private maxRetries = 1 
 
-  // Audio player state
   private _isPlaying = new BehaviorSubject<boolean>(false)
   private _currentTime = new BehaviorSubject<number>(0)
   private _duration = new BehaviorSubject<number>(0)
@@ -47,29 +46,24 @@ export class SongsService {
     })
 
     this.audioPlayer.addEventListener("play", () => {
-      console.log("SongsService - Audio play event")
       this._isPlaying.next(true)
     })
 
     this.audioPlayer.addEventListener("pause", () => {
-      console.log("SongsService - Audio pause event")
       this._isPlaying.next(false)
     })
 
     this.audioPlayer.addEventListener("ended", () => {
-      console.log("SongsService - Audio ended event")
       this._isPlaying.next(false)
       this._currentTime.next(0)
     })
 
     this.audioPlayer.addEventListener("loadeddata", () => {
       this.isAudioLoaded = true
-      console.log("SongsService - Audio loaded successfully")
     })
 
     this.audioPlayer.addEventListener("canplay", () => {
       this.isAudioLoaded = true
-      console.log("SongsService - Audio can play now")
     })
 
     this.audioPlayer.addEventListener("error", (e) => {
@@ -79,7 +73,6 @@ export class SongsService {
       // אם יש שגיאה בטעינת האודיו, ננסה שוב פעם אחת בלבד
       if (this.retryCount < this.maxRetries && this._currentPlayingSong.value) {
         this.retryCount++
-        console.log(`SongsService - Retrying playback (attempt ${this.retryCount})...`)
         setTimeout(() => {
           this.retryPlayback()
         }, 1000)
@@ -96,7 +89,6 @@ export class SongsService {
     if (!this.isBrowser || !this.audioPlayer || !this._currentPlayingSong.value) return
 
     const song = this._currentPlayingSong.value
-    console.log("SongsService - Retrying playback for:", song.songName)
 
     try {
       this.audioPlayer.src = song.filePath
@@ -186,14 +178,11 @@ export class SongsService {
 
   playSong(songOrPath: Song | string): void {
 
-    console.log("SongsService - playSong called with:", songOrPath)
-
     if (!this.isBrowser || !this.audioPlayer) {
       console.error("SongsService - Browser or audio player not available")
       return
     }
 
-    // איפוס מונה הניסיונות בכל פעם שמנגנים שיר חדש
     this.retryCount = 0
     this.isAudioLoaded = false
 
@@ -227,11 +216,9 @@ export class SongsService {
     const isSameSong = currentSong && currentSong.filePath === filePath
 
     if (isSameSong && this._isPlaying.value) {
-      console.log("SongsService - Same song already playing, pausing")
       this.pauseSong()
       return
     } else if (isSameSong && !this._isPlaying.value) {
-      console.log("SongsService - Same song paused, resuming")
       this.resumeSong()
       this._shouldOpenModal.next(true)
       return
@@ -247,7 +234,6 @@ export class SongsService {
       setTimeout(() => {
         if (!this.audioPlayer) return
 
-        console.log("SongsService - Attempting to play audio")
         this.audioPlayer.play().catch((error) => {
           console.error("SongsService - Error playing audio:", error)
         })
@@ -258,13 +244,11 @@ export class SongsService {
   }
 
   pauseSong(): void {
-    console.log("SongsService - pauseSong called")
     if (!this.isBrowser || !this.audioPlayer) return
     this.audioPlayer.pause()
   }
 
   resumeSong(): void {
-    console.log("SongsService - resumeSong called")
     if (!this.isBrowser || !this.audioPlayer) return
 
     this._shouldOpenModal.next(true)
@@ -276,7 +260,6 @@ export class SongsService {
 
   
   stopSong(): void {
-    console.log("SongsService - stopSong called")
     if (!this.isBrowser || !this.audioPlayer) return
     this.audioPlayer.pause()
     this.audioPlayer.currentTime = 0
@@ -284,13 +267,11 @@ export class SongsService {
   }
 
   seekTo(time: number): void {
-    console.log("SongsService - seekTo called with time:", time)
     if (!this.isBrowser || !this.audioPlayer || !this.audioPlayer.src) return
     this.audioPlayer.currentTime = time
   }
 
   setVolume(volume: number): void {
-    console.log("SongsService - setVolume called with volume:", volume)
     if (!this.isBrowser || !this.audioPlayer) return
     const newVolume = Math.max(0, Math.min(1, volume))
     this.audioPlayer.volume = newVolume
@@ -298,7 +279,6 @@ export class SongsService {
   }
 
   openPlayerModal(): void {
-    console.log("SongsService - openPlayerModal called")
     if (this._currentPlayingSong.value) {
       this._shouldOpenModal.next(true)
     }

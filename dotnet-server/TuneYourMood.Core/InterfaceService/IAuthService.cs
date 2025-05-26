@@ -14,5 +14,7 @@ namespace TuneYourMood.Core.InterfaceService
         bool ValidateUser(string usernameOrEmail, string password, out string[] roles, out UserEntity user);
         Result<LoginResponseDto> Login(string usernameOrEmail, string password);
         Task<Result<LoginResponseDto>> Register(UserDto userDto);
+       Task<Result<LoginResponseDto>> GoogleLogin(string googleToken);
+
     }
 }
