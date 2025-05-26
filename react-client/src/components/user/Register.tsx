@@ -1,13 +1,14 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { AppDispatch, StoreType } from "../redux/store"
-import { registerUser } from "../redux/AuthSlice"
+import { googleLogin, registerUser } from "../redux/AuthSlice"
 import { useNavigate } from "react-router-dom"
 import {
   TextField, Button, Box, Typography, Paper, IconButton, CircularProgress, Divider, InputAdornment
 } from "@mui/material"
 import { Close, Email, Lock, Headphones, MusicNote, QueueMusic, Album, Visibility, VisibilityOff } from "@mui/icons-material"
 import { motion } from "framer-motion"
+import GoogleLogin from "./GoogleLogin"
 
 const Register = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -46,6 +47,17 @@ const Register = () => {
     }
   }
 
+    const handleGoogleSuccess = async (token: string) => {
+      const result = await dispatch(googleLogin(token))
+      if (googleLogin.fulfilled.match(result)) {
+        navigate("/home")
+      }
+    }
+  
+    const handleGoogleError = (error: string) => {
+      console.error('Google login error:', error)
+    }
+    
   const noteVariants = {
     animate: (i: number) => ({
       y: [0, -10, 0],
@@ -133,6 +145,21 @@ const Register = () => {
             </Button>
           </form>
 
+          {/* 🆕 Divider */}
+          <Box sx={{ display: 'flex', alignItems: 'center', my: 3 }}>
+            <Divider sx={{ flex: 1 }} />
+            <Typography variant="body2" sx={{ mx: 2, color: 'text.secondary' }}>
+              OR
+            </Typography>
+            <Divider sx={{ flex: 1 }} />
+          </Box>
+          
+          {/* 🆕 Google Login Button */}
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            loading={loading}
+          />
           <Divider sx={{ my: 3, borderColor: "#E91E63" }} />
 
           <Typography variant="body2" color="text.secondary">
