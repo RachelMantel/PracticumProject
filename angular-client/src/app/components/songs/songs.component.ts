@@ -26,30 +26,7 @@ import type { Subscription } from "rxjs"
     MatProgressSpinnerModule,
     SongCardComponent,
   ],
-  template: `
-    @if(loading) {
-      <div class="spinner-container">
-        <mat-spinner color="accent"></mat-spinner>
-      </div>
-    } @else {
-      <div class="songs-container">
-        <div class="header-container">
-          <h2 class="header">All Songs</h2>
-        </div>
-        
-        <div class="songs-grid">
-          @for(song of songs; track song.id) {
-            <app-song-card
-              [song]="song"
-              (play)="playSong($event)"
-              (delete)="deleteSong($event)"
-              (edit)="updateSong($event)">
-            </app-song-card>
-          }
-        </div>
-      </div>
-    }
-  `,
+  templateUrl: "./songs.component.html",
   styleUrls: ["./songs.component.css"],
 })
 export class SongsComponent implements OnInit, OnDestroy {
@@ -83,6 +60,7 @@ export class SongsComponent implements OnInit, OnDestroy {
         this.snackBar.open("Error loading songs", "Close", { duration: 3000 })
       },
     })
+    console.log(sub);    
     this.subscriptions.push(sub)
   }
 
@@ -102,10 +80,8 @@ export class SongsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // בדיוק אותה פונקציה כמו ב-UserSongsComponent!
   playSong(song: Song): void {
-    console.log("Playing song: " + JSON.stringify(song))
-    // פשוט קורא ישירות לשירות בלי getDownloadUrl
+    console.log("Playing song----: " + JSON.stringify(song))
     this.songsService.playSong(song)
   }
 

@@ -88,7 +88,7 @@ export class SongCardComponent implements OnInit, OnDestroy {
 
   handlePlayClick(event: Event): void {
     console.log("=====================");
-    console.log(this.song+"===");
+    console.log(JSON.stringify(this.song, null, 2));
     
     event.stopPropagation()
     this.play.emit(this.song)

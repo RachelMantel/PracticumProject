@@ -176,11 +176,16 @@ export class SongsService {
     return this.http.get<string>(`/api/songs/download-url?fileName=${encodeURIComponent(fileName)}`)
   }
 
+  getDownloadUrl1(song: Song): Observable<string> {
+    return this.http.post<string>(`https://your-api-url/songs/download-url`, song)
+  }
+
   private getFileNameFromPath(path: string): string {
     return path.split("/").pop() || "song.mp3"
   }
 
   playSong(songOrPath: Song | string): void {
+
     console.log("SongsService - playSong called with:", songOrPath)
 
     if (!this.isBrowser || !this.audioPlayer) {
@@ -212,44 +217,33 @@ export class SongsService {
       filePath = song.filePath
     }
 
-    console.log("SongsService - Playing song:", song)
-    console.log("SongsService - File path:", filePath)
 
-    // בדיקה שנתיב הקובץ תקין
     if (!filePath || filePath.trim() === "") {
       console.error("SongsService - Invalid file path")
       return
     }
 
-    // בדיקה אם זה אותו שיר שכבר מנגן
     const currentSong = this._currentPlayingSong.value
     const isSameSong = currentSong && currentSong.filePath === filePath
 
     if (isSameSong && this._isPlaying.value) {
-      // אם זה אותו שיר וכבר מנגן, נעצור אותו
       console.log("SongsService - Same song already playing, pausing")
       this.pauseSong()
       return
     } else if (isSameSong && !this._isPlaying.value) {
-      // אם זה אותו שיר אבל הוא מושהה, נמשיך את הנגינה
       console.log("SongsService - Same song paused, resuming")
       this.resumeSong()
-      // פתיחת המודל גם כאשר ממשיכים נגינה של שיר קיים
       this._shouldOpenModal.next(true)
       return
     }
 
-    // עדכון השיר הנוכחי
     this._currentPlayingSong.next(song)
-    // פתיחת המודל בכל פעם שמנגנים שיר
     this._shouldOpenModal.next(true)
 
     try {
-      // הגדרת מקור חדש ונגינה
       this.audioPlayer.src = filePath
       this.audioPlayer.load()
 
-      // השהייה קצרה לפני הנגינה
       setTimeout(() => {
         if (!this.audioPlayer) return
 
@@ -273,7 +267,6 @@ export class SongsService {
     console.log("SongsService - resumeSong called")
     if (!this.isBrowser || !this.audioPlayer) return
 
-    // פתיחת המודל גם כאשר ממשיכים נגינה
     this._shouldOpenModal.next(true)
 
     this.audioPlayer.play().catch((error) => {
@@ -281,6 +274,7 @@ export class SongsService {
     })
   }
 
+  
   stopSong(): void {
     console.log("SongsService - stopSong called")
     if (!this.isBrowser || !this.audioPlayer) return

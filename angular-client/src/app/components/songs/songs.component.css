@@ -52,7 +52,6 @@
   box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
 }
 
-/* 🔥 FULL WIDTH SONGS LIST - NO GRID */
 .songs-grid {
   display: flex;
   flex-direction: column;

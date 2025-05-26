@@ -20,6 +20,13 @@ namespace TuneYourMood.Service
         {
             var songs = await _repositoryManager._songRepository.GetFullAsync();
             var songsDtos = _mapper.Map<List<SongDto>>(songs);
+
+            foreach (var songDto in songsDtos)
+            {
+                songDto.FilePath = await _repositoryManager._songRepository.GetSongUrlAsync(songId: songDto.Id);
+
+            }
+
             return songsDtos;
         }
 
