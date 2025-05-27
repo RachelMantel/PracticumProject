@@ -1,23 +1,15 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Box, Container, Grid, Typography, Button, IconButton, Stack } from "@mui/material"
-import {
-  Email,
-  Phone,
-  LocationOn,
-  GitHub,
-  LinkedIn,
-  Twitter,
-  Instagram,
-  KeyboardArrowUp,
-  Favorite,
-  Headphones,
-} from "@mui/icons-material"
-import { motion } from "framer-motion"
+import { Box, Container, Typography, IconButton, Stack, useMediaQuery, useTheme } from "@mui/material"
+import { GitHub, LinkedIn, Twitter, Instagram, KeyboardArrowUp, Favorite, Headphones } from "@mui/icons-material"
 
 const Footer = () => {
   const [isScrollToTopVisible, setIsScrollToTopVisible] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(0)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const currentYear = new Date().getFullYear()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -32,32 +24,102 @@ const Footer = () => {
     return () => window.removeEventListener("scroll", toggleVisibility)
   }, [])
 
+  useEffect(() => {
+    const detectSidebar = () => {
+      const possibleSelectors = [
+        ".MuiDrawer-root .MuiPaper-root",
+        '[role="navigation"]',
+        ".sidebar",
+        ".navigation",
+        ".nav-sidebar",
+        ".side-nav",
+        "nav.sidebar",
+        ".drawer",
+        ".menu-sidebar",
+      ]
+
+      let detectedWidth = 0
+      let isOpen = false
+
+      for (const selector of possibleSelectors) {
+        const element = document.querySelector(selector)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const computedStyle = window.getComputedStyle(element)
+
+          if (
+            rect.width > 0 &&
+            computedStyle.display !== "none" &&
+            computedStyle.visibility !== "hidden" &&
+            rect.left < window.innerWidth
+          ) {
+            detectedWidth = Math.max(detectedWidth, rect.width)
+            isOpen = true
+          }
+        }
+      }
+
+      const allElements = document.querySelectorAll("*")
+      allElements.forEach((el) => {
+        const style = window.getComputedStyle(el)
+        const rect = el.getBoundingClientRect()
+
+        if (
+          (style.position === "fixed" || style.position === "absolute") &&
+          rect.left <= 10 &&
+          rect.width > 200 &&
+          rect.height > window.innerHeight * 0.5 &&
+          rect.top <= 100
+        ) {
+          detectedWidth = Math.max(detectedWidth, rect.width)
+          isOpen = true
+        }
+      })
+
+      if (!isMobile) {
+        setSidebarWidth(detectedWidth)
+        setIsSidebarOpen(isOpen)
+      } else {
+        setSidebarWidth(0)
+        setIsSidebarOpen(false)
+      }
+    }
+
+    detectSidebar()
+
+    const observer = new MutationObserver(() => {
+      setTimeout(detectSidebar, 100)
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "style", "aria-hidden", "data-state"],
+    })
+
+    const handleResize = () => {
+      setTimeout(detectSidebar, 100)
+    }
+    window.addEventListener("resize", handleResize)
+
+    const handleRouteChange = () => {
+      setTimeout(detectSidebar, 200)
+    }
+    window.addEventListener("popstate", handleRouteChange)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("popstate", handleRouteChange)
+    }
+  }, [isMobile])
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     })
-  }
-
-  const footerLinks = {
-    product: [
-      { name: "Features", href: "#features" },
-      { name: "Music Player", href: "#player" },
-      { name: "Mood Analysis", href: "#mood" },
-      { name: "API", href: "#api" },
-    ],
-    company: [
-      { name: "About Us", href: "#about" },
-      { name: "Our Team", href: "#team" },
-      { name: "Blog", href: "#blog" },
-      { name: "Careers", href: "#careers" },
-    ],
-    support: [
-      { name: "Help Center", href: "#help" },
-      { name: "Contact", href: "#contact" },
-      { name: "FAQ", href: "#faq" },
-      { name: "Community", href: "#community" },
-    ],
   }
 
   const socialLinks = [
@@ -67,286 +129,179 @@ const Footer = () => {
     { name: "Instagram", icon: <Instagram />, href: "https://instagram.com", color: "#E4405F" },
   ]
 
+  const footerStyles = {
+    position: "relative" as const,
+    zIndex: 1,
+    marginLeft: isMobile ? 0 : isSidebarOpen ? `${sidebarWidth}px` : 0,
+    width: isMobile ? "100%" : isSidebarOpen ? `calc(100% - ${sidebarWidth}px)` : "100%",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    background: "linear-gradient(90deg, #FFFFFF 0%, #F8F9FA 100%)",
+    borderTop: "1px solid #E5E7EB",
+    color: "#374151",
+    mt: 2, // Reduced from 8
+    overflow: "hidden",
+  }
+
   return (
     <>
-      {/* Main Footer */}
-      <Box
-        component="footer"
-        sx={{
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%)",
-          color: "#121212",
-          mt: 8, // Added top margin
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Top Border */}
+      {/* Compact Footer */}
+      <Box component="footer" sx={footerStyles}>
+        {/* Top accent line */}
         <Box
           sx={{
-            height: "4px",
+            height: "2px", // Reduced from 4px
             background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
           }}
         />
 
-        {/* Main Footer Content */}
-        <Container maxWidth="lg" sx={{ py: 6 }}>
-          <Grid container spacing={4}>
-            {/* Brand Section */}
-            <Grid item xs={12} md={4}>
+        {/* Single row footer content */}
+        <Container
+          maxWidth={false}
+          sx={{
+            maxWidth: isSidebarOpen && !isMobile ? `calc(1200px - ${sidebarWidth * 0.5}px)` : "1200px",
+            py: 2, // Reduced from 6
+            px: { xs: 2, sm: 3, md: 4 },
+            mx: "auto",
+          }}
+        >
+          <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems="center" spacing={2}>
+            {/* Brand */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Box
-                component={motion.div}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+                sx={{
+                  background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
+                  p: 0.8, // Reduced padding
+                  borderRadius: "8px", // Smaller radius
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                  <Box
-                    sx={{
-                      background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
-                      p: 1.5,
-                      borderRadius: "12px",
-                      mr: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Headphones sx={{ fontSize: 28, color: "white" }} />
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    fontWeight={700}
-                    sx={{
-                      background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    TuneYourMood
-                  </Typography>
-                </Box>
-
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-                  Transform your music experience with AI-powered mood analysis and intelligent recommendations.
-                </Typography>
-
-                {/* Contact Info */}
-                <Stack spacing={1.5}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Email sx={{ fontSize: 18, color: "#E91E63" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      contact@tuneyourmood.com
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Phone sx={{ fontSize: 18, color: "#E91E63" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      +972 52-718-5040
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <LocationOn sx={{ fontSize: 18, color: "#E91E63" }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Tel Aviv, Israel
-                    </Typography>
-                  </Box>
-                </Stack>
+                <Headphones sx={{ fontSize: 20, color: "white" }} /> {/* Smaller icon */}
               </Box>
-            </Grid>
+              <Typography
+                variant="h6"
+                fontWeight={600}
+                sx={{
+                  background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  fontSize: { xs: "1rem", md: "1.1rem" }, // Smaller font
+                }}
+              >
+                TuneYourMood
+              </Typography>
+            </Box>
 
-            {/* Links Sections */}
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={3}>
-                {/* Product Links */}
-                <Grid item xs={4} md={4}>
-                  <Typography
-                    variant="h6"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{
-                      color: "#E91E63",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    Product
-                  </Typography>
-                  <Stack spacing={1}>
-                    {footerLinks.product.map((link) => (
-                      <Button
-                        key={link.name}
-                        href={link.href}
-                        sx={{
-                          color: "text.secondary",
-                          justifyContent: "flex-start",
-                          p: 0.5,
-                          fontSize: "0.875rem",
-                          "&:hover": {
-                            color: "#E91E63",
-                            backgroundColor: "rgba(233,30,99,0.05)",
-                          },
-                        }}
-                      >
-                        {link.name}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Grid>
+            {/* Quick Links */}
+            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
+              <Typography
+                component="a"
+                href="#features"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  textDecoration: "none",
+                  fontSize: "0.875rem",
+                  "&:hover": {
+                    color: "#E91E63",
+                  },
+                }}
+              >
+                Features
+              </Typography>
+              <Typography
+                component="a"
+                href="#about"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  textDecoration: "none",
+                  fontSize: "0.875rem",
+                  "&:hover": {
+                    color: "#E91E63",
+                  },
+                }}
+              >
+                About
+              </Typography>
+              <Typography
+                component="a"
+                href="#contact"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  textDecoration: "none",
+                  fontSize: "0.875rem",
+                  "&:hover": {
+                    color: "#E91E63",
+                  },
+                }}
+              >
+                Contact
+              </Typography>
+            </Stack>
 
-                {/* Company Links */}
-                <Grid item xs={4} md={4}>
-                  <Typography
-                    variant="h6"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{
-                      color: "#E91E63",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    Company
-                  </Typography>
-                  <Stack spacing={1}>
-                    {footerLinks.company.map((link) => (
-                      <Button
-                        key={link.name}
-                        href={link.href}
-                        sx={{
-                          color: "text.secondary",
-                          justifyContent: "flex-start",
-                          p: 0.5,
-                          fontSize: "0.875rem",
-                          "&:hover": {
-                            color: "#E91E63",
-                            backgroundColor: "rgba(233,30,99,0.05)",
-                          },
-                        }}
-                      >
-                        {link.name}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Grid>
-
-                {/* Support Links */}
-                <Grid item xs={4} md={4}>
-                  <Typography
-                    variant="h6"
-                    fontWeight={600}
-                    gutterBottom
-                    sx={{
-                      color: "#E91E63",
-                      fontSize: "1rem",
-                    }}
-                  >
-                    Support
-                  </Typography>
-                  <Stack spacing={1}>
-                    {footerLinks.support.map((link) => (
-                      <Button
-                        key={link.name}
-                        href={link.href}
-                        sx={{
-                          color: "text.secondary",
-                          justifyContent: "flex-start",
-                          p: 0.5,
-                          fontSize: "0.875rem",
-                          "&:hover": {
-                            color: "#E91E63",
-                            backgroundColor: "rgba(233,30,99,0.05)",
-                          },
-                        }}
-                      >
-                        {link.name}
-                      </Button>
-                    ))}
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Container>
-
-        {/* Bottom Bar */}
-        <Box sx={{ bgcolor: "#F5F5F5", py: 3 }}>
-          <Container maxWidth="lg">
-            <Grid container spacing={2} alignItems="center">
-              {/* Copyright */}
-              <Grid item xs={12} md={4}>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    justifyContent: { xs: "center", md: "flex-start" },
-                  }}
-                >
-                  © {currentYear} TuneYourMood. Made with
-                  <Favorite sx={{ fontSize: 14, color: "#E91E63" }} />
-                  in Tel Aviv
-                </Typography>
-              </Grid>
-
+            {/* Right section */}
+            <Stack direction="row" alignItems="center" spacing={2}>
               {/* Social Links */}
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
-                  {socialLinks.map((social) => (
-                    <IconButton
-                      key={social.name}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      size="small"
-                      sx={{
-                        color: "text.secondary",
-                        "&:hover": {
-                          color: social.color,
-                          backgroundColor: `${social.color}10`,
-                          transform: "translateY(-2px)",
-                        },
-                        transition: "all 0.3s ease",
-                      }}
-                    >
-                      {social.icon}
-                    </IconButton>
-                  ))}
-                </Box>
-              </Grid>
-
-              {/* Status */}
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: { xs: "center", md: "flex-end" },
-                    gap: 1,
-                  }}
-                >
-                  <Box
+              <Stack direction="row" spacing={0.5}>
+                {socialLinks.map((social) => (
+                  <IconButton
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    size="small"
                     sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#4CAF50",
-                      animation: "pulse 2s infinite",
-                      "@keyframes pulse": {
-                        "0%": { opacity: 1 },
-                        "50%": { opacity: 0.5 },
-                        "100%": { opacity: 1 },
+                      color: "text.secondary",
+                      width: 32, // Smaller buttons
+                      height: 32,
+                      "&:hover": {
+                        color: social.color,
+                        backgroundColor: `${social.color}10`,
                       },
+                      transition: "all 0.2s ease",
                     }}
-                  />
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
-                    All systems operational
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Container>
-        </Box>
+                  >
+                    {social.icon}
+                  </IconButton>
+                ))}
+              </Stack>
+
+              {/* Copyright */}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontSize: "0.75rem", // Smaller font
+                  display: { xs: "none", sm: "flex" },
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+              >
+                © {currentYear}
+                <Favorite sx={{ fontSize: 12, color: "#E91E63" }} />
+                Tel Aviv
+              </Typography>
+            </Stack>
+          </Stack>
+
+          {/* Mobile copyright */}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              fontSize: "0.75rem",
+              textAlign: "center",
+              mt: 1,
+              display: { xs: "block", sm: "none" },
+            }}
+          >
+            © {currentYear} TuneYourMood • Made with <Favorite sx={{ fontSize: 12, color: "#E91E63", mx: 0.5 }} /> in
+            Tel Aviv
+          </Typography>
+        </Container>
       </Box>
 
       {/* Scroll to Top Button */}
@@ -354,9 +309,10 @@ const Footer = () => {
         <Box
           sx={{
             position: "fixed",
-            bottom: 32,
-            right: 32,
-            zIndex: 1000,
+            bottom: 20, // Reduced from 32
+            right: 20, // Reduced from 32
+            zIndex: 9999,
+            transition: "all 0.3s ease",
           }}
         >
           <IconButton
@@ -364,18 +320,18 @@ const Footer = () => {
             sx={{
               background: "linear-gradient(90deg, #E91E63 0%, #FF5722 100%)",
               color: "white",
-              width: 48,
-              height: 48,
-              boxShadow: "0 4px 15px rgba(233, 30, 99, 0.3)",
+              width: 40, // Smaller button
+              height: 40,
+              boxShadow: "0 2px 8px rgba(233, 30, 99, 0.3)", // Reduced shadow
               "&:hover": {
                 background: "linear-gradient(90deg, #D81B60 0%, #F4511E 100%)",
-                boxShadow: "0 6px 20px rgba(233, 30, 99, 0.4)",
-                transform: "translateY(-2px)",
+                boxShadow: "0 4px 12px rgba(233, 30, 99, 0.4)",
+                transform: "translateY(-1px)", // Reduced movement
               },
               transition: "all 0.3s ease",
             }}
           >
-            <KeyboardArrowUp />
+            <KeyboardArrowUp sx={{ fontSize: 20 }} /> {/* Smaller icon */}
           </IconButton>
         </Box>
       )}
